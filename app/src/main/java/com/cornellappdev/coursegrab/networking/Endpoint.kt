@@ -13,7 +13,7 @@ enum class EndpointMethod {
 
 class Endpoint(private val path: String, private val headers: Map<String, String> = mapOf(), private val body: RequestBody? = null, private val method: EndpointMethod) {
 
-    private val host = "https://" + BuildConfig.BACKEND_URI + "/api/"
+    private val host = "https://" + BuildConfig.BACKEND_URI + "/api"
 
     companion object
 
@@ -25,7 +25,7 @@ class Endpoint(private val path: String, private val headers: Map<String, String
             EndpointMethod.POST -> {
                 return Request.Builder()
                     .url(endpoint)
-                    .post(body.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull()))
+                    .post(body!!)
                     .headers(headers)
                     .build()
             }
