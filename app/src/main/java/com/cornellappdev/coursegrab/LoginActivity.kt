@@ -2,7 +2,6 @@ package com.cornellappdev.coursegrab
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.UserSession
@@ -34,24 +33,30 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        if (preferencesHelper.expiresAt > System.currentTimeMillis() / 1000L){
+        if (preferencesHelper.expiresAt > System.currentTimeMillis() / 1000L) {
             val intent = Intent(this@LoginActivity, MainActivity::class.java)
             startActivity(intent)
-        }else{
+        } else {
             if (preferencesHelper.updateToken != null)
-            try {
-                val updateSession = Endpoint.updateSession(preferencesHelper.updateToken.toString())
+                try {
+                    val updateSession =
+                        Endpoint.updateSession(preferencesHelper.updateToken.toString())
 
-                CoroutineScope(Dispatchers.Main).launch {
-                    val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
-                    val userSession = withContext(Dispatchers.IO) { Request.makeRequest<ApiResponse<UserSession>>(updateSession.okHttpRequest(), typeToken) }!!.data
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
+                        val userSession = withContext(Dispatchers.IO) {
+                            Request.makeRequest<ApiResponse<UserSession>>(
+                                updateSession.okHttpRequest(),
+                                typeToken
+                            )
+                        }!!.data
 
-                    verifySession(userSession)
+                        verifySession(userSession)
+                    }
+
+                } catch (e: ApiException) {
+                    e.printStackTrace()
                 }
-
-            } catch (e: ApiException) {
-                e.printStackTrace()
-            }
         }
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -69,17 +74,11 @@ class LoginActivity : AppCompatActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    private fun signOut() {
-        // Google sign out
-        googleSignInClient.signOut().addOnCompleteListener(this) {
-            // ...
-        }
-    }
-
-    private fun verifySession(userSession: UserSession){
+    private fun verifySession(userSession: UserSession) {
         if (userSession.session_expiration.isNullOrEmpty() ||
             userSession.session_token.isNullOrEmpty() ||
-            userSession.update_token.isNullOrEmpty()){
+            userSession.update_token.isNullOrEmpty()
+        ) {
             Snackbar.make(login_rootView, "Login Failed, Please Try Again", Snackbar.LENGTH_LONG)
             return
         }
@@ -105,7 +104,12 @@ class LoginActivity : AppCompatActivity() {
 
                 CoroutineScope(Dispatchers.Main).launch {
                     val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
-                    val userSession = withContext(Dispatchers.IO) { Request.makeRequest<ApiResponse<UserSession>>(initializeSession.okHttpRequest(), typeToken) }!!.data
+                    val userSession = withContext(Dispatchers.IO) {
+                        Request.makeRequest<ApiResponse<UserSession>>(
+                            initializeSession.okHttpRequest(),
+                            typeToken
+                        )
+                    }!!.data
 
                     verifySession(userSession)
                 }

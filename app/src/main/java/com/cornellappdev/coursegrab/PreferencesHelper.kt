@@ -25,9 +25,28 @@ class PreferencesHelper(context: Context) {
             field = preferences.getLong(EXPIRES_AT, 0L)
         }
 
+    var email_alert_setting = preferences.getBoolean(EMAIL_ALERTS, true)
+        set(value) {
+            preferences.edit().putBoolean(EMAIL_ALERTS, value).apply()
+            field = preferences.getBoolean(EMAIL_ALERTS, true)
+        }
+
+    var mobile_alert_setting = preferences.getBoolean(MOBILE_ALERTS, true)
+        set(value) {
+            preferences.edit().putBoolean(MOBILE_ALERTS, value).apply()
+            field = preferences.getBoolean(MOBILE_ALERTS, true)
+        }
+
+    fun clearAll() {
+        preferences.edit().clear().commit();
+    }
+
     companion object {
         private const val SESSION_TOKEN = "data.source.prefs.SESSION_TOKEN"
         private const val UPDATE_TOKEN = "data.source.prefs.UPDATE_TOKEN"
         private const val EXPIRES_AT = "data.source.prefs.EXPIRES_AT"
+
+        private const val EMAIL_ALERTS = "data.source.prefs.EMAIL_ALERTS"
+        private const val MOBILE_ALERTS = "data.source.prefs.MOBILE_ALERTS"
     }
 }

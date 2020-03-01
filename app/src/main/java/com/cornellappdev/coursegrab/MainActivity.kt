@@ -1,5 +1,6 @@
 package com.cornellappdev.coursegrab
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var awaitingRecyclerView: RecyclerView
     private lateinit var awaitingViewAdapter: RecyclerView.Adapter<*>
     private lateinit var awaitingViewManager: RecyclerView.LayoutManager
+
+    private val preferencesHelper: PreferencesHelper by lazy {
+        PreferencesHelper(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +74,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         awaiting_title.text = "${awaiting_list.adapter?.itemCount} Awaiting"
+
+        settings_btn.setOnClickListener {
+            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     class AvailableAdapter(private val availableCourses: List<Course>) :
