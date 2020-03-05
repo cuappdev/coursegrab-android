@@ -8,10 +8,23 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isEmpty
+import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
+import com.cornellappdev.coursegrab.models.UserSession
+import com.cornellappdev.coursegrab.networking.Endpoint
+import com.cornellappdev.coursegrab.networking.Request
+import com.cornellappdev.coursegrab.networking.getTracking
+import com.cornellappdev.coursegrab.networking.initializeSession
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     private lateinit var availableRecyclerView: RecyclerView
@@ -29,33 +42,31 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val tCourse0 = Course(
-            10032, 1998, "LEC 606 / M 7:30PM", "OPEN",
-            "CS", "Intro to Android"
-        )
-        val tCourse1 = Course(
-            12401, 3110, "DIS 212 / TR 12:20pm - 1:10pm",
-            "OPEN", "CS", "Data Structures and Functional Programming"
-        )
-        val templateList = listOf(tCourse0, tCourse1)
+        var listOpen = mutableListOf<Course>()
+        var listAwaiting = mutableListOf<Course>()
 
-        val tCourse2 = Course(
-            17982, 4021, "LEC 001 / MW 2:55pm - 4:10pm",
-            "CLOSED", "LAW", "Competition Law and Policy"
-        )
-        val tCourse3 = Course(
-            4959, 2701, "STU 501 / MW 1:25pm - 4:25pm", "CLOSED",
-            "ART", "Digital Media: Introduction to Digital Media"
-        )
-        val tCourse4 = Course(
-            11373, 3152, "DIS 201 / TR 11:15am - 12:05pm",
-            "CLOSED", "CS", "Introduction to Computer Game Architecture"
-        )
-        val templateListAwaiting = listOf(tCourse2, tCourse3, tCourse4)
+        val getTracking = Endpoint.getTracking(preferencesHelper.sessionToken.toString())
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<List<Course>>>() {}.type
+            val courseList = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<List<Course>>>(
+                    getTracking.okHttpRequest(),
+                    typeToken
+                )
+            }!!.data
+
+            for (course in courseList){
+                if (course.status == "OPEN")
+                    listOpen.add(course)
+                else
+                    listAwaiting.add(course)
+            }
+        }
 
         // Available Courses Adapter
         availableViewManager = LinearLayoutManager(this)
-        availableViewAdapter = AvailableAdapter(templateList)
+        availableViewAdapter = AvailableAdapter(listOpen)
 
         availableRecyclerView = findViewById<RecyclerView>(R.id.available_list).apply {
             layoutManager = availableViewManager
@@ -64,9 +75,10 @@ class MainActivity : AppCompatActivity() {
 
         available_title.text = "${available_list.adapter?.itemCount} Available"
 
+
         // Awaiting Courses Adapter
         awaitingViewManager = LinearLayoutManager(this)
-        awaitingViewAdapter = AwaitingAdapter(templateListAwaiting)
+        awaitingViewAdapter = AwaitingAdapter(listAwaiting)
 
         awaitingRecyclerView = findViewById<RecyclerView>(R.id.awaiting_list).apply {
             layoutManager = awaitingViewManager
@@ -74,6 +86,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         awaiting_title.text = "${awaiting_list.adapter?.itemCount} Awaiting"
+
+        layout_available.visibility = if (listOpen.isNotEmpty()) View.VISIBLE else View.GONE
+        layout_awaiting.visibility = if (listAwaiting.isNotEmpty()) View.VISIBLE else View.GONE
+
+        no_courses_view.visibility = if (listOpen.isEmpty() && listAwaiting.isEmpty()) View.VISIBLE else View.GONE
 
         settings_btn.setOnClickListener {
             val intent = Intent(this@MainActivity, SettingsActivity::class.java)

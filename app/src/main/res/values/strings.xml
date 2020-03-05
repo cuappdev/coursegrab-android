@@ -6,4 +6,13 @@
     <string name="mobile_alerts">Mobile Alerts</string>
 
     <string name="sign_out">Sign Out</string>
+
+    <string name="notification_title">A course is now open!</string>
+    <string name="default_notification_channel_id">coursegrab_alert</string>
+
+    <string name="no_courses_alert">No Courses Currently Tracked</string>
+    <string name="no_courses_alert_subtext">
+        Enter an ID below to start tracking\n
+        Find course IDs using the roster above
+    </string>
 </resources>

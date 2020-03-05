@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_settings.*
 import kotlin.system.exitProcess
 
@@ -35,6 +36,7 @@ class SettingsActivity : AppCompatActivity() {
 
         mobile_alerts_switch.setOnCheckedChangeListener { _, isChecked ->
             preferencesHelper.mobile_alert_setting = isChecked
+            FirebaseMessaging.getInstance().isAutoInitEnabled = isChecked
         }
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
