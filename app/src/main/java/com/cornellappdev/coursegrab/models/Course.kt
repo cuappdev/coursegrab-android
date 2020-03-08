@@ -11,5 +11,5 @@ data class Course(
     val status: String,
     val subject_code: String,
     val title: String,
-    val errors: String?
+    val errors: Array<String>?
 ) : Parcelable

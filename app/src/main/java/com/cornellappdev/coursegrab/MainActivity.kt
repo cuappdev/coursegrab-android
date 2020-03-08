@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             if (!response!!.success)
                 Toast.makeText(
                     this@MainActivity,
-                    response.data.errors.toString(),
+                    response.data.errors!![0],
                     Toast.LENGTH_SHORT
                 ).show()
         }
@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             if (!response!!.success)
                 Toast.makeText(
                     this@MainActivity,
-                    response.data.errors.toString(),
+                    response.data.errors!![0],
                     Toast.LENGTH_SHORT
                 ).show()
         }
