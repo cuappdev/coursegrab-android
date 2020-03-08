@@ -1,24 +1,25 @@
 package com.cornellappdev.coursegrab
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isEmpty
-import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
-import com.cornellappdev.coursegrab.models.UserSession
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.getTracking
-import com.cornellappdev.coursegrab.networking.initializeSession
+import com.cornellappdev.coursegrab.networking.*
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +43,33 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        refreshAwaiting()
+
+        settings_btn.setOnClickListener {
+            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
+        addCourseButton.setOnClickListener {
+            addCourse(addCourseEditText.text.toString().toInt())
+            addCourseEditText.clearFocus()
+            addCourseEditText.text.clear()
+            val inputMethodManager =
+                getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+
+        addCourseEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                addCourseButton.isEnabled = (s!!.length > 3)
+            }
+        })
+    }
+
+    private fun refreshAwaiting() {
         var listOpen = mutableListOf<Course>()
         var listAwaiting = mutableListOf<Course>()
 
@@ -56,49 +84,89 @@ class MainActivity : AppCompatActivity() {
                 )
             }!!.data
 
-            for (course in courseList){
+            for (course in courseList) {
                 if (course.status == "OPEN")
                     listOpen.add(course)
                 else
                     listAwaiting.add(course)
             }
-        }
 
-        // Available Courses Adapter
-        availableViewManager = LinearLayoutManager(this)
-        availableViewAdapter = AvailableAdapter(listOpen)
+            // Available Courses Adapter
+            availableViewManager = LinearLayoutManager(this@MainActivity)
+            availableViewAdapter = AvailableAdapter(listOpen, this@MainActivity)
 
-        availableRecyclerView = findViewById<RecyclerView>(R.id.available_list).apply {
-            layoutManager = availableViewManager
-            adapter = availableViewAdapter
-        }
+            availableRecyclerView = findViewById<RecyclerView>(R.id.available_list).apply {
+                layoutManager = availableViewManager
+                adapter = availableViewAdapter
+            }
+            available_title.text = "${available_list.adapter?.itemCount} Available"
 
-        available_title.text = "${available_list.adapter?.itemCount} Available"
+            // Awaiting Courses Adapter
+            awaitingViewManager = LinearLayoutManager(this@MainActivity)
+            awaitingViewAdapter = AwaitingAdapter(listAwaiting, this@MainActivity)
 
+            awaitingRecyclerView = findViewById<RecyclerView>(R.id.awaiting_list).apply {
+                layoutManager = awaitingViewManager
+                adapter = awaitingViewAdapter
+            }
+            awaiting_title.text = "${awaiting_list.adapter?.itemCount} Awaiting"
 
-        // Awaiting Courses Adapter
-        awaitingViewManager = LinearLayoutManager(this)
-        awaitingViewAdapter = AwaitingAdapter(listAwaiting)
+            layout_available.visibility = if (listOpen.isNotEmpty()) View.VISIBLE else View.GONE
+            layout_awaiting.visibility = if (listAwaiting.isNotEmpty()) View.VISIBLE else View.GONE
 
-        awaitingRecyclerView = findViewById<RecyclerView>(R.id.awaiting_list).apply {
-            layoutManager = awaitingViewManager
-            adapter = awaitingViewAdapter
-        }
-
-        awaiting_title.text = "${awaiting_list.adapter?.itemCount} Awaiting"
-
-        layout_available.visibility = if (listOpen.isNotEmpty()) View.VISIBLE else View.GONE
-        layout_awaiting.visibility = if (listAwaiting.isNotEmpty()) View.VISIBLE else View.GONE
-
-        no_courses_view.visibility = if (listOpen.isEmpty() && listAwaiting.isEmpty()) View.VISIBLE else View.GONE
-
-        settings_btn.setOnClickListener {
-            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
-            startActivity(intent)
+            no_courses_view.visibility =
+                if (listOpen.isEmpty() && listAwaiting.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
-    class AvailableAdapter(private val availableCourses: List<Course>) :
+    private fun addCourse(courseId: Int) {
+        val addTracking = Endpoint.addTracking(preferencesHelper.sessionToken.toString(), courseId)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
+            val response = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<Course>>(
+                    addTracking.okHttpRequest(),
+                    typeToken
+                )
+            }
+
+            refreshAwaiting()
+
+            if (!response!!.success)
+                Toast.makeText(
+                    this@MainActivity,
+                    response.data.errors.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+        }
+    }
+
+    private fun removeCourse(courseId: Int) {
+        val removeTracking =
+            Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
+            val response = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<Course>>(
+                    removeTracking.okHttpRequest(),
+                    typeToken
+                )
+            }
+
+            refreshAwaiting()
+
+            if (!response!!.success)
+                Toast.makeText(
+                    this@MainActivity,
+                    response.data.errors.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+        }
+    }
+
+    class AvailableAdapter(private val availableCourses: List<Course>, private val context: Context) :
         RecyclerView.Adapter<AvailableAdapter.ViewHolder>() {
 
         class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -107,17 +175,17 @@ class MainActivity : AppCompatActivity() {
             val courseStatus: ImageView
             val courseTime: TextView
             val coursePin: TextView
+            val removeButton: Button
 
             init {
                 courseTitle = itemView.findViewById(R.id.course_title)
                 courseStatus = itemView.findViewById(R.id.course_status)
                 courseTime = itemView.findViewById(R.id.course_time)
                 coursePin = itemView.findViewById(R.id.course_pin)
+                removeButton = itemView.findViewById(R.id.button_remove)
             }
 
-            override fun onClick(view: View) {
-
-            }
+            override fun onClick(view: View) {}
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -132,13 +200,19 @@ class MainActivity : AppCompatActivity() {
             holder.courseTime.text = availableCourses[position].section
             holder.coursePin.text = availableCourses[position].catalog_num.toString()
             holder.courseStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
+
+            holder.removeButton.setOnClickListener {
+                (context as MainActivity).removeCourse(
+                    availableCourses[position].catalog_num
+                )
+            }
         }
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = availableCourses.size
     }
 
-    class AwaitingAdapter(private val awaitingCourses: List<Course>) :
+    class AwaitingAdapter(private val awaitingCourses: List<Course>, private val context: Context) :
         RecyclerView.Adapter<AwaitingAdapter.ViewHolder>() {
 
         class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -147,12 +221,15 @@ class MainActivity : AppCompatActivity() {
             val courseStatus: ImageView
             val courseTime: TextView
             val coursePin: TextView
+            val removeButton: Button
 
             init {
                 courseTitle = itemView.findViewById(R.id.course_title)
                 courseStatus = itemView.findViewById(R.id.course_status)
                 courseTime = itemView.findViewById(R.id.course_time)
                 coursePin = itemView.findViewById(R.id.course_pin)
+
+                removeButton = itemView.findViewById(R.id.button_remove)
             }
 
             override fun onClick(view: View) {
@@ -172,6 +249,12 @@ class MainActivity : AppCompatActivity() {
             holder.courseTime.text = awaitingCourses[position].section
             holder.coursePin.text = awaitingCourses[position].catalog_num.toString()
             holder.courseStatus.setImageResource(if (awaitingCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
+
+            holder.removeButton.setOnClickListener {
+                (context as MainActivity).removeCourse(
+                    awaitingCourses[position].catalog_num
+                )
+            }
         }
 
         // Return the size of your dataset (invoked by the layout manager)
