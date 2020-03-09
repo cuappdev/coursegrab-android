@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="removalRed">#CA4238</color>
+    <color name="lightTextColor">#9EA7B3</color>
+    <color name="darkEnough">#202020</color>
+    <color name="white">#FFF</color>
+    <color name="black">#000</color>
 </resources>

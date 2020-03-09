@@ -23,3 +23,34 @@ fun Endpoint.Companion.updateSession(updateToken: String): Endpoint {
     val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
     return Endpoint(path = "/session/update/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
 }
+
+fun Endpoint.Companion.getTracking(accessToken: String): Endpoint {
+    val codeJSON = JSONObject()
+    val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
+    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(path = "/users/tracking/", headers = authHeaders, body = requestBody, method = EndpointMethod.GET)
+}
+
+fun Endpoint.Companion.addTracking(accessToken: String, courseId: Int): Endpoint {
+    val codeJSON = JSONObject()
+    try {
+        codeJSON.put("course_id", courseId)
+    } catch (e: JSONException) {
+        e.printStackTrace()
+    }
+    val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
+    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(path = "/sections/track/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+}
+
+fun Endpoint.Companion.removeTracking(accessToken: String, courseId: Int): Endpoint {
+    val codeJSON = JSONObject()
+    try {
+        codeJSON.put("course_id", courseId)
+    } catch (e: JSONException) {
+        e.printStackTrace()
+    }
+    val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
+    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(path = "/sections/untrack/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+}
