@@ -31,6 +31,18 @@ fun Endpoint.Companion.getTracking(accessToken: String): Endpoint {
     return Endpoint(path = "/users/tracking/", headers = authHeaders, body = requestBody, method = EndpointMethod.GET)
 }
 
+fun Endpoint.Companion.searchCourses(accessToken: String, query: String): Endpoint {
+    val codeJSON = JSONObject()
+    try {
+        codeJSON.put("query", query)
+    } catch (e: JSONException) {
+        e.printStackTrace()
+    }
+    val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
+    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(path = "/courses/search/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+}
+
 fun Endpoint.Companion.addTracking(accessToken: String, courseId: Int): Endpoint {
     val codeJSON = JSONObject()
     try {
@@ -53,4 +65,28 @@ fun Endpoint.Companion.removeTracking(accessToken: String, courseId: Int): Endpo
     val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
     val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
     return Endpoint(path = "/sections/untrack/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+}
+
+fun Endpoint.Companion.deviceToken(accessToken: String, deviceToken: String): Endpoint {
+    val codeJSON = JSONObject()
+    try {
+        codeJSON.put("device_token", deviceToken)
+    } catch (e: JSONException) {
+        e.printStackTrace()
+    }
+    val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
+    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(path = "/users/device-token/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+}
+
+fun Endpoint.Companion.setNotification(accessToken: String, notifSetting: String): Endpoint {
+    val codeJSON = JSONObject()
+    try {
+        codeJSON.put("notification", notifSetting)
+    } catch (e: JSONException) {
+        e.printStackTrace()
+    }
+    val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
+    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(path = "/users/notification/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
 }

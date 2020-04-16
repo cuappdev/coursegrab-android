@@ -5,16 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.cornellappdev.coursegrab.models.ApiResponse
+import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.UserSession
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.initializeSession
-import com.cornellappdev.coursegrab.networking.updateSession
+import com.cornellappdev.coursegrab.networking.*
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.gson.reflect.TypeToken
@@ -75,16 +72,26 @@ class LoginActivity : AppCompatActivity() {
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
 
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("FailedToken", "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
-                }
-                // Get new Instance ID token
-                val token = task.result?.token
-            })
+    private fun sendRegistrationToServer(token: String?) {
+        val sendDeviceToken = Endpoint.deviceToken(
+            preferencesHelper.sessionToken.toString(),
+            token.toString()
+        )
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
+            val response = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<Course>>(
+                    sendDeviceToken.okHttpRequest(),
+                    typeToken
+                )
+            }
+
+            if (response!!.success)
+                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
+        }
     }
 
     private fun verifySession(userSession: UserSession) {
@@ -99,6 +106,10 @@ class LoginActivity : AppCompatActivity() {
         preferencesHelper.sessionToken = userSession.session_token
         preferencesHelper.updateToken = userSession.update_token
         preferencesHelper.expiresAt = userSession.session_expiration.toLong()
+
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
+            sendRegistrationToServer(instanceIdResult.token)
+        }
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         startActivity(intent)

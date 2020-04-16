@@ -81,7 +81,7 @@
                     android:paddingTop="16dp"
                     android:paddingBottom="10dp"
                     android:text="0 Available"
-                    android:textColor="@android:color/holo_green_light"
+                    android:textColor="@color/greenTextColor"
                     android:textSize="24sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -131,11 +131,11 @@
 
                 <ImageView
                     android:id="@+id/no_courses_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="250dp"
-                    android:scaleX="5"
-                    android:scaleY="5"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_marginTop="210dp"
+                    android:scaleX="1"
+                    android:scaleY="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -145,7 +145,7 @@
                     android:id="@+id/no_courses_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="55dp"
+                    android:layout_marginTop="25dp"
                     android:text="@string/no_courses_alert"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"

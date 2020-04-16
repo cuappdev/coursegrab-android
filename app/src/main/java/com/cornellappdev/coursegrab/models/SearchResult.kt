@@ -4,12 +4,9 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Course(
-    val catalog_num: Int,
-    val course_num: Int,
-    val section: String,
-    val status: String,
+data class SearchResult(
     val subject_code: String,
+    val course_num: Int,
     val title: String,
-    val errors: List<String>?
+    val sections: List<Section>
 ) : Parcelable

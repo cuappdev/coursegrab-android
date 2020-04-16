@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,6 +52,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        search_btn.setOnClickListener {
+            val intent = Intent(this@MainActivity, SearchActivity::class.java)
+            startActivity(intent)
+        }
+
         addCourseButton.setOnClickListener {
             addCourse(addCourseEditText.text.toString().toInt())
             addCourseEditText.clearFocus()
@@ -66,6 +72,19 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 addCourseButton.isEnabled = (s!!.length > 3)
             }
+        })
+
+        addCourseEditText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                addCourse(addCourseEditText.text.toString().toInt())
+                addCourseEditText.clearFocus()
+                addCourseEditText.text.clear()
+                val inputMethodManager =
+                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+                return@OnKeyListener true
+            }
+            false
         })
     }
 
@@ -166,7 +185,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    class AvailableAdapter(private val availableCourses: List<Course>, private val context: Context) :
+    class AvailableAdapter(
+        private val availableCourses: List<Course>,
+        private val context: Context
+    ) :
         RecyclerView.Adapter<AvailableAdapter.ViewHolder>() {
 
         class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
