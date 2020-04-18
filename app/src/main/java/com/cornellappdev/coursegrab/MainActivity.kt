@@ -3,6 +3,7 @@ package com.cornellappdev.coursegrab
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -47,6 +48,10 @@ class MainActivity : AppCompatActivity() {
 
         refreshAwaiting()
 
+        refresh_courses_layout.setOnRefreshListener {
+            refreshAwaiting()
+        }
+
         settings_btn.setOnClickListener {
             val intent = Intent(this@MainActivity, SettingsActivity::class.java)
             startActivity(intent)
@@ -58,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         addCourseButton.setOnClickListener {
-            addCourse(addCourseEditText.text.toString().toInt())
+            addCourse(addCourseEditText.text.toString().toInt(), this)
             addCourseEditText.clearFocus()
             addCourseEditText.text.clear()
             val inputMethodManager =
@@ -76,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
         addCourseEditText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                addCourse(addCourseEditText.text.toString().toInt())
+                addCourse(addCourseEditText.text.toString().toInt(), this)
                 addCourseEditText.clearFocus()
                 addCourseEditText.text.clear()
                 val inputMethodManager =
@@ -87,6 +92,14 @@ class MainActivity : AppCompatActivity() {
             false
         })
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        refreshAwaiting()
+    }
+
+    override fun onBackPressed() { }
 
     private fun refreshAwaiting() {
         var listOpen = mutableListOf<Course>()
@@ -135,10 +148,12 @@ class MainActivity : AppCompatActivity() {
 
             no_courses_view.visibility =
                 if (listOpen.isEmpty() && listAwaiting.isEmpty()) View.VISIBLE else View.GONE
+
+            refresh_courses_layout.isRefreshing = false
         }
     }
 
-    private fun addCourse(courseId: Int) {
+    private fun addCourse(courseId: Int, context: Context) {
         val addTracking = Endpoint.addTracking(preferencesHelper.sessionToken.toString(), courseId)
 
         CoroutineScope(Dispatchers.Main).launch {
@@ -154,14 +169,14 @@ class MainActivity : AppCompatActivity() {
 
             if (!response!!.success)
                 Toast.makeText(
-                    this@MainActivity,
+                    context,
                     response.data.errors!![0],
                     Toast.LENGTH_SHORT
                 ).show()
         }
     }
 
-    private fun removeCourse(courseId: Int) {
+    private fun removeCourse(courseId: Int, context: Context) {
         val removeTracking =
             Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
 
@@ -178,11 +193,17 @@ class MainActivity : AppCompatActivity() {
 
             if (!response!!.success)
                 Toast.makeText(
-                    this@MainActivity,
+                    context,
                     response.data.errors!![0],
                     Toast.LENGTH_SHORT
                 ).show()
         }
+    }
+
+    private fun enrollCourse(courseId: Int, context: Context) {
+        val browserIntent =
+            Intent(Intent.ACTION_VIEW, Uri.parse("http://studentcenter.cornell.edu"))
+        startActivity(browserIntent)
     }
 
     class AvailableAdapter(
@@ -197,6 +218,7 @@ class MainActivity : AppCompatActivity() {
             val courseStatus: ImageView
             val courseTime: TextView
             val coursePin: TextView
+            val enrollButton: Button
             val removeButton: Button
 
             init {
@@ -204,6 +226,7 @@ class MainActivity : AppCompatActivity() {
                 courseStatus = itemView.findViewById(R.id.course_status)
                 courseTime = itemView.findViewById(R.id.course_time)
                 coursePin = itemView.findViewById(R.id.course_pin)
+                enrollButton = itemView.findViewById(R.id.button_enroll)
                 removeButton = itemView.findViewById(R.id.button_remove)
             }
 
@@ -225,7 +248,13 @@ class MainActivity : AppCompatActivity() {
 
             holder.removeButton.setOnClickListener {
                 (context as MainActivity).removeCourse(
-                    availableCourses[position].catalog_num
+                    availableCourses[position].catalog_num, context
+                )
+            }
+
+            holder.enrollButton.setOnClickListener {
+                (context as MainActivity).enrollCourse(
+                    availableCourses[position].catalog_num, context
                 )
             }
         }
@@ -274,7 +303,7 @@ class MainActivity : AppCompatActivity() {
 
             holder.removeButton.setOnClickListener {
                 (context as MainActivity).removeCourse(
-                    awaitingCourses[position].catalog_num
+                    awaitingCourses[position].catalog_num, context
                 )
             }
         }

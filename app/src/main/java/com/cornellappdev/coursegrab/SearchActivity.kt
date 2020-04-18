@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
-import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
@@ -82,7 +81,10 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    class ResultsAdapter(private val resultsCourses: List<SearchResult>, private val context: Context) :
+    class ResultsAdapter(
+        private val resultsCourses: List<SearchResult>,
+        private val context: Context
+    ) :
         RecyclerView.Adapter<ResultsAdapter.ViewHolder>() {
 
         class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),

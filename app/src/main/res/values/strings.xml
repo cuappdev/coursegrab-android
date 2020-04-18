@@ -6,6 +6,8 @@
     <string name="email_alerts">Email Alerts</string>
     <string name="mobile_alerts">Mobile Alerts</string>
 
+    <string name="class_roster">Class Roster</string>
+    <string name="cornell_academic_calendar">Cornell Academic Calendar</string>
     <string name="sign_out">Sign Out</string>
 
     <string name="welcome">Welcome to</string>
@@ -37,7 +39,7 @@
     <string name="no_results_alert_subtext_try_another">
         Try a different query
     </string>
-    
+
     <string name="available_now">Available Now</string>
     <string name="course_id">Course ID</string>
     <string name="open_student_center">Open Student Center</string>

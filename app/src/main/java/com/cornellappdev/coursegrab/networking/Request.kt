@@ -20,7 +20,7 @@ object Request {
         val response = httpClient.newCall(request).await()
         val responseBody = response.body
         val responseBodyString = responseBody?.string() ?: ""
-//        Log.d("NETWORK RESPONSE", responseBodyString)
+        Log.d("NETWORK RESPONSE", responseBodyString)
 
         // Invalid Session Token, should automatically refresh and then retry the request
         if (response.code == 401) {

@@ -1,19 +1,17 @@
 package com.cornellappdev.coursegrab
 
-import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.deviceToken
 import com.cornellappdev.coursegrab.networking.setNotification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -61,6 +59,18 @@ class SettingsActivity : AppCompatActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
+        class_roster.setOnClickListener {
+            val browserIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://classes.cornell.edu/"))
+            startActivity(browserIntent)
+        }
+
+        cornell_academic_calendar.setOnClickListener {
+            val browserIntent =
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://registrar.cornell.edu/academic-calendar"))
+            startActivity(browserIntent)
+        }
+
         sign_out.setOnClickListener {
             preferencesHelper.clearAll();
             signOut()
@@ -69,8 +79,9 @@ class SettingsActivity : AppCompatActivity() {
         back_btn.setOnClickListener { finish() }
     }
 
-    private fun setNotificationsStatus(enabled : Boolean){
-        val setNotifs = Endpoint.setNotification(preferencesHelper.sessionToken.toString(),
+    private fun setNotificationsStatus(enabled: Boolean) {
+        val setNotifs = Endpoint.setNotification(
+            preferencesHelper.sessionToken.toString(),
             if (enabled) "ANDROID" else "NONE"
         )
 

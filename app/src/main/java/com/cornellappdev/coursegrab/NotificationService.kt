@@ -11,6 +11,7 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
+import com.cornellappdev.coursegrab.models.CourseNotification
 import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.deviceToken
@@ -35,12 +36,13 @@ class NotificationService : FirebaseMessagingService() {
      * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
      */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        Log.d("Networking", remoteMessage.data.toString())
         // Check if message contains a data payload.
         remoteMessage.data.isNotEmpty().let {
             val courseInfoRaw = Gson()
-            val courseInfo = courseInfoRaw.fromJson<Course>(
+            val courseInfo = courseInfoRaw.fromJson<CourseNotification>(
                 remoteMessage.data["message"].toString(),
-                object : TypeToken<Course>() {}.type
+                object : TypeToken<CourseNotification>() {}.type
             )
 
             sendNotification(courseInfo)
@@ -94,7 +96,7 @@ class NotificationService : FirebaseMessagingService() {
      *
      * @param course FCM message body received.
      */
-    private fun sendNotification(course: Course) {
+    private fun sendNotification(course: CourseNotification) {
         val intent = Intent(this, NotificationModal::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.putExtra("courseDetails", course)
@@ -107,13 +109,13 @@ class NotificationService : FirebaseMessagingService() {
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_coursegrab_icon)
-            .setContentTitle("${course.subject_code} ${course.course_num}: ${course.title}, ${course.section} is now open!")
-            .setContentText(getString(R.string.notification_title))
+            .setContentTitle(course.title)
+            .setContentText(course.body)
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
             .setStyle(
-                NotificationCompat.BigTextStyle().bigText(getString(R.string.notification_title))
+                NotificationCompat.BigTextStyle().bigText(course.body)
             )
 
         val notificationManager =
@@ -129,6 +131,6 @@ class NotificationService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        notificationManager.notify(10032, notificationBuilder.build())
+        notificationManager.notify(course.section.catalog_num, notificationBuilder.build())
     }
 }

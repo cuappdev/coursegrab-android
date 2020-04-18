@@ -8,13 +8,25 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.models.ApiResponse
+import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.models.Section
+import com.cornellappdev.coursegrab.networking.Endpoint
+import com.cornellappdev.coursegrab.networking.Request
+import com.cornellappdev.coursegrab.networking.addTracking
+import com.cornellappdev.coursegrab.networking.removeTracking
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_course_details.*
 import kotlinx.android.synthetic.main.activity_search.back_btn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CourseDetailsActivity : AppCompatActivity() {
     private lateinit var sectionsRecyclerView: RecyclerView
@@ -49,6 +61,49 @@ class CourseDetailsActivity : AppCompatActivity() {
         back_btn.setOnClickListener { finish() }
     }
 
+    fun addCourse(courseId: Int, context: Context) {
+        val addTracking = Endpoint.addTracking(preferencesHelper.sessionToken.toString(), courseId)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
+            val response = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<Course>>(
+                    addTracking.okHttpRequest(),
+                    typeToken
+                )
+            }
+
+            if (!response!!.success)
+                Toast.makeText(
+                    context,
+                    response.data.errors!![0],
+                    Toast.LENGTH_SHORT
+                ).show()
+        }
+    }
+
+    fun removeCourse(courseId: Int, context: Context) {
+        val removeTracking =
+            Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
+            val response = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<Course>>(
+                    removeTracking.okHttpRequest(),
+                    typeToken
+                )
+            }
+
+            if (!response!!.success)
+                Toast.makeText(
+                    context,
+                    response.data.errors!![0],
+                    Toast.LENGTH_SHORT
+                ).show()
+        }
+    }
+
     class SectionAdapter(
         private val availableCourses: List<Section>,
         private val context: Context
@@ -75,16 +130,27 @@ class CourseDetailsActivity : AppCompatActivity() {
             holder.sectionTitle.text = availableCourses[position].section
             holder.sectionStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
+            holder.removeButton.visibility =
+                if (availableCourses[position].is_tracking) View.VISIBLE else View.GONE
+            holder.trackButton.visibility =
+                if (!availableCourses[position].is_tracking) View.VISIBLE else View.GONE
+
             holder.removeButton.setOnClickListener {
-//                (context as CourseDetailsActivity).removeCourse(
-//                    availableCourses[position].catalog_num
-//                )
+                (context as CourseDetailsActivity).removeCourse(
+                    availableCourses[position].catalog_num,
+                    context
+                )
+                holder.removeButton.visibility = View.GONE
+                holder.trackButton.visibility = View.VISIBLE
             }
 
             holder.trackButton.setOnClickListener {
-//                (context as CourseDetailsActivity).removeCourse(
-//                    availableCourses[position].catalog_num
-//                )
+                (context as CourseDetailsActivity).addCourse(
+                    availableCourses[position].catalog_num,
+                    context
+                )
+                holder.trackButton.visibility = View.GONE
+                holder.removeButton.visibility = View.VISIBLE
             }
         }
 

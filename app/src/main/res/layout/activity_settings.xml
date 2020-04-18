@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SettingsActivity">
+
     <LinearLayout
         android:id="@+id/action_bar"
         android:layout_width="0dp"
@@ -58,29 +59,53 @@
 
         <Switch
             android:id="@+id/email_alerts_switch"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:text="@string/email_alerts"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <Switch
             android:id="@+id/mobile_alerts_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
-            android:paddingBottom="16dp"
+            android:paddingBottom="8dp"
             android:text="@string/mobile_alerts"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/class_roster"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/transparent"
+            android:text="@string/class_roster"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/design_default_color_primary_dark"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/cornell_academic_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/transparent"
+            android:text="@string/cornell_academic_calendar"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textColor="@color/design_default_color_primary_dark"
+            android:textSize="16sp" />
+
+        <Button
             android:id="@+id/sign_out"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
+            android:background="@drawable/track_button_background"
             android:text="@string/sign_out" />
     </LinearLayout>
 
