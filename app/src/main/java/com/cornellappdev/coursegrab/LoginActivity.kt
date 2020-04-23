@@ -89,8 +89,8 @@ class LoginActivity : AppCompatActivity() {
                 )
             }
 
-            if (response!!.success)
-                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
+//            if (response!!.success)
+//                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
         }
     }
 

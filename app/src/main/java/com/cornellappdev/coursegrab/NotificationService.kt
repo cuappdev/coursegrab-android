@@ -36,7 +36,7 @@ class NotificationService : FirebaseMessagingService() {
      * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
      */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d("Networking", remoteMessage.data.toString())
+//        Log.d("Networking", remoteMessage.data.toString())
         // Check if message contains a data payload.
         remoteMessage.data.isNotEmpty().let {
             val courseInfoRaw = Gson()
@@ -86,8 +86,8 @@ class NotificationService : FirebaseMessagingService() {
                 )
             }
 
-            if (response!!.success)
-                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
+//            if (response!!.success)
+//                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
         }
     }
 

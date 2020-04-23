@@ -96,3 +96,4 @@ lint/tmp/
 app/google-services.json
 .idea/codeStyles/Project.xml
 .idea/codeStyles/Project.xml
+app/release/output.json

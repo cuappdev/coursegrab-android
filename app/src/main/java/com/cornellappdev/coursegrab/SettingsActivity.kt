@@ -99,7 +99,7 @@ class SettingsActivity : AppCompatActivity() {
                     this@SettingsActivity,
                     "Notifications ${if (enabled) "enabled." else "disabled."}",
                     Toast.LENGTH_SHORT
-                )
+                ).show()
         }
     }
 

@@ -69,7 +69,7 @@ class SearchActivity : AppCompatActivity() {
             searchViewManager = LinearLayoutManager(this@SearchActivity)
             searchViewAdapter = SearchActivity.ResultsAdapter(courseList, this@SearchActivity)
 
-            searchRecyclerView = findViewById<RecyclerView>(R.id.results_list).apply {
+            searchRecyclerView = results_list.apply {
                 layoutManager = searchViewManager
                 adapter = searchViewAdapter
             }

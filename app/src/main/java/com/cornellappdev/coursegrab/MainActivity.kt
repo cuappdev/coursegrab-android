@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
             availableViewManager = LinearLayoutManager(this@MainActivity)
             availableViewAdapter = AvailableAdapter(listOpen, this@MainActivity)
 
-            availableRecyclerView = findViewById<RecyclerView>(R.id.available_list).apply {
+            availableRecyclerView = available_list.apply {
                 layoutManager = availableViewManager
                 adapter = availableViewAdapter
             }
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
             awaitingViewManager = LinearLayoutManager(this@MainActivity)
             awaitingViewAdapter = AwaitingAdapter(listAwaiting, this@MainActivity)
 
-            awaitingRecyclerView = findViewById<RecyclerView>(R.id.awaiting_list).apply {
+            awaitingRecyclerView = awaiting_list.apply {
                 layoutManager = awaitingViewManager
                 adapter = awaitingViewAdapter
             }

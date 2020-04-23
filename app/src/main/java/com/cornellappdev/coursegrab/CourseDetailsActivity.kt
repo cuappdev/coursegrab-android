@@ -53,7 +53,7 @@ class CourseDetailsActivity : AppCompatActivity() {
         sectionsViewManager = LinearLayoutManager(this@CourseDetailsActivity)
         sectionsViewAdapter = SectionAdapter(courseDetails.sections, this@CourseDetailsActivity)
 
-        sectionsRecyclerView = findViewById<RecyclerView>(R.id.sections_recyclerview).apply {
+        sectionsRecyclerView = sections_recyclerview.apply {
             layoutManager = sectionsViewManager
             adapter = sectionsViewAdapter
         }
