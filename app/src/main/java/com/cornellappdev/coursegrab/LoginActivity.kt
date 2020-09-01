@@ -2,6 +2,7 @@ package com.cornellappdev.coursegrab
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
@@ -87,13 +88,16 @@ class LoginActivity : AppCompatActivity() {
                     typeToken
                 )
             }
+
+            if (response!!.success)
+                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
         }
     }
 
     private fun verifySession(userSession: UserSession) {
-        if (userSession.session_expiration.isEmpty() ||
-            userSession.session_token.isEmpty() ||
-            userSession.update_token.isEmpty()
+        if (userSession.session_expiration.isNullOrEmpty() ||
+            userSession.session_token.isNullOrEmpty() ||
+            userSession.update_token.isNullOrEmpty()
         ) return
 
         preferencesHelper.sessionToken = userSession.session_token
