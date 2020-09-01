@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
-    val RC_SIGN_IN = 10032
+    private val RC_SIGN_IN = 10032
 
     private val preferencesHelper: PreferencesHelper by lazy {
         PreferencesHelper(this)
@@ -91,12 +91,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun verifySession(userSession: UserSession) {
-        if (userSession.session_expiration.isNullOrEmpty() ||
-            userSession.session_token.isNullOrEmpty() ||
-            userSession.update_token.isNullOrEmpty()
-        ) {
-            return
-        }
+        if (userSession.session_expiration.isEmpty() ||
+            userSession.session_token.isEmpty() ||
+            userSession.update_token.isEmpty()
+        ) return
 
         preferencesHelper.sessionToken = userSession.session_token
         preferencesHelper.updateToken = userSession.update_token
@@ -106,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
             sendRegistrationToServer(instanceIdResult.token)
         }
 
-        setNotificationsStatus(true);
+        setNotificationsStatus(true)
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         startActivity(intent)
@@ -139,7 +137,7 @@ class LoginActivity : AppCompatActivity() {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)
                 if (account?.email?.contains("@cornell.edu") == true) {
-                    val initializeSession = Endpoint.initializeSession(account?.idToken.toString())
+                    val initializeSession = Endpoint.initializeSession(account.idToken.toString())
 
                     CoroutineScope(Dispatchers.Main).launch {
                         val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type

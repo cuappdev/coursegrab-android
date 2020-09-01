@@ -14,7 +14,7 @@ class NotificationModal : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_modal)
 
-        var course: Section =
+        val course: Section =
             (intent.getParcelableExtra("courseDetails") as CourseNotification).section
 
         course_title.text = "${course.subject_code} ${course.course_num}: ${course.title}"

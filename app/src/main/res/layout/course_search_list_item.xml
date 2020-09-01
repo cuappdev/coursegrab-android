@@ -25,7 +25,7 @@
             android:layout_weight="0.8"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
-            android:gravity="bottom"
+            android:gravity="start"
             android:paddingStart="14dp"
             android:scrollHorizontally="true"
             android:text="CS 1998: Intro to Android"

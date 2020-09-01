@@ -25,13 +25,13 @@ class PreferencesHelper(context: Context) {
             field = preferences.getLong(EXPIRES_AT, 0L)
         }
 
-    var email_alert_setting = preferences.getBoolean(EMAIL_ALERTS, true)
+    var emailAlertSetting = preferences.getBoolean(EMAIL_ALERTS, true)
         set(value) {
             preferences.edit().putBoolean(EMAIL_ALERTS, value).apply()
             field = preferences.getBoolean(EMAIL_ALERTS, true)
         }
 
-    var mobile_alert_setting = preferences.getBoolean(MOBILE_ALERTS, true)
+    var mobileAlertSetting = preferences.getBoolean(MOBILE_ALERTS, true)
         set(value) {
             preferences.edit().putBoolean(MOBILE_ALERTS, value).apply()
             field = preferences.getBoolean(MOBILE_ALERTS, true)

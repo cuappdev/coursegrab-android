@@ -2,8 +2,6 @@ package com.cornellappdev.coursegrab.networking
 
 import com.cornellappdev.coursegrab.BuildConfig
 import okhttp3.Headers.Companion.toHeaders
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Request
 import okhttp3.RequestBody
 
@@ -11,7 +9,12 @@ enum class EndpointMethod {
     GET, POST, DELETE, PUT
 }
 
-class Endpoint(private val path: String, private val headers: Map<String, String> = mapOf(), private val body: RequestBody? = null, private val method: EndpointMethod) {
+class Endpoint(
+    private val path: String,
+    private val headers: Map<String, String> = mapOf(),
+    private val body: RequestBody? = null,
+    private val method: EndpointMethod
+) {
 
     private val host = "https://" + BuildConfig.BACKEND_URI + "/api"
 
