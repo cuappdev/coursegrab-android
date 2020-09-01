@@ -38,7 +38,7 @@ class PreferencesHelper(context: Context) {
         }
 
     fun clearAll() {
-        preferences.edit().clear().commit();
+        preferences.edit().clear().apply()
     }
 
     companion object {

@@ -2,7 +2,6 @@ package com.cornellappdev.coursegrab
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
@@ -99,7 +98,6 @@ class LoginActivity : AppCompatActivity() {
             userSession.session_token.isNullOrEmpty() ||
             userSession.update_token.isNullOrEmpty()
         ) {
-            Snackbar.make(login_rootView, "Login Failed, Please Try Again", Snackbar.LENGTH_LONG)
             return
         }
 
@@ -124,19 +122,29 @@ class LoginActivity : AppCompatActivity() {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)
-                val initializeSession = Endpoint.initializeSession(account?.idToken.toString())
+                if (account?.email?.contains("@cornell.edu") == true) {
+                    val initializeSession = Endpoint.initializeSession(account?.idToken.toString())
 
-                CoroutineScope(Dispatchers.Main).launch {
-                    val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
-                    val userSession = withContext(Dispatchers.IO) {
-                        Request.makeRequest<ApiResponse<UserSession>>(
-                            initializeSession.okHttpRequest(),
-                            typeToken
-                        )
-                    }!!.data
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
+                        val userSession = withContext(Dispatchers.IO) {
+                            Request.makeRequest<ApiResponse<UserSession>>(
+                                initializeSession.okHttpRequest(),
+                                typeToken
+                            )
+                        }!!.data
 
-                    verifySession(userSession)
+                        verifySession(userSession)
+                    }
+                } else {
+                    Snackbar.make(
+                        login_rootView,
+                        "Please use a @cornell.edu account",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                    googleSignInClient.signOut()
                 }
+
 
             } catch (e: ApiException) {
                 e.printStackTrace()

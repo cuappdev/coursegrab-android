@@ -13,22 +13,35 @@ fun Endpoint.Companion.initializeSession(googleToken: String): Endpoint {
     } catch (e: JSONException) {
         e.printStackTrace()
     }
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
     return Endpoint(path = "/session/initialize/", body = requestBody, method = EndpointMethod.POST)
 }
 
 fun Endpoint.Companion.updateSession(updateToken: String): Endpoint {
     val codeJSON = JSONObject()
     val authHeaders = mapOf(Pair("Authorization", "Bearer $updateToken"))
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-    return Endpoint(path = "/session/update/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/session/update/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.POST
+    )
 }
 
 fun Endpoint.Companion.getTracking(accessToken: String): Endpoint {
     val codeJSON = JSONObject()
     val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-    return Endpoint(path = "/users/tracking/", headers = authHeaders, body = requestBody, method = EndpointMethod.GET)
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/users/tracking/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.GET
+    )
 }
 
 fun Endpoint.Companion.searchCourses(accessToken: String, query: String): Endpoint {
@@ -39,8 +52,14 @@ fun Endpoint.Companion.searchCourses(accessToken: String, query: String): Endpoi
         e.printStackTrace()
     }
     val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-    return Endpoint(path = "/courses/search/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/courses/search/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.POST
+    )
 }
 
 fun Endpoint.Companion.addTracking(accessToken: String, courseId: Int): Endpoint {
@@ -51,8 +70,14 @@ fun Endpoint.Companion.addTracking(accessToken: String, courseId: Int): Endpoint
         e.printStackTrace()
     }
     val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-    return Endpoint(path = "/sections/track/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/sections/track/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.POST
+    )
 }
 
 fun Endpoint.Companion.removeTracking(accessToken: String, courseId: Int): Endpoint {
@@ -63,8 +88,14 @@ fun Endpoint.Companion.removeTracking(accessToken: String, courseId: Int): Endpo
         e.printStackTrace()
     }
     val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-    return Endpoint(path = "/sections/untrack/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/sections/untrack/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.POST
+    )
 }
 
 fun Endpoint.Companion.deviceToken(accessToken: String, deviceToken: String): Endpoint {
@@ -75,8 +106,14 @@ fun Endpoint.Companion.deviceToken(accessToken: String, deviceToken: String): En
         e.printStackTrace()
     }
     val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-    return Endpoint(path = "/users/device-token/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/users/device-token/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.POST
+    )
 }
 
 fun Endpoint.Companion.setNotification(accessToken: String, notifSetting: String): Endpoint {
@@ -87,6 +124,12 @@ fun Endpoint.Companion.setNotification(accessToken: String, notifSetting: String
         e.printStackTrace()
     }
     val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
-    val requestBody = codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-    return Endpoint(path = "/users/notification/", headers = authHeaders, body = requestBody, method = EndpointMethod.POST)
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/users/notification/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.POST
+    )
 }

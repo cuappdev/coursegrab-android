@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         refreshAwaiting()
     }
 
-    override fun onBackPressed() { }
+    override fun onBackPressed() {}
 
     private fun refreshAwaiting() {
         var listOpen = mutableListOf<Course>()

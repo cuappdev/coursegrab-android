@@ -67,7 +67,10 @@ class SettingsActivity : AppCompatActivity() {
 
         cornell_academic_calendar.setOnClickListener {
             val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://registrar.cornell.edu/academic-calendar"))
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://registrar.cornell.edu/academic-calendar")
+                )
             startActivity(browserIntent)
         }
 
