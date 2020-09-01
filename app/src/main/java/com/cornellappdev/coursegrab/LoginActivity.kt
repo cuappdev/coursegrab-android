@@ -87,9 +87,6 @@ class LoginActivity : AppCompatActivity() {
                     typeToken
                 )
             }
-
-//            if (response!!.success)
-//                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
         }
     }
 
@@ -109,8 +106,27 @@ class LoginActivity : AppCompatActivity() {
             sendRegistrationToServer(instanceIdResult.token)
         }
 
+        setNotificationsStatus(true);
+
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun setNotificationsStatus(enabled: Boolean) {
+        val setNotifs = Endpoint.setNotification(
+            preferencesHelper.sessionToken.toString(),
+            if (enabled) "ANDROID" else "NONE"
+        )
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
+            val response = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<Course>>(
+                    setNotifs.okHttpRequest(),
+                    typeToken
+                )
+            }
+        }
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
