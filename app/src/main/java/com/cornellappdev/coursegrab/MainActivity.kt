@@ -99,11 +99,11 @@ class MainActivity : AppCompatActivity() {
         refreshAwaiting()
     }
 
-    override fun onBackPressed() { }
+    override fun onBackPressed() {}
 
     private fun refreshAwaiting() {
-        var listOpen = mutableListOf<Course>()
-        var listAwaiting = mutableListOf<Course>()
+        val listOpen = mutableListOf<Course>()
+        val listAwaiting = mutableListOf<Course>()
 
         val getTracking = Endpoint.getTracking(preferencesHelper.sessionToken.toString())
 
@@ -214,21 +214,12 @@ class MainActivity : AppCompatActivity() {
 
         class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
             View.OnClickListener {
-            val courseTitle: TextView
-            val courseStatus: ImageView
-            val courseTime: TextView
-            val coursePin: TextView
-            val enrollButton: Button
-            val removeButton: Button
-
-            init {
-                courseTitle = itemView.findViewById(R.id.course_title)
-                courseStatus = itemView.findViewById(R.id.course_status)
-                courseTime = itemView.findViewById(R.id.course_time)
-                coursePin = itemView.findViewById(R.id.course_pin)
-                enrollButton = itemView.findViewById(R.id.button_enroll)
-                removeButton = itemView.findViewById(R.id.button_remove)
-            }
+            val courseTitle: TextView = itemView.findViewById(R.id.course_title)
+            val courseStatus: ImageView = itemView.findViewById(R.id.course_status)
+            val courseTime: TextView = itemView.findViewById(R.id.course_time)
+            val coursePin: TextView = itemView.findViewById(R.id.course_pin)
+            val enrollButton: Button = itemView.findViewById(R.id.button_enroll)
+            val removeButton: Button = itemView.findViewById(R.id.button_remove)
 
             override fun onClick(view: View) {}
         }
@@ -268,20 +259,11 @@ class MainActivity : AppCompatActivity() {
 
         class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
             View.OnClickListener {
-            val courseTitle: TextView
-            val courseStatus: ImageView
-            val courseTime: TextView
-            val coursePin: TextView
-            val removeButton: Button
-
-            init {
-                courseTitle = itemView.findViewById(R.id.course_title)
-                courseStatus = itemView.findViewById(R.id.course_status)
-                courseTime = itemView.findViewById(R.id.course_time)
-                coursePin = itemView.findViewById(R.id.course_pin)
-
-                removeButton = itemView.findViewById(R.id.button_remove)
-            }
+            val courseTitle: TextView = itemView.findViewById(R.id.course_title)
+            val courseStatus: ImageView = itemView.findViewById(R.id.course_status)
+            val courseTime: TextView = itemView.findViewById(R.id.course_time)
+            val coursePin: TextView = itemView.findViewById(R.id.course_pin)
+            val removeButton: Button = itemView.findViewById(R.id.button_remove)
 
             override fun onClick(view: View) {
 

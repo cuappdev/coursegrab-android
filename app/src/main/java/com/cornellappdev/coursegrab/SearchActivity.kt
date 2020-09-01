@@ -67,7 +67,7 @@ class SearchActivity : AppCompatActivity() {
 
             // Results Courses Adapter
             searchViewManager = LinearLayoutManager(this@SearchActivity)
-            searchViewAdapter = SearchActivity.ResultsAdapter(courseList, this@SearchActivity)
+            searchViewAdapter = ResultsAdapter(courseList, this@SearchActivity)
 
             searchRecyclerView = results_list.apply {
                 layoutManager = searchViewManager
@@ -89,13 +89,8 @@ class SearchActivity : AppCompatActivity() {
 
         class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
             View.OnClickListener {
-            val courseTitle: TextView
-            val expandButton: ImageButton
-
-            init {
-                courseTitle = itemView.findViewById(R.id.course_title)
-                expandButton = itemView.findViewById(R.id.expand_button)
-            }
+            val courseTitle: TextView = itemView.findViewById(R.id.course_title)
+            val expandButton: ImageButton = itemView.findViewById(R.id.expand_button)
 
             override fun onClick(view: View) {}
         }

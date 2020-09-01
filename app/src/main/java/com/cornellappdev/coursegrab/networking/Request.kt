@@ -1,14 +1,13 @@
 package com.cornellappdev.coursegrab.networking
 
-import android.util.Log
 import com.google.gson.Gson
+import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okio.IOException
 import java.lang.reflect.Type
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -20,11 +19,7 @@ object Request {
         val response = httpClient.newCall(request).await()
         val responseBody = response.body
         val responseBodyString = responseBody?.string() ?: ""
-//        Log.d("NETWORK RESPONSE", responseBodyString)
 
-        // Invalid Session Token, should automatically refresh and then retry the request
-        if (response.code == 401) {
-        }
         val responseBodyJSON = Gson()
 
         return responseBodyJSON.fromJson<T>(responseBodyString, typeToken)
@@ -36,7 +31,8 @@ object Request {
      * @return Result of request or throw exception
      */
     suspend fun Call.await(recordStackTrace: Boolean = true): Response {
-        val recordStackTrace = if (recordStackTrace) IOException("Exception occured while awaiting Call.") else null
+        val recordStackTrace =
+            if (recordStackTrace) IOException("Exception occured while awaiting Call.") else null
         return suspendCancellableCoroutine { continuation ->
             enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {

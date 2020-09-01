@@ -28,7 +28,7 @@ import kotlin.system.exitProcess
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
-    val RC_SIGN_IN = 10032
+    private val RC_SIGN_IN = 10032
 
     private val preferencesHelper: PreferencesHelper by lazy {
         PreferencesHelper(this)
@@ -38,15 +38,15 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        email_alerts_switch.isChecked = preferencesHelper.email_alert_setting
-        mobile_alerts_switch.isChecked = preferencesHelper.mobile_alert_setting
+        email_alerts_switch.isChecked = preferencesHelper.emailAlertSetting
+        mobile_alerts_switch.isChecked = preferencesHelper.mobileAlertSetting
 
         email_alerts_switch.setOnCheckedChangeListener { _, isChecked ->
-            preferencesHelper.email_alert_setting = isChecked
+            preferencesHelper.emailAlertSetting = isChecked
         }
 
         mobile_alerts_switch.setOnCheckedChangeListener { _, isChecked ->
-            preferencesHelper.mobile_alert_setting = isChecked
+            preferencesHelper.mobileAlertSetting = isChecked
             FirebaseMessaging.getInstance().isAutoInitEnabled = isChecked
 
             setNotificationsStatus(isChecked)
@@ -67,12 +67,15 @@ class SettingsActivity : AppCompatActivity() {
 
         cornell_academic_calendar.setOnClickListener {
             val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://registrar.cornell.edu/academic-calendar"))
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://registrar.cornell.edu/academic-calendar")
+                )
             startActivity(browserIntent)
         }
 
         sign_out.setOnClickListener {
-            preferencesHelper.clearAll();
+            preferencesHelper.clearAll()
             signOut()
         }
 
