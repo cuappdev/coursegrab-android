@@ -44,7 +44,8 @@ class NotificationService : FirebaseMessagingService() {
                 object : TypeToken<CourseNotification>() {}.type
             )
 
-            sendNotification(courseInfo)
+            if (courseInfo != null)
+                sendNotification(courseInfo)
         }
 
         // Check if message contains a notification payload.
