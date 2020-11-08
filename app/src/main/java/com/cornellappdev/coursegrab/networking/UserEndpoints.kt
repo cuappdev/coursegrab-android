@@ -5,11 +5,12 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONException
 import org.json.JSONObject
 
-fun Endpoint.Companion.initializeSession(googleToken: String): Endpoint {
+fun Endpoint.Companion.initializeSession(googleToken: String, deviceToken: String?): Endpoint {
     val codeJSON = JSONObject()
     try {
         codeJSON.put("token", googleToken)
-        codeJSON.put("is_ios", false)
+        codeJSON.put("device_type", "ANDROID")
+        codeJSON.put("device_token", deviceToken)
     } catch (e: JSONException) {
         e.printStackTrace()
     }

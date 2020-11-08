@@ -41,7 +41,7 @@ class CourseDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_course_details)
 
-        val courseDetails: SearchResult = intent.getParcelableExtra("courseDetails") as SearchResult
+        val courseDetails: SearchResult = intent.getParcelableExtra<SearchResult>("courseDetails") as SearchResult
 
         header_textView.text = "${courseDetails.subject_code} ${courseDetails.course_num}"
 

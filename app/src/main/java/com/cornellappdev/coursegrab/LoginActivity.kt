@@ -141,7 +141,7 @@ class LoginActivity : AppCompatActivity() {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)
                 if (account?.email?.contains("@cornell.edu") == true) {
-                    val initializeSession = Endpoint.initializeSession(account.idToken.toString())
+                    val initializeSession = Endpoint.initializeSession(account.idToken.toString(), null)
 
                     CoroutineScope(Dispatchers.Main).launch {
                         val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type

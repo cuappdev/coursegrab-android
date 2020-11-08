@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
+import com.cornellappdev.coursegrab.models.TrackingContainer
 import com.cornellappdev.coursegrab.networking.*
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
@@ -109,13 +110,13 @@ class MainActivity : AppCompatActivity() {
         val getTracking = Endpoint.getTracking(preferencesHelper.sessionToken.toString())
 
         CoroutineScope(Dispatchers.Main).launch {
-            val typeToken = object : TypeToken<ApiResponse<List<Course>>>() {}.type
+            val typeToken = object : TypeToken<ApiResponse<TrackingContainer>>() {}.type
             val courseList = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<List<Course>>>(
+                Request.makeRequest<ApiResponse<TrackingContainer>>(
                     getTracking.okHttpRequest(),
                     typeToken
                 )
-            }!!.data
+            }!!.data.sections
 
             for (course in courseList) {
                 if (course.status == "OPEN")

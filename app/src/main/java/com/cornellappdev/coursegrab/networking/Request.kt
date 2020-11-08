@@ -32,7 +32,7 @@ object Request {
      */
     suspend fun Call.await(recordStackTrace: Boolean = true): Response {
         val recordStackTrace =
-            if (recordStackTrace) IOException("Exception occured while awaiting Call.") else null
+            if (recordStackTrace) IOException("Exception occurred while awaiting Call.") else null
         return suspendCancellableCoroutine { continuation ->
             enqueue(object : Callback {
                 override fun onResponse(call: Call, response: Response) {
