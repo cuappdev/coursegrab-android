@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
+import com.cornellappdev.coursegrab.models.SearchContainer
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
@@ -57,13 +58,13 @@ class SearchActivity : AppCompatActivity() {
         val getTracking = Endpoint.searchCourses(preferencesHelper.sessionToken.toString(), query)
 
         CoroutineScope(Dispatchers.Main).launch {
-            val typeToken = object : TypeToken<ApiResponse<List<SearchResult>>>() {}.type
+            val typeToken = object : TypeToken<ApiResponse<SearchContainer>>() {}.type
             val courseList = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<List<SearchResult>>>(
+                Request.makeRequest<ApiResponse<SearchContainer>>(
                     getTracking.okHttpRequest(),
                     typeToken
                 )
-            }!!.data
+            }!!.data.courses
 
             // Results Courses Adapter
             searchViewManager = LinearLayoutManager(this@SearchActivity)
