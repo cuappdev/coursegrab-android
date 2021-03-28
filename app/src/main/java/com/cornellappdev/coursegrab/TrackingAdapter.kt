@@ -12,6 +12,7 @@ import com.cornellappdev.coursegrab.models.Course
 
 class TrackingAdapter(
     private val coursesList: List<Course>,
+    private val presenter: MainPresenter,
     private val context: Context,
     private val isAwaiting: Boolean
 ) :
@@ -46,19 +47,14 @@ class TrackingAdapter(
 
         holder.removeButton.setOnClickListener {
             //TODO
-//            (context as MainActivity).removeCourse(
-//                coursesList[position].catalog_num, context
-//            )
+            presenter.removeCourse(coursesList[position].catalog_num)
         }
 
         if (isAwaiting) {
             holder.enrollButton.visibility = View.GONE
         } else {
             holder.enrollButton?.setOnClickListener {
-                //TODO
-//            (context as MainActivity).enrollCourse(
-//                coursesList[position].catalog_num, context
-//            )
+                presenter.enrollCourse(coursesList[position].catalog_num)
             }
         }
 

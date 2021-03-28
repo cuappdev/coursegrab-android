@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.Repository.courseList
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.TrackingContainer
@@ -43,6 +44,8 @@ class MainActivity : AppCompatActivity() {
     private val preferencesHelper: PreferencesHelper by lazy {
         PreferencesHelper(this)
     }
+
+    private val mainPresenter = MainPresenter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,7 +115,7 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val typeToken = object : TypeToken<ApiResponse<TrackingContainer>>() {}.type
-            val courseList = withContext(Dispatchers.IO) {
+            Repository.courseList = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<TrackingContainer>>(
                     getTracking.okHttpRequest(),
                     typeToken
@@ -128,7 +131,7 @@ class MainActivity : AppCompatActivity() {
 
             // Available Courses Adapter
             availableViewManager = LinearLayoutManager(this@MainActivity)
-            availableViewAdapter = TrackingAdapter(listOpen, this@MainActivity, false)
+            availableViewAdapter = TrackingAdapter(listOpen, mainPresenter, this@MainActivity,false)
 
             availableRecyclerView = available_list.apply {
                 layoutManager = availableViewManager
@@ -138,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
             // Awaiting Courses Adapter
             awaitingViewManager = LinearLayoutManager(this@MainActivity)
-            awaitingViewAdapter = TrackingAdapter(listAwaiting, this@MainActivity, true)
+            awaitingViewAdapter = TrackingAdapter(listAwaiting, mainPresenter, this@MainActivity,true)
 
             awaitingRecyclerView = awaiting_list.apply {
                 layoutManager = awaitingViewManager
@@ -179,33 +182,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun removeCourse(courseId: Int, context: Context) {
-        val removeTracking =
-            Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
+//    private fun removeCourse(courseId: Int, context: Context) {
+//        val removeTracking =
+//            Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
+//
+//        CoroutineScope(Dispatchers.Main).launch {
+//            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
+//            val response = withContext(Dispatchers.IO) {
+//                Request.makeRequest<ApiResponse<Course>>(
+//                    removeTracking.okHttpRequest(),
+//                    typeToken
+//                )
+//            }
+//
+//            refreshAwaiting()
+//
+//            if (!response!!.success)
+//                Toast.makeText(
+//                    context,
+//                    response.data.errors!![0],
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//        }
+//    }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    removeTracking.okHttpRequest(),
-                    typeToken
-                )
-            }
-
-            refreshAwaiting()
-
-            if (!response!!.success)
-                Toast.makeText(
-                    context,
-                    response.data.errors!![0],
-                    Toast.LENGTH_SHORT
-                ).show()
-        }
-    }
-
-    private fun enrollCourse(courseId: Int, context: Context) {
-        val browserIntent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("http://studentcenter.cornell.edu"))
-        startActivity(browserIntent)
-    }
+//    private fun enrollCourse(courseId: Int, context: Context) {
+//        val browserIntent =
+//            Intent(Intent.ACTION_VIEW, Uri.parse("http://studentcenter.cornell.edu"))
+//        startActivity(browserIntent)
+//    }
 }
