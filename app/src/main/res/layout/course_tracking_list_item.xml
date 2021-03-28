@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/card_layout_background"
     android:padding="16dp"
     android:layout_marginBottom="10dp">
@@ -37,7 +37,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/course_title"
         app:layout_constraintTop_toBottomOf="@id/course_title"
-        android:clickable="false"
         app:singleLine="true">
 
         <com.google.android.material.chip.Chip
@@ -45,6 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:theme="@style/Theme.MaterialComponents.Light"
+            android:clickable="false"
             android:fontFamily="sans-serif-medium"
             android:textSize="16sp"
             android:textColor="#1B1F23"
@@ -56,6 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:theme="@style/Theme.MaterialComponents.Light"
+            android:clickable="false"
             android:fontFamily="sans-serif-medium"
             android:textSize="16sp"
             android:textColor="#FAFAFA"

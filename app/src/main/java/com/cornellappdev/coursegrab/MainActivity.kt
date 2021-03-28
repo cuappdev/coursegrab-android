@@ -64,35 +64,36 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        addCourseButton.setOnClickListener {
-            addCourse(addCourseEditText.text.toString().toInt(), this)
-            addCourseEditText.clearFocus()
-            addCourseEditText.text.clear()
-            val inputMethodManager =
-                getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
-        }
-
-        addCourseEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                addCourseButton.isEnabled = (s!!.length > 3)
-            }
-        })
-
-        addCourseEditText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                addCourse(addCourseEditText.text.toString().toInt(), this)
-                addCourseEditText.clearFocus()
-                addCourseEditText.text.clear()
-                val inputMethodManager =
-                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
-                return@OnKeyListener true
-            }
-            false
-        })
+        //TODO: remove
+//        addCourseButton.setOnClickListener {
+//            addCourse(addCourseEditText.text.toString().toInt(), this)
+//            addCourseEditText.clearFocus()
+//            addCourseEditText.text.clear()
+//            val inputMethodManager =
+//                getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+//            inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
+//        }
+//
+//        addCourseEditText.addTextChangedListener(object : TextWatcher {
+//            override fun afterTextChanged(s: Editable?) {}
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                addCourseButton.isEnabled = (s!!.length > 3)
+//            }
+//        })
+//
+//        addCourseEditText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+//            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+//                addCourse(addCourseEditText.text.toString().toInt(), this)
+//                addCourseEditText.clearFocus()
+//                addCourseEditText.text.clear()
+//                val inputMethodManager =
+//                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+//                inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
+//                return@OnKeyListener true
+//            }
+//            false
+//        })
     }
 
     override fun onResume() {
