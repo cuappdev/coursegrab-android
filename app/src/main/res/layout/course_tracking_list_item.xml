@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/card_layout_background"
+    android:padding="16dp"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:id="@+id/course_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="2"
+        android:text="CS 1998: Intro to Android"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/course_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/course_title"
+        app:srcCompat="@drawable/ic_status_closed" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/tracking_chip_group"
+        android:layout_marginTop="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/course_title"
+        app:layout_constraintTop_toBottomOf="@id/course_title"
+        android:clickable="false"
+        app:singleLine="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/course_section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/Theme.MaterialComponents.Light"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="16sp"
+            android:textColor="#1B1F23"
+            app:chipBackgroundColor="#E1E4E8"
+            android:text="1389" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/course_modality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/Theme.MaterialComponents.Light"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="16sp"
+            android:textColor="#FAFAFA"
+            app:chipBackgroundColor="#6A737D"
+            android:text="In Person" />
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/course_time"
+        android:layout_marginTop="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LEC 006 / M 7:30PM"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@+id/tracking_chip_group"
+        app:layout_constraintTop_toBottomOf="@+id/tracking_chip_group" />
+
+    <Button
+        android:id="@+id/button_remove"
+        android:layout_width="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
+        android:text="@string/remove_button"
+        android:textColor="@color/removalRed"
+        android:background="@drawable/remove_button_background"
+        app:layout_constraintEnd_toStartOf="@+id/button_enroll"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/course_time" />
+
+    <Button
+        android:id="@+id/button_enroll"
+        android:layout_width="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/background_dark"
+        android:text="@string/enroll_button"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_remove"
+        app:layout_constraintTop_toTopOf="@+id/button_remove" />
+</androidx.constraintlayout.widget.ConstraintLayout>

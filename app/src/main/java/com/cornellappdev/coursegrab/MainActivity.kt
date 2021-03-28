@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
             // Available Courses Adapter
             availableViewManager = LinearLayoutManager(this@MainActivity)
-            availableViewAdapter = AvailableAdapter(listOpen, this@MainActivity)
+            availableViewAdapter = TrackingAdapter(listOpen, this@MainActivity, false)
 
             availableRecyclerView = available_list.apply {
                 layoutManager = availableViewManager
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
 
             // Awaiting Courses Adapter
             awaitingViewManager = LinearLayoutManager(this@MainActivity)
-            awaitingViewAdapter = AwaitingAdapter(listAwaiting, this@MainActivity)
+            awaitingViewAdapter = TrackingAdapter(listAwaiting, this@MainActivity, true)
 
             awaitingRecyclerView = awaiting_list.apply {
                 layoutManager = awaitingViewManager
@@ -206,93 +206,5 @@ class MainActivity : AppCompatActivity() {
         val browserIntent =
             Intent(Intent.ACTION_VIEW, Uri.parse("http://studentcenter.cornell.edu"))
         startActivity(browserIntent)
-    }
-
-    class AvailableAdapter(
-        private val availableCourses: List<Course>,
-        private val context: Context
-    ) :
-        RecyclerView.Adapter<AvailableAdapter.ViewHolder>() {
-
-        class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
-            View.OnClickListener {
-            val courseTitle: TextView = itemView.findViewById(R.id.course_title)
-            val courseStatus: ImageView = itemView.findViewById(R.id.course_status)
-            val courseTime: TextView = itemView.findViewById(R.id.course_time)
-            val coursePin: TextView = itemView.findViewById(R.id.course_pin)
-            val enrollButton: Button = itemView.findViewById(R.id.button_enroll)
-            val removeButton: Button = itemView.findViewById(R.id.button_remove)
-
-            override fun onClick(view: View) {}
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.course_available_list_item, parent, false) as View
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.courseTitle.text =
-                "${availableCourses[position].subject_code} ${availableCourses[position].course_num}: ${availableCourses[position].title}"
-            holder.courseTime.text = availableCourses[position].section
-            holder.coursePin.text = availableCourses[position].catalog_num.toString()
-            holder.courseStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
-
-            holder.removeButton.setOnClickListener {
-                (context as MainActivity).removeCourse(
-                    availableCourses[position].catalog_num, context
-                )
-            }
-
-            holder.enrollButton.setOnClickListener {
-                (context as MainActivity).enrollCourse(
-                    availableCourses[position].catalog_num, context
-                )
-            }
-        }
-
-        // Return the size of your dataset (invoked by the layout manager)
-        override fun getItemCount() = availableCourses.size
-    }
-
-    class AwaitingAdapter(private val awaitingCourses: List<Course>, private val context: Context) :
-        RecyclerView.Adapter<AwaitingAdapter.ViewHolder>() {
-
-        class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
-            View.OnClickListener {
-            val courseTitle: TextView = itemView.findViewById(R.id.course_title)
-            val courseStatus: ImageView = itemView.findViewById(R.id.course_status)
-            val courseTime: TextView = itemView.findViewById(R.id.course_time)
-            val coursePin: TextView = itemView.findViewById(R.id.course_pin)
-            val removeButton: Button = itemView.findViewById(R.id.button_remove)
-
-            override fun onClick(view: View) {
-
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.course_awaiting_list_item, parent, false) as View
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.courseTitle.text =
-                "${awaitingCourses[position].subject_code} ${awaitingCourses[position].course_num}: ${awaitingCourses[position].title}"
-            holder.courseTime.text = awaitingCourses[position].section
-            holder.coursePin.text = awaitingCourses[position].catalog_num.toString()
-            holder.courseStatus.setImageResource(if (awaitingCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
-
-            holder.removeButton.setOnClickListener {
-                (context as MainActivity).removeCourse(
-                    awaitingCourses[position].catalog_num, context
-                )
-            }
-        }
-
-        // Return the size of your dataset (invoked by the layout manager)
-        override fun getItemCount() = awaitingCourses.size
     }
 }
