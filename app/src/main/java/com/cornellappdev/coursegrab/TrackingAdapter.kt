@@ -1,7 +1,6 @@
 package com.cornellappdev.coursegrab
 
 import android.content.Context
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,8 @@ class TrackingAdapter(
         val courseTitle: TextView = itemView.findViewById(R.id.course_title)
         val courseStatus: ImageView = itemView.findViewById(R.id.course_status)
         val courseTime: TextView = itemView.findViewById(R.id.course_time)
-        val coursePin: TextView = itemView.findViewById(R.id.course_section)
+        val courseNumber: TextView = itemView.findViewById(R.id.catalog_number)
+        val courseMode: TextView = itemView.findViewById(R.id.course_modality)
         val removeButton: Button = itemView.findViewById(R.id.button_remove)
         val enrollButton: Button = itemView.findViewById(R.id.button_enroll)
         //TODO: add modality
@@ -40,7 +40,8 @@ class TrackingAdapter(
         holder.courseTitle.text =
             "${coursesList[position].subject_code} ${coursesList[position].course_num}: ${coursesList[position].title}"
         holder.courseTime.text = coursesList[position].section
-        holder.coursePin.text = coursesList[position].catalog_num.toString()
+        holder.courseNumber.text = coursesList[position].catalog_num.toString()
+        holder.courseMode.text = coursesList[position].mode
         holder.courseStatus.setImageResource(if (coursesList[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
         holder.removeButton.setOnClickListener {

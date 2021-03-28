@@ -57,7 +57,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <TextView
-        android:id="@+id/course_section"
+        android:id="@+id/catalog_number"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"

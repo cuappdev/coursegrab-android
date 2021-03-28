@@ -10,6 +10,7 @@ data class Course(
     val section: String,
     val instructors: List<String>,
     val is_tracking: Boolean,
+    val mode: String,
     val status: String,
     val subject_code: String,
     val title: String,

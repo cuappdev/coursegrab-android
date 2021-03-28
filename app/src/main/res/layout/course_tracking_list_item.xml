@@ -40,7 +40,7 @@
         app:singleLine="true">
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/course_section"
+            android:id="@+id/catalog_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:theme="@style/Theme.MaterialComponents.Light"

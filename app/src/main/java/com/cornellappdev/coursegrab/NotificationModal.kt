@@ -18,7 +18,7 @@ class NotificationModal : AppCompatActivity() {
             (intent.getParcelableExtra<CourseNotification>("courseDetails") as CourseNotification).section
 
         course_title.text = "${course.subject_code} ${course.course_num}: ${course.title}"
-        course_section.text = course.section
+        catalog_number.text = course.section
         course_pin.text = course.catalog_num.toString()
 
         button_student_center.setOnClickListener {

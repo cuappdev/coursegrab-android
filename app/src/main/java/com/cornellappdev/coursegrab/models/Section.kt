@@ -9,6 +9,7 @@ data class Section(
     val course_num: Int,
     val section: String,
     val status: String,
+    val mode: String,
     val is_tracking: Boolean,
     val subject_code: String,
     val title: String,
