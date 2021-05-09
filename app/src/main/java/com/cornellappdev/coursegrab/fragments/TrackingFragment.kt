@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.*
+import com.cornellappdev.coursegrab.adapters.TrackingAdapter
+import com.cornellappdev.coursegrab.presenters.TrackingPresenter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_tracking.*
 import kotlinx.android.synthetic.main.fragment_tracking.view.*
@@ -16,9 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TrackingFragment(
-    mContext: Context
-) : Fragment() {
+class TrackingFragment(mContext: Context) : Fragment() {
     private lateinit var availableRecyclerView: RecyclerView
     private lateinit var availableViewAdapter: RecyclerView.Adapter<*>
     private lateinit var availableViewManager: RecyclerView.LayoutManager
@@ -27,7 +27,9 @@ class TrackingFragment(
     private lateinit var awaitingViewAdapter: RecyclerView.Adapter<*>
     private lateinit var awaitingViewManager: RecyclerView.LayoutManager
 
-    private val mainPresenter = MainPresenter(mContext)
+    lateinit var mCallback: FragmentChangeListener
+
+    private val mainPresenter = TrackingPresenter(mContext)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,7 @@ class TrackingFragment(
     ): View {
         val rootView: View =
             inflater.inflate(R.layout.fragment_tracking, container, false)
+        mCallback = activity as FragmentChangeListener
 
         rootView.refresh_courses_layout.setOnRefreshListener {
             refreshAwaiting()
@@ -50,7 +53,7 @@ class TrackingFragment(
         }
 
         rootView.search_btn.setOnClickListener {
-            // TODO: inflate new fragment
+            mCallback.onSearchButtonPressed()
         }
         return rootView
     }
@@ -100,5 +103,9 @@ class TrackingFragment(
     companion object {
         @JvmStatic
         fun newInstance(context: Context) = TrackingFragment(context)
+    }
+
+    interface FragmentChangeListener {
+        fun onSearchButtonPressed()
     }
 }

@@ -1,4 +1,4 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,19 +7,19 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.presenters.TrackingPresenter
+import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.fragments.TrackingFragment
 import com.cornellappdev.coursegrab.models.Course
 
 class TrackingAdapter(
     private val coursesList: List<Course>,
-    private val presenter: MainPresenter,
+    private val presenter: TrackingPresenter,
     private val isAwaiting: Boolean,
     private val _fragment: TrackingFragment
-) :
-    RecyclerView.Adapter<TrackingAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<TrackingAdapter.ViewHolder>() {
 
-    class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener {
+    class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val courseTitle: TextView = itemView.findViewById(R.id.course_title)
         val courseStatus: ImageView = itemView.findViewById(R.id.course_status)
         val courseTime: TextView = itemView.findViewById(R.id.course_time)
@@ -27,7 +27,6 @@ class TrackingAdapter(
         val courseMode: TextView = itemView.findViewById(R.id.course_modality)
         val removeButton: Button = itemView.findViewById(R.id.button_remove)
         val enrollButton: Button = itemView.findViewById(R.id.button_enroll)
-        override fun onClick(view: View) {}
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

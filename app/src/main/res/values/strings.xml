@@ -23,10 +23,7 @@
     <string name="search_courses_hint">Find Courses</string>
 
     <string name="no_courses_alert">No Courses Currently Tracked</string>
-    <string name="no_courses_alert_subtext">
-        Enter an ID below to start tracking\n
-        Find course IDs using the roster above
-    </string>
+    <string name="no_courses_alert_subtext">Tap the search icon to start adding courses</string>
 
     <string name="remove_button">Remove</string>
     <string name="track_button">Track</string>
@@ -35,6 +32,10 @@
     <string name="no_results_alert">No Results</string>
     <string name="no_results_alert_subtext_start_searching">
         Enter a query above to start searching
+    </string>
+    <string name="not_enough_character_alert">3 characters needed</string>
+    <string name="not_enough_character_subtext">
+        Please add more
     </string>
     <string name="no_results_alert_subtext_try_another">
         Try a different query

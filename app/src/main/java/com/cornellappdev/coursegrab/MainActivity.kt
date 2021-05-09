@@ -2,16 +2,17 @@ package com.cornellappdev.coursegrab
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
+import com.cornellappdev.coursegrab.fragments.SearchFragment
 import com.cornellappdev.coursegrab.fragments.TrackingFragment
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TrackingFragment.FragmentChangeListener, SearchFragment.FragmentChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val fragmentManager = supportFragmentManager;
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container, TrackingFragment(this))
             .addToBackStack("tracking")
             .commit()
@@ -55,6 +56,17 @@ class MainActivity : AppCompatActivity() {
 //    }
 
     override fun onBackPressed() {}
+
+    override fun onSearchButtonPressed() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, SearchFragment(this))
+            .addToBackStack("search")
+            .commit()
+    }
+
+    override fun onBackButtonPressed() {
+        supportFragmentManager.popBackStackImmediate()
+    }
 
 
     //TODO
