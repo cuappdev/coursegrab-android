@@ -1,6 +1,5 @@
 package com.cornellappdev.coursegrab
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,13 +7,14 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.fragments.TrackingFragment
 import com.cornellappdev.coursegrab.models.Course
 
 class TrackingAdapter(
     private val coursesList: List<Course>,
     private val presenter: MainPresenter,
-    private val context: Context,
-    private val isAwaiting: Boolean
+    private val isAwaiting: Boolean,
+    private val _fragment: TrackingFragment
 ) :
     RecyclerView.Adapter<TrackingAdapter.ViewHolder>() {
 
@@ -27,7 +27,6 @@ class TrackingAdapter(
         val courseMode: TextView = itemView.findViewById(R.id.course_modality)
         val removeButton: Button = itemView.findViewById(R.id.button_remove)
         val enrollButton: Button = itemView.findViewById(R.id.button_enroll)
-        //TODO: add modality
         override fun onClick(view: View) {}
     }
 
@@ -46,8 +45,7 @@ class TrackingAdapter(
         holder.courseStatus.setImageResource(if (coursesList[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
         holder.removeButton.setOnClickListener {
-            //TODO
-            presenter.removeCourse(coursesList[position].catalog_num)
+            presenter.removeCourse(coursesList[position].catalog_num, _fragment)
         }
 
         if (isAwaiting) {
