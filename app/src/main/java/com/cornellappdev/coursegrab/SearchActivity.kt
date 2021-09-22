@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
@@ -51,6 +53,23 @@ class SearchActivity : AppCompatActivity() {
             false
         })
 
+        editText_search.doOnTextChanged { text, _, _, count ->
+            if (count > 2) {
+                searchCourses(text.toString())
+            } else {
+                layout_results.visibility = View.GONE
+                no_results_view.visibility = View.VISIBLE
+                no_results_icon.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        this,
+                        R.drawable.ic_status_warning
+                    )
+                );
+                no_results_title.text = getString(R.string.requires_longer_search)
+                no_results_subtitle.text = getString(R.string.requires_longer_search_subtext)
+            }
+        }
+
         back_btn.setOnClickListener { finish() }
     }
 
@@ -66,6 +85,9 @@ class SearchActivity : AppCompatActivity() {
                 )
             }!!.data.courses
 
+            if (editText_search.text.toString() != query)
+                return@launch;
+
             // Results Courses Adapter
             searchViewManager = LinearLayoutManager(this@SearchActivity)
             searchViewAdapter = ResultsAdapter(courseList, this@SearchActivity)
@@ -78,6 +100,13 @@ class SearchActivity : AppCompatActivity() {
 
             layout_results.visibility = if (courseList.isNotEmpty()) View.VISIBLE else View.GONE
             no_results_view.visibility = if (courseList.isEmpty()) View.VISIBLE else View.GONE
+            no_results_icon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this@SearchActivity,
+                    R.drawable.ic_status_closed
+                )
+            );
+            no_results_title.text = getString(R.string.no_courses_alert)
             no_results_subtitle.text = getString(R.string.no_results_alert_subtext_try_another)
         }
     }

@@ -5,6 +5,24 @@
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/drawable-v24/enroll_button_background.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/drawable/card_layout_background.xml" value="0.18385416666666668" />
+        <entry key="app/src/main/res/drawable/enroll_button_background.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/drawable/ic_status_closed.xml" value="0.31203703703703706" />
+        <entry key="app/src/main/res/drawable/remove_button_background.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/drawable/rounded_add_button.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/drawable/track_button_background.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.15744535519125682" />
+        <entry key="app/src/main/res/layout/activity_search.xml" value="0.20471014492753623" />
+        <entry key="app/src/main/res/layout/course_available_list_item.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/layout/course_awaiting_list_item.xml" value="0.20878623188405798" />
+      </map>
+    </option>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
