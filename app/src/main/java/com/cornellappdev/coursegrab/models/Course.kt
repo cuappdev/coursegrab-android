@@ -13,5 +13,7 @@ data class Course(
     val status: String,
     val subject_code: String,
     val title: String,
+    val num_tracking: Int,
+    val mode: String,
     val errors: List<String>?
 ) : Parcelable

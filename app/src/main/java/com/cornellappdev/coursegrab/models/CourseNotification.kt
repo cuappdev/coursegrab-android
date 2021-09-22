@@ -7,6 +7,6 @@ import kotlinx.android.parcel.Parcelize
 data class CourseNotification(
     val title: String,
     val body: String,
-    val section: Section,
+    val section: Course,
     val timestamp: Long
 ) : Parcelable

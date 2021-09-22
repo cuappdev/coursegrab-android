@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.models.Section
 import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.addTracking
@@ -105,7 +104,7 @@ class CourseDetailsActivity : AppCompatActivity() {
     }
 
     class SectionAdapter(
-        private val availableCourses: List<Section>,
+        private val availableCourses: List<Course>,
         private val context: Context
     ) :
         RecyclerView.Adapter<SectionAdapter.ViewHolder>() {

@@ -4,8 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.CourseNotification
-import com.cornellappdev.coursegrab.models.Section
 import kotlinx.android.synthetic.main.activity_notification_modal.*
 
 class NotificationModal : AppCompatActivity() {
@@ -14,7 +14,7 @@ class NotificationModal : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_modal)
 
-        val course: Section =
+        val course: Course =
             (intent.getParcelableExtra<CourseNotification>("courseDetails") as CourseNotification).section
 
         course_title.text = "${course.subject_code} ${course.course_num}: ${course.title}"
