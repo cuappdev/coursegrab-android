@@ -32,9 +32,13 @@
     <string name="track_button">Track</string>
     <string name="enroll_button">Enroll</string>
 
-    <string name="no_results_alert">No Results</string>
+    <string name="no_results_alert">No results</string>
     <string name="no_results_alert_subtext_start_searching">
         Enter a query above to start searching
+    </string>
+    <string name="requires_longer_search">Too few characters</string>
+    <string name="requires_longer_search_subtext">
+        Please type at least 3 characters
     </string>
     <string name="no_results_alert_subtext_try_another">
         Try a different query
