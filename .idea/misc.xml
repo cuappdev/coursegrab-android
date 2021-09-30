@@ -12,8 +12,12 @@
         <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/drawable/ic_open_arrow.xml" value="0.14947916666666666" />
         <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/drawable/ic_search.xml" value="0.14947916666666666" />
         <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/drawable/ic_status_closed.xml" value="0.14947916666666666" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/drawable/ic_tracking_ppl_logo.xml" value="0.11875" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/drawable/track_button_background.xml" value="0.15677083333333333" />
         <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/activity_course_details.xml" value="0.23229166666666667" />
-        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_section_item.xml" value="0.5" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/activity_login.xml" value="0.16458333333333333" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/activity_main.xml" value="0.146875" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_section_item.xml" value="0.25" />
       </map>
     </option>
   </component>
