@@ -115,6 +115,7 @@ class CourseDetailsActivity : AppCompatActivity() {
             val sectionStatus: ImageView = itemView.findViewById(R.id.section_status)
             val removeButton: Button = itemView.findViewById(R.id.button_remove)
             val trackButton: Button = itemView.findViewById(R.id.button_track)
+            val trackText: TextView = itemView.findViewById(R.id.TrackingText)
 
             override fun onClick(view: View) {}
         }
@@ -126,9 +127,14 @@ class CourseDetailsActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
             holder.sectionTitle.text = availableCourses[position].section
             holder.sectionStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
+            //change tracking text
+            holder.trackText.text = availableCourses[position].num_tracking.toString() + " Tracking"
+
+            //Change the track button to remove button
             holder.removeButton.visibility =
                 if (availableCourses[position].is_tracking) View.VISIBLE else View.GONE
             holder.trackButton.visibility =
