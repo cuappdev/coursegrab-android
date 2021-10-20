@@ -1,5 +1,6 @@
 package com.cornellappdev.coursegrab.networking
 
+import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
@@ -21,7 +22,6 @@ object Request {
         val responseBodyString = responseBody?.string() ?: ""
 
         val responseBodyJSON = Gson()
-
         return responseBodyJSON.fromJson<T>(responseBodyString, typeToken)
     }
 

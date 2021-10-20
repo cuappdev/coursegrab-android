@@ -39,8 +39,6 @@ class Endpoint(
                     .get()
                     .build()
             }
-
-
             else -> {
                 throw IllegalArgumentException("NOT IMPLEMENTED")
             }
