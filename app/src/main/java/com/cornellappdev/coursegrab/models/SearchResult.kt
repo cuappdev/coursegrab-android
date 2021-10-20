@@ -8,5 +8,5 @@ data class SearchResult(
     val subject_code: String,
     val course_num: Int,
     val title: String,
-    val sections: List<Section>
+    val sections: List<Course>
 ) : Parcelable

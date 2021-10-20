@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.models.Section
 import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.addTracking
@@ -105,7 +104,7 @@ class CourseDetailsActivity : AppCompatActivity() {
     }
 
     class SectionAdapter(
-        private val availableCourses: List<Section>,
+        private val availableCourses: List<Course>,
         private val context: Context
     ) :
         RecyclerView.Adapter<SectionAdapter.ViewHolder>() {
@@ -116,6 +115,7 @@ class CourseDetailsActivity : AppCompatActivity() {
             val sectionStatus: ImageView = itemView.findViewById(R.id.section_status)
             val removeButton: Button = itemView.findViewById(R.id.button_remove)
             val trackButton: Button = itemView.findViewById(R.id.button_track)
+            val trackText: TextView = itemView.findViewById(R.id.TrackingText)
 
             override fun onClick(view: View) {}
         }
@@ -127,9 +127,14 @@ class CourseDetailsActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
             holder.sectionTitle.text = availableCourses[position].section
             holder.sectionStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
+            //change tracking text
+            holder.trackText.text = availableCourses[position].num_tracking.toString() + " Tracking"
+
+            //Change the track button to remove button
             holder.removeButton.visibility =
                 if (availableCourses[position].is_tracking) View.VISIBLE else View.GONE
             holder.trackButton.visibility =
