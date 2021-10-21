@@ -54,7 +54,7 @@ class SearchActivity : AppCompatActivity() {
         })
 
         editText_search.doOnTextChanged { text, _, _, count ->
-            if (count > 2) {
+            if ((text ?: "").length > 2) {
                 searchCourses(text.toString())
             } else {
                 layout_results.visibility = View.GONE
