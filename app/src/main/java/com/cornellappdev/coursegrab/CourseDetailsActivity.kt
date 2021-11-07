@@ -147,6 +147,12 @@ class CourseDetailsActivity : AppCompatActivity() {
                 )
                 holder.removeButton.visibility = View.GONE
                 holder.trackButton.visibility = View.VISIBLE
+
+                Toast.makeText(
+                    context,
+                    "Stop Tracking: " + availableCourses[position].section,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             holder.trackButton.setOnClickListener {
@@ -156,6 +162,12 @@ class CourseDetailsActivity : AppCompatActivity() {
                 )
                 holder.trackButton.visibility = View.GONE
                 holder.removeButton.visibility = View.VISIBLE
+
+                Toast.makeText(
+                    context,
+                    "Now Tracking: " + availableCourses[position].section,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
