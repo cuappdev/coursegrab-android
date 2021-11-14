@@ -48,4 +48,7 @@
     <string name="course_id">Course ID</string>
     <string name="open_student_center">Open Student Center</string>
     <string name="back_to_home">Back to Home</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
