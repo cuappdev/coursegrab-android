@@ -11,16 +11,18 @@
     <Button
         android:id="@+id/background_Button"
         android:layout_width="match_parent"
-        android:layout_height="145dp"
+        android:layout_height="160dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+
         android:background="#FFFFFF"
-        android:translationZ="-10dp"
+        android:stateListAnimator="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
- />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/course_title"
@@ -36,6 +38,7 @@
         android:text="CS 1998: Intro to Android"
         android:textColor="@android:color/black"
         android:textSize="18sp"
+        android:translationZ="2dp"
         app:layout_constraintEnd_toStartOf="@+id/course_status"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -46,9 +49,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:translationZ="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/course_title"
         app:layout_constraintTop_toTopOf="@id/course_title"
+
         app:srcCompat="@drawable/ic_status_closed" />
 
     <TextView
@@ -61,6 +66,7 @@
         android:gravity="bottom"
         android:text="LEC 006 / M 7:30PM"
         android:textSize="16sp"
+        android:translationZ="2dp"
         app:layout_constraintEnd_toStartOf="@+id/course_pin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/course_title" />
@@ -73,6 +79,7 @@
         android:fontFamily="sans-serif-medium"
         android:text="10032"
         android:textSize="16sp"
+        android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/course_time"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/course_time"
@@ -90,6 +97,7 @@
         android:background="@drawable/remove_button_background"
         android:text="@string/remove_button"
         android:textColor="@color/removalRed"
+        android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

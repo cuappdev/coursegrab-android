@@ -8,6 +8,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/activity_course_details.xml" value="0.3625" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/activity_main.xml" value="0.25677083333333334" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/activity_notification_modal.xml" value="0.25677083333333334" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/activity_search.xml" value="0.12487335359675786" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_available_list_item.xml" value="0.20260416666666667" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_available_list_item_v2.xml" value="0.33" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_avaliable_list_item_v2.xml" value="0.14447463768115942" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_awaiting_list_item.xml" value="0.25" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_awaiting_list_item_v2.xml" value="0.33" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_awaiting_list_item_v3.xml" value="0.20260416666666667" />
+        <entry key="..\:/Users/thesn/Documents/GitHub/coursegrab-android/app/src/main/res/layout/course_search_list_item.xml" value="0.12487335359675786" />
         <entry key="app/src/main/res/drawable-v24/enroll_button_background.xml" value="0.321025641025641" />
         <entry key="app/src/main/res/drawable/card_layout_background.xml" value="0.18385416666666668" />
         <entry key="app/src/main/res/drawable/enroll_button_background.xml" value="0.321025641025641" />
