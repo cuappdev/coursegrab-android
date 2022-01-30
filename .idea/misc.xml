@@ -15,6 +15,7 @@
         <entry key="app/src/main/res/drawable/remove_button_background.xml" value="0.321025641025641" />
         <entry key="app/src/main/res/drawable/rounded_add_button.xml" value="0.321025641025641" />
         <entry key="app/src/main/res/drawable/track_button_background.xml" value="0.321025641025641" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.20652173913043478" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.15744535519125682" />
         <entry key="app/src/main/res/layout/activity_search.xml" value="0.20471014492753623" />
         <entry key="app/src/main/res/layout/activity_splash_screen.xml" value="0.1897644927536232" />

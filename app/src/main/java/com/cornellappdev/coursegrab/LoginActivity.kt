@@ -13,7 +13,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.CoroutineScope
@@ -104,8 +104,8 @@ class LoginActivity : AppCompatActivity() {
         preferencesHelper.updateToken = userSession.update_token
         preferencesHelper.expiresAt = userSession.session_expiration.toLong()
 
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
-            sendRegistrationToServer(instanceIdResult.token)
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+            sendRegistrationToServer(token)
         }
 
         setNotificationsStatus(true)
