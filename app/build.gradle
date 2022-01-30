@@ -10,8 +10,8 @@ android {
         applicationId "com.cornellappdev.coursegrab"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 7
-        versionName "1.1.0"
+        versionCode 8
+        versionName "1.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BACKEND_URI", "\"coursegrab-backend.cornellappdev.com\"")
     }
