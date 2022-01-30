@@ -158,7 +158,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
     private fun jump() {
         if (isFinishing) return
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, LoginActivity::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish()
     }
