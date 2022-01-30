@@ -8,24 +8,12 @@ import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.cornellappdev.coursegrab.databinding.ActivitySplashScreenBinding
 import android.content.Intent
-import android.media.MediaPlayer
-
-import android.media.MediaPlayer.OnCompletionListener
-
 import android.net.Uri
-
 import android.widget.VideoView
 import java.lang.Exception
 
-
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 class SplashScreenActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashScreenBinding
@@ -34,13 +22,9 @@ class SplashScreenActivity : AppCompatActivity() {
 
     @SuppressLint("InlinedApi")
     private val hidePart2Runnable = Runnable {
-        // Delayed removal of status and navigation bar
         if (Build.VERSION.SDK_INT >= 30) {
             fullscreenContent.windowInsetsController?.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
         } else {
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
             fullscreenContent.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LOW_PROFILE or
                         View.SYSTEM_UI_FLAG_FULLSCREEN or
@@ -86,7 +70,6 @@ class SplashScreenActivity : AppCompatActivity() {
 
         isFullscreen = true
 
-        // Set up the user interaction to manually show or hide the system UI.
         fullscreenContent = binding.fullscreenContent
         fullscreenContent.setOnClickListener { toggle() }
         try {
@@ -101,15 +84,11 @@ class SplashScreenActivity : AppCompatActivity() {
         } catch (ex: Exception) {
             jump()
         }
-
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
 
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
         delayedHide(0)
     }
 
@@ -122,17 +101,14 @@ class SplashScreenActivity : AppCompatActivity() {
     }
 
     private fun hide() {
-        // Hide UI first
         supportActionBar?.hide()
         isFullscreen = false
 
-        // Schedule a runnable to remove the status and navigation bar after a delay
         hideHandler.removeCallbacks(showPart2Runnable)
         hideHandler.postDelayed(hidePart2Runnable, UI_ANIMATION_DELAY.toLong())
     }
 
     private fun show() {
-        // Show the system bar
         if (Build.VERSION.SDK_INT >= 30) {
             fullscreenContent.windowInsetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
         } else {
@@ -142,7 +118,6 @@ class SplashScreenActivity : AppCompatActivity() {
         }
         isFullscreen = true
 
-        // Schedule a runnable to display UI elements after a delay
         hideHandler.removeCallbacks(hidePart2Runnable)
         hideHandler.postDelayed(showPart2Runnable, UI_ANIMATION_DELAY.toLong())
     }
@@ -164,22 +139,8 @@ class SplashScreenActivity : AppCompatActivity() {
     }
 
     companion object {
-        /**
-         * Whether or not the system UI should be auto-hidden after
-         * [AUTO_HIDE_DELAY_MILLIS] milliseconds.
-         */
         private const val AUTO_HIDE = true
-
-        /**
-         * If [AUTO_HIDE] is set, the number of milliseconds to wait after
-         * user interaction before hiding the system UI.
-         */
         private const val AUTO_HIDE_DELAY_MILLIS = 3000
-
-        /**
-         * Some older devices needs a small delay between UI widget updates
-         * and a change of the status and navigation bar.
-         */
         private const val UI_ANIMATION_DELAY = 300
     }
 }
