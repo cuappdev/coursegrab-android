@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                     getTracking.okHttpRequest(),
                     typeToken
                 )
-            }!!.data.sections
+            }!!.data.sections ?: listOf()
 
             for (course in courseList) {
                 if (course.status == "OPEN")
