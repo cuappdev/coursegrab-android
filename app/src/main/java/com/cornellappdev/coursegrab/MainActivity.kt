@@ -29,7 +29,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.RuntimeException
+import com.cornellappdev.coursegrab.models.SearchResult
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var availableRecyclerView: RecyclerView
@@ -201,6 +202,31 @@ class MainActivity : AppCompatActivity() {
                 ).show()
         }
     }
+    private fun editCourse(courseId: Int, context: Context) {
+        val editCourse =
+            Endpoint.getCourseByID(preferencesHelper.sessionToken.toString(), courseID)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val typeToken = object : TypeToken<ApiResponse<SearchResult>>() {}.type
+            val course = withContext(Dispatchers.IO) {
+                Request.makeRequest<ApiResponse<SearchResult>>(
+                    editCourse.okHttpRequest(),
+                    typeToken
+                )
+            }!!.data
+
+
+
+//            context.setOnClickListener {
+                val intent = Intent(context, CourseDetailsActivity::class.java).apply {
+                    putExtra("courseDetails", course)
+                }
+                context.startActivity(intent)
+//            }
+
+
+        }
+    }
 
     private fun enrollCourse(courseId: Int, context: Context) {
         val browserIntent =
@@ -222,13 +248,14 @@ class MainActivity : AppCompatActivity() {
             val coursePin: TextView = itemView.findViewById(R.id.course_pin)
             val enrollButton: Button = itemView.findViewById(R.id.button_enroll)
             val removeButton: Button = itemView.findViewById(R.id.button_remove)
+            val backgroundButton: Button = itemView.findViewById(R.id.background_Button)
 
             override fun onClick(view: View) {}
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.course_available_list_item, parent, false) as View
+                .inflate(R.layout.course_available_list_item_v2, parent, false) as View
             return ViewHolder(view)
         }
 
@@ -250,6 +277,12 @@ class MainActivity : AppCompatActivity() {
                     availableCourses[position].catalog_num, context
                 )
             }
+
+            holder.backgroundButton.setOnClickListener{
+                (context as MainActivity).editCourse(
+                    availableCourses[position].catalog_num, context
+                )
+            }
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -266,7 +299,7 @@ class MainActivity : AppCompatActivity() {
             val courseTime: TextView = itemView.findViewById(R.id.course_time)
             val coursePin: TextView = itemView.findViewById(R.id.course_pin)
             val removeButton: Button = itemView.findViewById(R.id.button_remove)
-
+            val backgroundButton: Button = itemView.findViewById(R.id.background_Button)
             override fun onClick(view: View) {
 
             }
@@ -274,7 +307,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.course_awaiting_list_item, parent, false) as View
+                .inflate(R.layout.course_awaiting_list_item_v2, parent, false) as View
             return ViewHolder(view)
         }
 
@@ -287,6 +320,11 @@ class MainActivity : AppCompatActivity() {
 
             holder.removeButton.setOnClickListener {
                 (context as MainActivity).removeCourse(
+                    awaitingCourses[position].catalog_num, context
+                )
+            }
+            holder.backgroundButton.setOnClickListener{
+                (context as MainActivity).editCourse(
                     awaitingCourses[position].catalog_num, context
                 )
             }

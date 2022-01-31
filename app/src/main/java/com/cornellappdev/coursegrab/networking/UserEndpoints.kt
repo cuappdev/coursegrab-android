@@ -134,3 +134,16 @@ fun Endpoint.Companion.setNotification(accessToken: String, notifSetting: String
         method = EndpointMethod.POST
     )
 }
+
+fun Endpoint.Companion.getCourseByID(accessToken: String, courseId: Int): Endpoint {
+    val codeJSON = JSONObject()
+    val authHeaders = mapOf(Pair("Authorization", "Bearer $accessToken"))
+    val requestBody =
+        codeJSON.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+    return Endpoint(
+        path = "/courses/1240/",
+        headers = authHeaders,
+        body = requestBody,
+        method = EndpointMethod.GET
+    )
+}
