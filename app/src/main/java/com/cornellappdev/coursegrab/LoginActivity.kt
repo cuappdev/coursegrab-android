@@ -147,7 +147,8 @@ class LoginActivity : AppCompatActivity() {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)
                 if (account?.email?.contains("@cornell.edu") == true ||
-                    account?.email == "appstoreappdev@gmail.com"
+                    account?.email == "appstoreappdev@gmail.com" ||
+                    account?.email == "coursegrab.droid@gmail.com"
                 ) {
                     val initializeSession =
                         Endpoint.initializeSession(account.idToken.toString(), null)
