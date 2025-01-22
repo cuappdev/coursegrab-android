@@ -7,7 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.UserSession
-import com.cornellappdev.coursegrab.networking.*
+import com.cornellappdev.coursegrab.networking.Endpoint
+import com.cornellappdev.coursegrab.networking.Request
+import com.cornellappdev.coursegrab.networking.deviceToken
+import com.cornellappdev.coursegrab.networking.initializeSession
+import com.cornellappdev.coursegrab.networking.setNotification
+import com.cornellappdev.coursegrab.networking.updateSession
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -15,7 +20,8 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_login.login_rootView
+import kotlinx.android.synthetic.main.activity_login.sign_in_button
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -140,8 +146,12 @@ class LoginActivity : AppCompatActivity() {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)
-                if (account?.email?.contains("@cornell.edu") == true) {
-                    val initializeSession = Endpoint.initializeSession(account.idToken.toString(), null)
+                if (account?.email?.contains("@cornell.edu") == true ||
+                    account?.email == "appstoreappdev@gmail.com" ||
+                    account?.email == "coursegrab.droid@gmail.com"
+                ) {
+                    val initializeSession =
+                        Endpoint.initializeSession(account.idToken.toString(), null)
 
                     CoroutineScope(Dispatchers.Main).launch {
                         val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
@@ -165,7 +175,7 @@ class LoginActivity : AppCompatActivity() {
 
 
             } catch (e: ApiException) {
-                e.printStackTrace()
+                Log.e("HELP", null, e)
             }
         }
     }

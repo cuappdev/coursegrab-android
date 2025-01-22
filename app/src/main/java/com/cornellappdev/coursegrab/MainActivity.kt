@@ -204,7 +204,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun editCourse(courseId: Int, context: Context) {
         val editCourse =
-            Endpoint.getCourseByID(preferencesHelper.sessionToken.toString(), courseID)
+            Endpoint.getCourseByID(preferencesHelper.sessionToken.toString(), courseId)
 
         CoroutineScope(Dispatchers.Main).launch {
             val typeToken = object : TypeToken<ApiResponse<SearchResult>>() {}.type
