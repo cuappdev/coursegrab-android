@@ -5,12 +5,12 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 31
+    compileSdk 34
     defaultConfig {
         applicationId "com.cornellappdev.coursegrab"
         minSdkVersion 23
-        targetSdkVersion 31
-        versionCode 8
+        targetSdkVersion 34
+        versionCode 10
         versionName "1.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BACKEND_URI", "\"coursegrab-backend.cornellappdev.com\"")

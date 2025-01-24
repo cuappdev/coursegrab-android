@@ -1,9 +1,12 @@
 package com.cornellappdev.coursegrab
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,19 +20,37 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
+import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.models.TrackingContainer
-import com.cornellappdev.coursegrab.networking.*
+import com.cornellappdev.coursegrab.networking.Endpoint
+import com.cornellappdev.coursegrab.networking.Request
+import com.cornellappdev.coursegrab.networking.addTracking
+import com.cornellappdev.coursegrab.networking.getCourseByID
+import com.cornellappdev.coursegrab.networking.getTracking
+import com.cornellappdev.coursegrab.networking.removeTracking
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.addCourseButton
+import kotlinx.android.synthetic.main.activity_main.addCourseEditText
+import kotlinx.android.synthetic.main.activity_main.available_list
+import kotlinx.android.synthetic.main.activity_main.available_title
+import kotlinx.android.synthetic.main.activity_main.awaiting_list
+import kotlinx.android.synthetic.main.activity_main.awaiting_title
+import kotlinx.android.synthetic.main.activity_main.layout_available
+import kotlinx.android.synthetic.main.activity_main.layout_awaiting
+import kotlinx.android.synthetic.main.activity_main.no_courses_view
+import kotlinx.android.synthetic.main.activity_main.refresh_courses_layout
+import kotlinx.android.synthetic.main.activity_main.search_btn
+import kotlinx.android.synthetic.main.activity_main.settings_btn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.cornellappdev.coursegrab.models.SearchResult
 
 
 class MainActivity : AppCompatActivity() {
@@ -94,6 +115,35 @@ class MainActivity : AppCompatActivity() {
             }
             false
         })
+
+        // Check if permission is already granted
+        if (Build.VERSION.SDK_INT >= 33 && (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED)
+        ) {
+            // Request the permission
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                1,
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(
+                this,
+                "Please enable notifications in settings to receive course updates",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     override fun onResume() {
@@ -202,6 +252,7 @@ class MainActivity : AppCompatActivity() {
                 ).show()
         }
     }
+
     private fun editCourse(courseId: Int, context: Context) {
         val editCourse =
             Endpoint.getCourseByID(preferencesHelper.sessionToken.toString(), courseId)
@@ -216,12 +267,11 @@ class MainActivity : AppCompatActivity() {
             }!!.data
 
 
-
 //            context.setOnClickListener {
-                val intent = Intent(context, CourseDetailsActivity::class.java).apply {
-                    putExtra("courseDetails", course)
-                }
-                context.startActivity(intent)
+            val intent = Intent(context, CourseDetailsActivity::class.java).apply {
+                putExtra("courseDetails", course)
+            }
+            context.startActivity(intent)
 //            }
 
 
@@ -278,7 +328,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            holder.backgroundButton.setOnClickListener{
+            holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
                     availableCourses[position].catalog_num, context
                 )
@@ -323,7 +373,7 @@ class MainActivity : AppCompatActivity() {
                     awaitingCourses[position].catalog_num, context
                 )
             }
-            holder.backgroundButton.setOnClickListener{
+            holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
                     awaitingCourses[position].catalog_num, context
                 )
