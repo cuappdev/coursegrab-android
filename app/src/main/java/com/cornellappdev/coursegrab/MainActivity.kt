@@ -131,6 +131,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(
+                this,
+                "Please enable notifications in settings to receive course updates",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 

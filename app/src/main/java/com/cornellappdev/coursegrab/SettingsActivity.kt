@@ -59,7 +59,7 @@ class SettingsActivity : AppCompatActivity() {
             ) {
                 Toast.makeText(
                     this,
-                    "Please enable notification permission in settings!",
+                    "Please enable notifications in settings to receive course updates",
                     Toast.LENGTH_LONG,
                 ).show()
             } else {
