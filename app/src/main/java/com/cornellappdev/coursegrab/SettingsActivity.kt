@@ -3,12 +3,12 @@ package com.cornellappdev.coursegrab
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.cornellappdev.coursegrab.databinding.ActivitySettingsBinding
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
@@ -76,7 +76,7 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.classRoster.setOnClickListener {
             val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://classes.cornell.edu/"))
+                Intent(Intent.ACTION_VIEW, "https://classes.cornell.edu/".toUri())
             startActivity(browserIntent)
         }
 
@@ -84,7 +84,7 @@ class SettingsActivity : AppCompatActivity() {
             val browserIntent =
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("https://registrar.cornell.edu/academic-calendar")
+                    "https://registrar.cornell.edu/academic-calendar".toUri()
                 )
             startActivity(browserIntent)
         }

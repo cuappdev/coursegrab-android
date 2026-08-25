@@ -1,7 +1,6 @@
 package com.cornellappdev.coursegrab
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -21,6 +20,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivityMainBinding
@@ -40,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale.getDefault
-import androidx.core.net.toUri
 
 
 class MainActivity : AppCompatActivity() {
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
             binding.addCourseEditText.clearFocus()
             binding.addCourseEditText.text.clear()
             val inputMethodManager =
-                getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
         }
 
@@ -102,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                 binding.addCourseEditText.clearFocus()
                 binding.addCourseEditText.text.clear()
                 val inputMethodManager =
-                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
                 return@OnKeyListener true
             }
@@ -163,7 +162,7 @@ class MainActivity : AppCompatActivity() {
                     getTracking.okHttpRequest(),
                     typeToken
                 )
-            }!!.data.sections ?: listOf()
+            }!!.data.sections
 
             for (course in courseList) {
                 if (course.status == "OPEN")

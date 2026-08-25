@@ -102,9 +102,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun verifySession(userSession: UserSession) {
-        if (userSession.session_expiration.isNullOrEmpty() ||
-            userSession.session_token.isNullOrEmpty() ||
-            userSession.update_token.isNullOrEmpty()
+        if (userSession.session_expiration.isEmpty() ||
+            userSession.session_token.isEmpty() ||
+            userSession.update_token.isEmpty()
         ) return
 
         preferencesHelper.sessionToken = userSession.session_token
@@ -129,7 +129,7 @@ class LoginActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
                     setNotifs.okHttpRequest(),
                     typeToken
