@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.cornellappdev.coursegrab.databinding.ActivitySettingsBinding
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.networking.Endpoint
@@ -19,12 +20,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_settings.back_btn
-import kotlinx.android.synthetic.main.activity_settings.class_roster
-import kotlinx.android.synthetic.main.activity_settings.cornell_academic_calendar
-import kotlinx.android.synthetic.main.activity_settings.email_alerts_switch
-import kotlinx.android.synthetic.main.activity_settings.mobile_alerts_switch
-import kotlinx.android.synthetic.main.activity_settings.sign_out
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +27,7 @@ import kotlinx.coroutines.withContext
 
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySettingsBinding
     private lateinit var googleSignInClient: GoogleSignInClient
 
     private val preferencesHelper: PreferencesHelper by lazy {
@@ -40,16 +36,17 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        email_alerts_switch.isChecked = preferencesHelper.emailAlertSetting
-        mobile_alerts_switch.isChecked = preferencesHelper.mobileAlertSetting
+        binding.emailAlertsSwitch.isChecked = preferencesHelper.emailAlertSetting
+        binding.mobileAlertsSwitch.isChecked = preferencesHelper.mobileAlertSetting
 
-        email_alerts_switch.setOnCheckedChangeListener { _, isChecked ->
+        binding.emailAlertsSwitch.setOnCheckedChangeListener { _, isChecked ->
             preferencesHelper.emailAlertSetting = isChecked
         }
 
-        mobile_alerts_switch.setOnCheckedChangeListener { _, isChecked ->
+        binding.mobileAlertsSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (
                 Build.VERSION.SDK_INT >= 33 &&
                 ContextCompat.checkSelfPermission(
@@ -77,13 +74,13 @@ class SettingsActivity : AppCompatActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        class_roster.setOnClickListener {
+        binding.classRoster.setOnClickListener {
             val browserIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://classes.cornell.edu/"))
             startActivity(browserIntent)
         }
 
-        cornell_academic_calendar.setOnClickListener {
+        binding.cornellAcademicCalendar.setOnClickListener {
             val browserIntent =
                 Intent(
                     Intent.ACTION_VIEW,
@@ -92,12 +89,12 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(browserIntent)
         }
 
-        sign_out.setOnClickListener {
+        binding.signOut.setOnClickListener {
             preferencesHelper.clearAll()
             signOut()
         }
 
-        back_btn.setOnClickListener { finish() }
+        binding.backBtn.setOnClickListener { finish() }
 
         if (
             Build.VERSION.SDK_INT >= 33 &&
@@ -106,8 +103,8 @@ class SettingsActivity : AppCompatActivity() {
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            mobile_alerts_switch.isChecked = false
-            mobile_alerts_switch.isEnabled = false
+            binding.mobileAlertsSwitch.isChecked = false
+            binding.mobileAlertsSwitch.isEnabled = false
         }
 
     }

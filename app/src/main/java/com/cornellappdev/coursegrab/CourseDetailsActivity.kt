@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.databinding.ActivityCourseDetailsBinding
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
@@ -20,14 +21,14 @@ import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.addTracking
 import com.cornellappdev.coursegrab.networking.removeTracking
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_course_details.*
-import kotlinx.android.synthetic.main.activity_search.back_btn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CourseDetailsActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityCourseDetailsBinding
+
     private lateinit var sectionsRecyclerView: RecyclerView
     private lateinit var sectionsViewAdapter: RecyclerView.Adapter<*>
     private lateinit var sectionsViewManager: RecyclerView.LayoutManager
@@ -38,26 +39,27 @@ class CourseDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_course_details)
+        binding = ActivityCourseDetailsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val courseDetails: SearchResult = intent.getParcelableExtra<SearchResult>("courseDetails") as SearchResult
 
-        header_textView.text = "${courseDetails.subject_code} ${courseDetails.course_num}"
+        binding.headerTextView.text = "${courseDetails.subject_code} ${courseDetails.course_num}"
 
-        course_title.text = courseDetails.title
-        course_details.text =
+        binding.courseTitle.text = courseDetails.title
+        binding.courseDetails.text =
             if (courseDetails.sections.isNotEmpty()) courseDetails.sections.first().instructors.first() else "To Be Assigned"
 
         // Available Courses Adapter
         sectionsViewManager = LinearLayoutManager(this@CourseDetailsActivity)
         sectionsViewAdapter = SectionAdapter(courseDetails.sections, this@CourseDetailsActivity)
 
-        sectionsRecyclerView = sections_recyclerview.apply {
+        sectionsRecyclerView = binding.sectionsRecyclerview.apply {
             layoutManager = sectionsViewManager
             adapter = sectionsViewAdapter
         }
 
-        back_btn.setOnClickListener { finish() }
+        binding.backBtn.setOnClickListener { finish() }
     }
 
     fun addCourse(courseId: Int, context: Context) {
