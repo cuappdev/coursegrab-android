@@ -1,11 +1,9 @@
 package com.cornellappdev.coursegrab
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -22,8 +20,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.databinding.ActivityMainBinding
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
@@ -35,25 +35,16 @@ import com.cornellappdev.coursegrab.networking.getCourseByID
 import com.cornellappdev.coursegrab.networking.getTracking
 import com.cornellappdev.coursegrab.networking.removeTracking
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_main.addCourseButton
-import kotlinx.android.synthetic.main.activity_main.addCourseEditText
-import kotlinx.android.synthetic.main.activity_main.available_list
-import kotlinx.android.synthetic.main.activity_main.available_title
-import kotlinx.android.synthetic.main.activity_main.awaiting_list
-import kotlinx.android.synthetic.main.activity_main.awaiting_title
-import kotlinx.android.synthetic.main.activity_main.layout_available
-import kotlinx.android.synthetic.main.activity_main.layout_awaiting
-import kotlinx.android.synthetic.main.activity_main.no_courses_view
-import kotlinx.android.synthetic.main.activity_main.refresh_courses_layout
-import kotlinx.android.synthetic.main.activity_main.search_btn
-import kotlinx.android.synthetic.main.activity_main.settings_btn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale.getDefault
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var availableRecyclerView: RecyclerView
     private lateinit var availableViewAdapter: RecyclerView.Adapter<*>
     private lateinit var availableViewManager: RecyclerView.LayoutManager
@@ -68,48 +59,49 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         refreshAwaiting()
 
-        refresh_courses_layout.setOnRefreshListener {
+        binding.refreshCoursesLayout.setOnRefreshListener {
             refreshAwaiting()
         }
 
-        settings_btn.setOnClickListener {
+        binding.settingsBtn.setOnClickListener {
             val intent = Intent(this@MainActivity, SettingsActivity::class.java)
             startActivity(intent)
         }
 
-        search_btn.setOnClickListener {
+        binding.searchBtn.setOnClickListener {
             val intent = Intent(this@MainActivity, SearchActivity::class.java)
             startActivity(intent)
         }
 
-        addCourseButton.setOnClickListener {
-            addCourse(addCourseEditText.text.toString().toInt(), this)
-            addCourseEditText.clearFocus()
-            addCourseEditText.text.clear()
+        binding.addCourseButton.setOnClickListener {
+            addCourse(binding.addCourseEditText.text.toString().toInt(), this)
+            binding.addCourseEditText.clearFocus()
+            binding.addCourseEditText.text.clear()
             val inputMethodManager =
-                getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(it.windowToken, 0)
         }
 
-        addCourseEditText.addTextChangedListener(object : TextWatcher {
+        binding.addCourseEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                addCourseButton.isEnabled = (s!!.length > 3)
+                binding.addCourseButton.isEnabled = (s!!.length > 3)
             }
         })
 
-        addCourseEditText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+        binding.addCourseEditText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                addCourse(addCourseEditText.text.toString().toInt(), this)
-                addCourseEditText.clearFocus()
-                addCourseEditText.text.clear()
+                addCourse(binding.addCourseEditText.text.toString().toInt(), this)
+                binding.addCourseEditText.clearFocus()
+                binding.addCourseEditText.text.clear()
                 val inputMethodManager =
-                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
                 return@OnKeyListener true
             }
@@ -152,7 +144,10 @@ class MainActivity : AppCompatActivity() {
         refreshAwaiting()
     }
 
-    override fun onBackPressed() {}
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
 
     private fun refreshAwaiting() {
         val listOpen = mutableListOf<Course>()
@@ -167,7 +162,7 @@ class MainActivity : AppCompatActivity() {
                     getTracking.okHttpRequest(),
                     typeToken
                 )
-            }!!.data.sections ?: listOf()
+            }!!.data.sections
 
             for (course in courseList) {
                 if (course.status == "OPEN")
@@ -180,29 +175,31 @@ class MainActivity : AppCompatActivity() {
             availableViewManager = LinearLayoutManager(this@MainActivity)
             availableViewAdapter = AvailableAdapter(listOpen, this@MainActivity)
 
-            availableRecyclerView = available_list.apply {
+            availableRecyclerView = binding.availableList.apply {
                 layoutManager = availableViewManager
                 adapter = availableViewAdapter
             }
-            available_title.text = "${available_list.adapter?.itemCount} Available"
+            binding.availableTitle.text = "${binding.availableList.adapter?.itemCount} Available"
 
             // Awaiting Courses Adapter
             awaitingViewManager = LinearLayoutManager(this@MainActivity)
             awaitingViewAdapter = AwaitingAdapter(listAwaiting, this@MainActivity)
 
-            awaitingRecyclerView = awaiting_list.apply {
+            awaitingRecyclerView = binding.awaitingList.apply {
                 layoutManager = awaitingViewManager
                 adapter = awaitingViewAdapter
             }
-            awaiting_title.text = "${awaiting_list.adapter?.itemCount} Awaiting"
+            binding.awaitingTitle.text = "${binding.awaitingList.adapter?.itemCount} Awaiting"
 
-            layout_available.visibility = if (listOpen.isNotEmpty()) View.VISIBLE else View.GONE
-            layout_awaiting.visibility = if (listAwaiting.isNotEmpty()) View.VISIBLE else View.GONE
+            binding.layoutAvailable.visibility =
+                if (listOpen.isNotEmpty()) View.VISIBLE else View.GONE
+            binding.layoutAwaiting.visibility =
+                if (listAwaiting.isNotEmpty()) View.VISIBLE else View.GONE
 
-            no_courses_view.visibility =
+            binding.noCoursesView.visibility =
                 if (listOpen.isEmpty() && listAwaiting.isEmpty()) View.VISIBLE else View.GONE
 
-            refresh_courses_layout.isRefreshing = false
+            binding.refreshCoursesLayout.isRefreshing = false
         }
     }
 
@@ -278,9 +275,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun enrollCourse(courseId: Int, context: Context) {
+    private fun enrollCourse() {
         val browserIntent =
-            Intent(Intent.ACTION_VIEW, Uri.parse("http://studentcenter.cornell.edu"))
+            Intent(Intent.ACTION_VIEW, "http://studentcenter.cornell.edu".toUri())
         startActivity(browserIntent)
     }
 
@@ -312,7 +309,7 @@ class MainActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.courseTitle.text =
                 "${availableCourses[position].subject_code} ${availableCourses[position].course_num}: ${availableCourses[position].title}"
-            holder.courseTime.text = availableCourses[position].section.toUpperCase()
+            holder.courseTime.text = availableCourses[position].section.uppercase(getDefault())
             holder.coursePin.text = availableCourses[position].catalog_num.toString()
             holder.courseStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
@@ -324,7 +321,6 @@ class MainActivity : AppCompatActivity() {
 
             holder.enrollButton.setOnClickListener {
                 (context as MainActivity).enrollCourse(
-                    availableCourses[position].catalog_num, context
                 )
             }
 
@@ -364,7 +360,7 @@ class MainActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.courseTitle.text =
                 "${awaitingCourses[position].subject_code} ${awaitingCourses[position].course_num}: ${awaitingCourses[position].title}"
-            holder.courseTime.text = awaitingCourses[position].section.toUpperCase()
+            holder.courseTime.text = awaitingCourses[position].section.uppercase(getDefault())
             holder.coursePin.text = awaitingCourses[position].catalog_num.toString()
             holder.courseStatus.setImageResource(if (awaitingCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
 

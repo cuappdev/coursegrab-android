@@ -1,6 +1,5 @@
 package com.cornellappdev.coursegrab
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -16,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.databinding.ActivitySearchBinding
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.SearchContainer
 import com.cornellappdev.coursegrab.models.SearchResult
@@ -23,13 +23,14 @@ import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.searchCourses
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SearchActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySearchBinding
+
     private lateinit var searchRecyclerView: RecyclerView
     private lateinit var searchViewAdapter: RecyclerView.Adapter<*>
     private lateinit var searchViewManager: RecyclerView.LayoutManager
@@ -40,37 +41,38 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        editText_search.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+        binding.editTextSearch.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                searchCourses(editText_search.text.toString())
+                searchCourses(binding.editTextSearch.text.toString())
                 val inputMethodManager =
-                    getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                    getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
                 return@OnKeyListener true
             }
             false
         })
 
-        editText_search.doOnTextChanged { text, _, _, count ->
+        binding.editTextSearch.doOnTextChanged { text, _, _, _ ->
             if ((text ?: "").length > 2) {
                 searchCourses(text.toString())
             } else {
-                layout_results.visibility = View.GONE
-                no_results_view.visibility = View.VISIBLE
-                no_results_icon.setImageDrawable(
+                binding.layoutResults.visibility = View.GONE
+                binding.noResultsView.visibility = View.VISIBLE
+                binding.noResultsIcon.setImageDrawable(
                     ContextCompat.getDrawable(
                         this,
                         R.drawable.ic_status_warning
                     )
                 );
-                no_results_title.text = getString(R.string.requires_longer_search)
-                no_results_subtitle.text = getString(R.string.requires_longer_search_subtext)
+                binding.noResultsTitle.text = getString(R.string.requires_longer_search)
+                binding.noResultsSubtitle.text = getString(R.string.requires_longer_search_subtext)
             }
         }
 
-        back_btn.setOnClickListener { finish() }
+        binding.backBtn.setOnClickListener { finish() }
     }
 
     private fun searchCourses(query: String) {
@@ -85,29 +87,31 @@ class SearchActivity : AppCompatActivity() {
                 )
             }!!.data.courses
 
-            if (editText_search.text.toString() != query)
+            if (binding.editTextSearch.text.toString() != query)
                 return@launch;
 
             // Results Courses Adapter
             searchViewManager = LinearLayoutManager(this@SearchActivity)
             searchViewAdapter = ResultsAdapter(courseList, this@SearchActivity)
 
-            searchRecyclerView = results_list.apply {
+            searchRecyclerView = binding.resultsList.apply {
                 layoutManager = searchViewManager
                 adapter = searchViewAdapter
             }
-            result_title.text = "${results_list.adapter?.itemCount} Results"
+            binding.resultTitle.text = "${binding.resultsList.adapter?.itemCount} Results"
 
-            layout_results.visibility = if (courseList.isNotEmpty()) View.VISIBLE else View.GONE
-            no_results_view.visibility = if (courseList.isEmpty()) View.VISIBLE else View.GONE
-            no_results_icon.setImageDrawable(
+            binding.layoutResults.visibility =
+                if (courseList.isNotEmpty()) View.VISIBLE else View.GONE
+            binding.noResultsView.visibility = if (courseList.isEmpty()) View.VISIBLE else View.GONE
+            binding.noResultsIcon.setImageDrawable(
                 ContextCompat.getDrawable(
                     this@SearchActivity,
                     R.drawable.ic_status_closed
                 )
             );
-            no_results_title.text = getString(R.string.no_courses_alert)
-            no_results_subtitle.text = getString(R.string.no_results_alert_subtext_try_another)
+            binding.noResultsTitle.text = getString(R.string.no_courses_alert)
+            binding.noResultsSubtitle.text =
+                getString(R.string.no_results_alert_subtext_try_another)
         }
     }
 

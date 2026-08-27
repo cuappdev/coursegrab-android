@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.cornellappdev.coursegrab.databinding.ActivityLoginBinding
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.UserSession
@@ -20,14 +21,13 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.activity_login.login_rootView
-import kotlinx.android.synthetic.main.activity_login.sign_in_button
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLoginBinding
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 10032
 
@@ -37,7 +37,8 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         if (preferencesHelper.expiresAt > System.currentTimeMillis() / 1000L) {
             val intent = Intent(this@LoginActivity, MainActivity::class.java)
@@ -72,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        sign_in_button.setOnClickListener { signIn() }
+        binding.signInButton.setOnClickListener { signIn() }
     }
 
     private fun signIn() {
@@ -101,9 +102,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun verifySession(userSession: UserSession) {
-        if (userSession.session_expiration.isNullOrEmpty() ||
-            userSession.session_token.isNullOrEmpty() ||
-            userSession.update_token.isNullOrEmpty()
+        if (userSession.session_expiration.isEmpty() ||
+            userSession.session_token.isEmpty() ||
+            userSession.update_token.isEmpty()
         ) return
 
         preferencesHelper.sessionToken = userSession.session_token
@@ -128,7 +129,7 @@ class LoginActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
                     setNotifs.okHttpRequest(),
                     typeToken
@@ -166,7 +167,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 } else {
                     Snackbar.make(
-                        login_rootView,
+                        binding.loginRootView,
                         "Please use a @cornell.edu account",
                         Snackbar.LENGTH_LONG
                     ).show()

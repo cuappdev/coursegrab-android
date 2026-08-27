@@ -3,7 +3,6 @@ package com.cornellappdev.coursegrab
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
@@ -35,7 +34,6 @@ class NotificationService : FirebaseMessagingService() {
      * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
      */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-//        Log.d("Networking", remoteMessage.data.toString())
         // Check if message contains a data payload.
         remoteMessage.data.isNotEmpty().let {
             val courseInfoRaw = Gson()
@@ -59,6 +57,7 @@ class NotificationService : FirebaseMessagingService() {
      * the previous token had been compromised. Note that this is called when the InstanceID token
      * is initially generated so this is where you would retrieve the token.
      */
+    @Deprecated("Deprecated in Java")
     override fun onNewToken(token: String) {
         sendRegistrationToServer(token)
     }
@@ -79,15 +78,12 @@ class NotificationService : FirebaseMessagingService() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
                     sendDeviceToken.okHttpRequest(),
                     typeToken
                 )
             }
-
-//            if (response!!.success)
-//                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
         }
     }
 
@@ -102,7 +98,7 @@ class NotificationService : FirebaseMessagingService() {
         intent.putExtra("courseDetails", course)
         val pendingIntent = PendingIntent.getActivity(
             this, 10032, intent,
-            PendingIntent.FLAG_ONE_SHOT
+            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val channelId = getString(R.string.default_notification_channel_id)
@@ -119,7 +115,7 @@ class NotificationService : FirebaseMessagingService() {
             )
 
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

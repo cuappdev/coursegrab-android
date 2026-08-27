@@ -1,0 +1,8 @@
+# Windows batch scripts break if checked out with LF endings.
+# This overrides core.autocrlf=input, which would otherwise strip the CRLFs.
+*.bat text eol=crlf
+
+# Unix shell scripts must stay LF, even for contributors on Windows
+# with core.autocrlf=true. CRLF here breaks the shebang under sh/CI/Docker.
+gradlew text eol=lf
+*.sh    text eol=lf
