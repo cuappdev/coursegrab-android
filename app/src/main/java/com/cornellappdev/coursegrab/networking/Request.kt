@@ -1,6 +1,5 @@
 package com.cornellappdev.coursegrab.networking
 
-import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
@@ -19,7 +18,7 @@ object Request {
     suspend inline fun <reified T> makeRequest(request: okhttp3.Request, typeToken: Type): T? {
         val response = httpClient.newCall(request).await()
         val responseBody = response.body
-        val responseBodyString = responseBody?.string() ?: ""
+        val responseBodyString = responseBody.string()
 
         val responseBodyJSON = Gson()
         return responseBodyJSON.fromJson<T>(responseBodyString, typeToken)
@@ -40,7 +39,7 @@ object Request {
                 }
 
                 override fun onFailure(call: Call, e: IOException) {
-                    // Don't bother with resuming the continuation if it is already cancelled.
+                    // Don't bother with resuming the continuation if it is already canceled.
                     if (recordStackTrace != null) {
                         recordStackTrace.initCause(e)
                         continuation.resumeWithException(recordStackTrace)
@@ -53,7 +52,7 @@ object Request {
             continuation.invokeOnCancellation {
                 try {
                     cancel()
-                } catch (ex: Throwable) {
+                } catch (_: Throwable) {
                     //Ignore cancel exception
                 }
             }

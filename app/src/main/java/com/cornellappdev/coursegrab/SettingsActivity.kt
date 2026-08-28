@@ -5,22 +5,23 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.ClearCredentialException
+import androidx.lifecycle.lifecycleScope
 import com.cornellappdev.coursegrab.databinding.ActivitySettingsBinding
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.setNotification
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,7 +29,10 @@ import kotlinx.coroutines.withContext
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private val credentialManager: CredentialManager by lazy {
+        CredentialManager.create(this)
+    }
 
     private val preferencesHelper: PreferencesHelper by lazy {
         PreferencesHelper(this)
@@ -66,13 +70,6 @@ class SettingsActivity : AppCompatActivity() {
                 setNotificationsStatus(isChecked)
             }
         }
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         binding.classRoster.setOnClickListener {
             val browserIntent =
@@ -115,7 +112,7 @@ class SettingsActivity : AppCompatActivity() {
             if (enabled) "ANDROID" else "NONE"
         )
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
             val response = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
@@ -134,10 +131,20 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun signOut() {
-        // Google sign out
-        googleSignInClient.signOut().addOnCompleteListener(this) {
-            val mStartActivity = Intent(this@SettingsActivity, LoginActivity::class.java)
-            startActivity(mStartActivity)
+        lifecycleScope.launch {
+            // Clears the Credential Manager provider state so the account picker
+            // reappears on the next sign-in attempt.
+            try {
+                credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            } catch (e: ClearCredentialException) {
+                Log.w(TAG, "Failed to clear credential state", e)
+            }
+
+            startActivity(Intent(this@SettingsActivity, LoginActivity::class.java))
         }
+    }
+
+    companion object {
+        private const val TAG = "SettingsActivity"
     }
 }

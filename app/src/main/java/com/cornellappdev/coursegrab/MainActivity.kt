@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivityMainBinding
@@ -35,7 +36,6 @@ import com.cornellappdev.coursegrab.networking.getCourseByID
 import com.cornellappdev.coursegrab.networking.getTracking
 import com.cornellappdev.coursegrab.networking.removeTracking
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -140,13 +140,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         refreshAwaiting()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        super.onBackPressed()
     }
 
     private fun refreshAwaiting() {
@@ -155,7 +149,7 @@ class MainActivity : AppCompatActivity() {
 
         val getTracking = Endpoint.getTracking(preferencesHelper.sessionToken.toString())
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<TrackingContainer>>() {}.type
             val courseList = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<TrackingContainer>>(
@@ -206,7 +200,7 @@ class MainActivity : AppCompatActivity() {
     private fun addCourse(courseId: Int, context: Context) {
         val addTracking = Endpoint.addTracking(preferencesHelper.sessionToken.toString(), courseId)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
             val response = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
@@ -230,7 +224,7 @@ class MainActivity : AppCompatActivity() {
         val removeTracking =
             Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
             val response = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
@@ -254,7 +248,7 @@ class MainActivity : AppCompatActivity() {
         val editCourse =
             Endpoint.getCourseByID(preferencesHelper.sessionToken.toString(), courseId)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<SearchResult>>() {}.type
             val course = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<SearchResult>>(
@@ -263,15 +257,10 @@ class MainActivity : AppCompatActivity() {
                 )
             }!!.data
 
-
-//            context.setOnClickListener {
             val intent = Intent(context, CourseDetailsActivity::class.java).apply {
                 putExtra("courseDetails", course)
             }
             context.startActivity(intent)
-//            }
-
-
         }
     }
 
