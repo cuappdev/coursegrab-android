@@ -17,26 +17,15 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.lifecycleScope
 import com.cornellappdev.coursegrab.databinding.ActivityLoginBinding
-import com.cornellappdev.coursegrab.models.ApiResponse
-import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.UserSession
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.deviceToken
-import com.cornellappdev.coursegrab.networking.initializeSession
-import com.cornellappdev.coursegrab.networking.setNotification
-import com.cornellappdev.coursegrab.networking.updateSession
+import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -52,6 +41,10 @@ class LoginActivity : AppCompatActivity() {
         PreferencesHelper(this)
     }
 
+    private val repository: CourseGrabRepository by lazy {
+        CourseGrabRepository(preferencesHelper)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -63,25 +56,11 @@ class LoginActivity : AppCompatActivity() {
         } else {
             val updateToken = preferencesHelper.updateToken
             if (!updateToken.isNullOrBlank()) {
-                val updateSession = Endpoint.updateSession(updateToken)
-
                 lifecycleScope.launch {
-                    val userSession = try {
-                        val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
-                        withContext(Dispatchers.IO) {
-                            Request.makeRequest<ApiResponse<UserSession>>(
-                                updateSession.okHttpRequest(),
-                                typeToken
-                            )
-                        }?.data
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        Log.d(TAG, "Could not resume previous session", e)
-                        null
-                    }
-
-                    if (userSession != null) verifySession(userSession)
+                    repository.updateSession(updateToken)
+                        .onSuccess { verifySession(it) }
+                        // The user simply stays on the login screen and signs in again.
+                        .onFailure { Log.d(TAG, "Could not resume previous session", it) }
                 }
             }
         }
@@ -191,30 +170,13 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        val initializeSession = Endpoint.initializeSession(googleCredential.idToken, null)
-
         lifecycleScope.launch {
-            val userSession = try {
-                val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
-                withContext(Dispatchers.IO) {
-                    Request.makeRequest<ApiResponse<UserSession>>(
-                        initializeSession.okHttpRequest(),
-                        typeToken
-                    )
-                }?.data
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to initialize session", e)
-                null
-            }
-
-            if (userSession == null) {
-                showLoginError("Sign-in failed. Please try again.")
-                return@launch
-            }
-
-            verifySession(userSession)
+            repository.initializeSession(googleCredential.idToken, null)
+                .onSuccess { verifySession(it) }
+                .onFailure { error ->
+                    Log.e(TAG, "Failed to initialize session", error)
+                    showLoginError("Sign-in failed. Please try again.")
+                }
         }
     }
 
@@ -238,22 +200,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun sendRegistrationToServer(token: String?) {
-        val sendDeviceToken = Endpoint.deviceToken(
-            preferencesHelper.sessionToken.toString(),
-            token.toString()
-        )
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    sendDeviceToken.okHttpRequest(),
-                    typeToken
-                )
-            }
-
-            if (response!!.success)
-                Log.d("NotificationService", "sendRegistrationTokenToServer($token)")
+            repository.sendDeviceToken(token.toString())
+                .onSuccess { Log.d(TAG, "sendRegistrationTokenToServer($token)") }
+                .onFailure { Log.w(TAG, "Failed to register device token", it) }
         }
     }
 
@@ -279,19 +229,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setNotificationsStatus(enabled: Boolean) {
-        val setNotifs = Endpoint.setNotification(
-            accessToken = preferencesHelper.sessionToken.toString(),
-            notifSetting = if (enabled) "ANDROID" else "NONE"
-        )
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    setNotifs.okHttpRequest(),
-                    typeToken
-                )
-            }
+            repository.setNotifications(enabled)
+                .onFailure { Log.w(TAG, "Failed to update notifications", it) }
         }
     }
 
