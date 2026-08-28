@@ -15,16 +15,9 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.exceptions.ClearCredentialException
 import androidx.lifecycle.lifecycleScope
 import com.cornellappdev.coursegrab.databinding.ActivitySettingsBinding
-import com.cornellappdev.coursegrab.models.ApiResponse
-import com.cornellappdev.coursegrab.models.Course
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.setNotification
+import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -36,6 +29,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private val preferencesHelper: PreferencesHelper by lazy {
         PreferencesHelper(this)
+    }
+
+    private val repository: CourseGrabRepository by lazy {
+        CourseGrabRepository(preferencesHelper)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,26 +104,23 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setNotificationsStatus(enabled: Boolean) {
-        val setNotifs = Endpoint.setNotification(
-            preferencesHelper.sessionToken.toString(),
-            if (enabled) "ANDROID" else "NONE"
-        )
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    setNotifs.okHttpRequest(),
-                    typeToken
-                )
-            }
-
-            if (response!!.success)
-                Toast.makeText(
-                    this@SettingsActivity,
-                    "Notifications ${if (enabled) "enabled." else "disabled."}",
-                    Toast.LENGTH_SHORT
-                ).show()
+            repository.setNotifications(enabled)
+                .onSuccess {
+                    Toast.makeText(
+                        this@SettingsActivity,
+                        "Notifications ${if (enabled) "enabled." else "disabled."}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                .onFailure { error ->
+                    Log.e(TAG, "Failed to update notification setting", error)
+                    Toast.makeText(
+                        this@SettingsActivity,
+                        "Couldn't update notification settings.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
         }
     }
 

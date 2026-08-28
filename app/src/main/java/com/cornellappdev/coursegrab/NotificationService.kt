@@ -7,12 +7,8 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.cornellappdev.coursegrab.models.ApiResponse
-import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.CourseNotification
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.deviceToken
+import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -20,12 +16,11 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class NotificationService : FirebaseMessagingService() {
 
-    private val preferencesHelper: PreferencesHelper by lazy {
-        PreferencesHelper(this)
+    private val repository: CourseGrabRepository by lazy {
+        CourseGrabRepository(PreferencesHelper(this))
     }
 
     /**
@@ -71,19 +66,8 @@ class NotificationService : FirebaseMessagingService() {
      * @param token The new token.
      */
     private fun sendRegistrationToServer(token: String?) {
-        val sendDeviceToken = Endpoint.deviceToken(
-            preferencesHelper.sessionToken.toString(),
-            token.toString()
-        )
-
         CoroutineScope(Dispatchers.Main).launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    sendDeviceToken.okHttpRequest(),
-                    typeToken
-                )
-            }
+            repository.sendDeviceToken(token.toString())
         }
     }
 

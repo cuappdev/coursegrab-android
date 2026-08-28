@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -25,20 +26,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivityMainBinding
-import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
-import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.models.TrackingContainer
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.addTracking
-import com.cornellappdev.coursegrab.networking.getCourseByID
-import com.cornellappdev.coursegrab.networking.getTracking
-import com.cornellappdev.coursegrab.networking.removeTracking
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
+import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Locale.getDefault
 
 
@@ -53,8 +43,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var awaitingViewAdapter: RecyclerView.Adapter<*>
     private lateinit var awaitingViewManager: RecyclerView.LayoutManager
 
-    private val preferencesHelper: PreferencesHelper by lazy {
-        PreferencesHelper(this)
+    private val repository: CourseGrabRepository by lazy {
+        CourseGrabRepository(PreferencesHelper(this))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,26 +134,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshAwaiting() {
-        val listOpen = mutableListOf<Course>()
-        val listAwaiting = mutableListOf<Course>()
-
-        val getTracking = Endpoint.getTracking(preferencesHelper.sessionToken.toString())
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<TrackingContainer>>() {}.type
-            val courseList = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<TrackingContainer>>(
-                    getTracking.okHttpRequest(),
-                    typeToken
-                )
-            }!!.data.sections
-
-            for (course in courseList) {
-                if (course.status == "OPEN")
-                    listOpen.add(course)
-                else
-                    listAwaiting.add(course)
+            val courseList = repository.getTracking().getOrElse { error ->
+                Log.e(TAG, "Failed to load tracked courses", error)
+                binding.refreshCoursesLayout.isRefreshing = false
+                Toast.makeText(
+                    this@MainActivity,
+                    "Couldn't load your courses.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@launch
             }
+
+            val listOpen = courseList.filter { it.status == "OPEN" }
+            val listAwaiting = courseList.filter { it.status != "OPEN" }
 
             // Available Courses Adapter
             availableViewManager = LinearLayoutManager(this@MainActivity)
@@ -198,64 +182,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addCourse(courseId: Int, context: Context) {
-        val addTracking = Endpoint.addTracking(preferencesHelper.sessionToken.toString(), courseId)
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    addTracking.okHttpRequest(),
-                    typeToken
-                )
-            }
+            val result = repository.addTracking(courseId)
 
             refreshAwaiting()
 
-            if (!response!!.success)
+            result.onFailure { error ->
+                Log.e(TAG, "Failed to track course $courseId", error)
                 Toast.makeText(
                     context,
-                    response.data.errors!![0],
+                    error.message ?: "Couldn't track that course.",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
         }
     }
 
     private fun removeCourse(courseId: Int, context: Context) {
-        val removeTracking =
-            Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    removeTracking.okHttpRequest(),
-                    typeToken
-                )
-            }
+            val result = repository.removeTracking(courseId)
 
             refreshAwaiting()
 
-            if (!response!!.success)
+            result.onFailure { error ->
+                Log.e(TAG, "Failed to untrack course $courseId", error)
                 Toast.makeText(
                     context,
-                    response.data.errors!![0],
+                    error.message ?: "Couldn't remove that course.",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
         }
     }
 
     private fun editCourse(courseId: Int, context: Context) {
-        val editCourse =
-            Endpoint.getCourseByID(preferencesHelper.sessionToken.toString(), courseId)
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<SearchResult>>() {}.type
-            val course = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<SearchResult>>(
-                    editCourse.okHttpRequest(),
-                    typeToken
-                )
-            }!!.data
+            val course = repository.getCourseById(courseId).getOrElse { error ->
+                Log.e(TAG, "Failed to load course $courseId", error)
+                Toast.makeText(
+                    context,
+                    "Couldn't open that course.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
 
             val intent = Intent(context, CourseDetailsActivity::class.java).apply {
                 putExtra("courseDetails", course)
@@ -367,5 +337,9 @@ class MainActivity : AppCompatActivity() {
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = awaitingCourses.size
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }

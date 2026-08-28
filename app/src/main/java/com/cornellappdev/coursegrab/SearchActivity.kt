@@ -3,6 +3,7 @@ package com.cornellappdev.coursegrab
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -17,16 +18,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivitySearchBinding
-import com.cornellappdev.coursegrab.models.ApiResponse
-import com.cornellappdev.coursegrab.models.SearchContainer
 import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.searchCourses
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
+import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
@@ -35,8 +29,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchViewAdapter: RecyclerView.Adapter<*>
     private lateinit var searchViewManager: RecyclerView.LayoutManager
 
-    private val preferencesHelper: PreferencesHelper by lazy {
-        PreferencesHelper(this)
+    private val repository: CourseGrabRepository by lazy {
+        CourseGrabRepository(PreferencesHelper(this))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,19 +70,18 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchCourses(query: String) {
-        val getTracking = Endpoint.searchCourses(preferencesHelper.sessionToken.toString(), query)
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<SearchContainer>>() {}.type
-            val courseList = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<SearchContainer>>(
-                    getTracking.okHttpRequest(),
-                    typeToken
-                )
-            }!!.data.courses
+            val result = repository.searchCourses(query)
 
+            // A slower earlier request may land after the user has typed on; ignore it.
             if (binding.editTextSearch.text.toString() != query)
                 return@launch
+
+            val courseList = result.getOrElse { error ->
+                Log.e(TAG, "Search failed for query \"$query\"", error)
+                showSearchError()
+                return@launch
+            }
 
             // Results Courses Adapter
             searchViewManager = LinearLayoutManager(this@SearchActivity)
@@ -113,6 +106,16 @@ class SearchActivity : AppCompatActivity() {
             binding.noResultsSubtitle.text =
                 getString(R.string.no_results_alert_subtext_try_another)
         }
+    }
+
+    private fun showSearchError() {
+        binding.layoutResults.visibility = View.GONE
+        binding.noResultsView.visibility = View.VISIBLE
+        binding.noResultsIcon.setImageDrawable(
+            ContextCompat.getDrawable(this, R.drawable.ic_status_warning)
+        )
+        binding.noResultsTitle.text = getString(R.string.search_failed)
+        binding.noResultsSubtitle.text = getString(R.string.search_failed_subtext)
     }
 
     class ResultsAdapter(
@@ -149,5 +152,9 @@ class SearchActivity : AppCompatActivity() {
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = resultsCourses.size
+    }
+
+    companion object {
+        private const val TAG = "SearchActivity"
     }
 }
