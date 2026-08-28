@@ -172,6 +172,7 @@ class LoginActivity : AppCompatActivity() {
 
             else -> {
                 Log.e(TAG, "Unexpected type of credential: ${credential::class}")
+                showLoginError("Sign-in failed. Please try again.")
                 return
             }
         }
