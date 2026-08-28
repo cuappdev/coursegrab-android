@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivityCourseDetailsBinding
@@ -21,7 +22,6 @@ import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.addTracking
 import com.cornellappdev.coursegrab.networking.removeTracking
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,7 +65,7 @@ class CourseDetailsActivity : AppCompatActivity() {
     fun addCourse(courseId: Int, context: Context) {
         val addTracking = Endpoint.addTracking(preferencesHelper.sessionToken.toString(), courseId)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
             val response = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
@@ -87,7 +87,7 @@ class CourseDetailsActivity : AppCompatActivity() {
         val removeTracking =
             Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
             val response = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<Course>>(
