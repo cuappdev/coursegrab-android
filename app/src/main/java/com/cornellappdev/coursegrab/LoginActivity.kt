@@ -271,16 +271,16 @@ class LoginActivity : AppCompatActivity() {
             sendRegistrationToServer(token)
         }
 
-        enableNotificationsStatus()
+        setNotificationsStatus(preferencesHelper.mobileAlertSetting)
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         startActivity(intent)
     }
 
-    private fun enableNotificationsStatus() {
+    private fun setNotificationsStatus(enabled: Boolean) {
         val setNotifs = Endpoint.setNotification(
             accessToken = preferencesHelper.sessionToken.toString(),
-            notifSetting = "ANDROID"
+            notifSetting = if (enabled) "ANDROID" else "NONE"
         )
 
         lifecycleScope.launch {
