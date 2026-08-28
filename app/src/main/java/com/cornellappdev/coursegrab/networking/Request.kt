@@ -8,7 +8,6 @@ import okio.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-
 object Request {
     val httpClient = OkHttpClient()
 }
@@ -28,7 +27,6 @@ suspend fun Call.await(recordStackTrace: Boolean = true): Response {
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                // Don't bother with resuming the continuation if it is already canceled.
                 if (recordStackTrace != null) {
                     recordStackTrace.initCause(e)
                     continuation.resumeWithException(recordStackTrace)
@@ -42,7 +40,6 @@ suspend fun Call.await(recordStackTrace: Boolean = true): Response {
             try {
                 cancel()
             } catch (_: Throwable) {
-                //Ignore cancel exception
             }
         }
     }
