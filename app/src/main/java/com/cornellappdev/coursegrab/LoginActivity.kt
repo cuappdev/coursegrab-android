@@ -26,7 +26,6 @@ import com.cornellappdev.coursegrab.networking.deviceToken
 import com.cornellappdev.coursegrab.networking.initializeSession
 import com.cornellappdev.coursegrab.networking.setNotification
 import com.cornellappdev.coursegrab.networking.updateSession
-import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -34,6 +33,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingExcept
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,26 +61,29 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this@LoginActivity, MainActivity::class.java)
             startActivity(intent)
         } else {
-            if (preferencesHelper.updateToken != null)
-                try {
-                    val updateSession =
-                        Endpoint.updateSession(preferencesHelper.updateToken.toString())
+            val updateToken = preferencesHelper.updateToken
+            if (!updateToken.isNullOrBlank()) {
+                val updateSession = Endpoint.updateSession(updateToken)
 
-                    lifecycleScope.launch {
+                lifecycleScope.launch {
+                    val userSession = try {
                         val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
-                        val userSession = withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.IO) {
                             Request.makeRequest<ApiResponse<UserSession>>(
                                 updateSession.okHttpRequest(),
                                 typeToken
                             )
-                        }!!.data
-
-                        verifySession(userSession)
+                        }?.data
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Log.d(TAG, "Could not resume previous session", e)
+                        null
                     }
 
-                } catch (e: ApiException) {
-                    e.printStackTrace()
+                    if (userSession != null) verifySession(userSession)
                 }
+            }
         }
 
         binding.signInButton.setOnClickListener { signIn() }
@@ -190,13 +193,25 @@ class LoginActivity : AppCompatActivity() {
         val initializeSession = Endpoint.initializeSession(googleCredential.idToken, null)
 
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
-            val userSession = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<UserSession>>(
-                    initializeSession.okHttpRequest(),
-                    typeToken
-                )
-            }!!.data
+            val userSession = try {
+                val typeToken = object : TypeToken<ApiResponse<UserSession>>() {}.type
+                withContext(Dispatchers.IO) {
+                    Request.makeRequest<ApiResponse<UserSession>>(
+                        initializeSession.okHttpRequest(),
+                        typeToken
+                    )
+                }?.data
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to initialize session", e)
+                null
+            }
+
+            if (userSession == null) {
+                showLoginError("Sign-in failed. Please try again.")
+                return@launch
+            }
 
             verifySession(userSession)
         }
