@@ -59,7 +59,6 @@ class LoginActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     repository.updateSession(updateToken)
                         .onSuccess { verifySession(it) }
-                        // The user simply stays on the login screen and signs in again.
                         .onFailure { Log.d(TAG, "Could not resume previous session", it) }
                 }
             }

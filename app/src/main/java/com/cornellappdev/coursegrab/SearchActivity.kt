@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -53,16 +55,11 @@ class SearchActivity : AppCompatActivity() {
             if ((text ?: "").length > 2) {
                 searchCourses(text.toString())
             } else {
-                binding.layoutResults.visibility = View.GONE
-                binding.noResultsView.visibility = View.VISIBLE
-                binding.noResultsIcon.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        this,
-                        R.drawable.ic_status_warning
-                    )
+                showEmptyState(
+                    R.drawable.ic_status_warning,
+                    R.string.requires_longer_search,
+                    R.string.requires_longer_search_subtext
                 )
-                binding.noResultsTitle.text = getString(R.string.requires_longer_search)
-                binding.noResultsSubtitle.text = getString(R.string.requires_longer_search_subtext)
             }
         }
 
@@ -79,7 +76,11 @@ class SearchActivity : AppCompatActivity() {
 
             val courseList = result.getOrElse { error ->
                 Log.e(TAG, "Search failed for query \"$query\"", error)
-                showSearchError()
+                showEmptyState(
+                    R.drawable.ic_status_warning,
+                    R.string.search_failed,
+                    R.string.search_failed_subtext
+                )
                 return@launch
             }
 
@@ -93,29 +94,33 @@ class SearchActivity : AppCompatActivity() {
             }
             binding.resultTitle.text = "${binding.resultsList.adapter?.itemCount} Results"
 
-            binding.layoutResults.visibility =
-                if (courseList.isNotEmpty()) View.VISIBLE else View.GONE
-            binding.noResultsView.visibility = if (courseList.isEmpty()) View.VISIBLE else View.GONE
-            binding.noResultsIcon.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this@SearchActivity,
-                    R.drawable.ic_status_closed
+            if (courseList.isEmpty()) {
+                showEmptyState(
+                    R.drawable.ic_status_closed,
+                    R.string.no_courses_alert,
+                    R.string.no_results_alert_subtext_try_another
                 )
-            )
-            binding.noResultsTitle.text = getString(R.string.no_courses_alert)
-            binding.noResultsSubtitle.text =
-                getString(R.string.no_results_alert_subtext_try_another)
+            } else {
+                showResults()
+            }
         }
     }
 
-    private fun showSearchError() {
+    private fun showEmptyState(
+        @DrawableRes icon: Int,
+        @StringRes title: Int,
+        @StringRes subtitle: Int
+    ) {
         binding.layoutResults.visibility = View.GONE
         binding.noResultsView.visibility = View.VISIBLE
-        binding.noResultsIcon.setImageDrawable(
-            ContextCompat.getDrawable(this, R.drawable.ic_status_warning)
-        )
-        binding.noResultsTitle.text = getString(R.string.search_failed)
-        binding.noResultsSubtitle.text = getString(R.string.search_failed_subtext)
+        binding.noResultsIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
+        binding.noResultsTitle.text = getString(title)
+        binding.noResultsSubtitle.text = getString(subtitle)
+    }
+
+    private fun showResults() {
+        binding.layoutResults.visibility = View.VISIBLE
+        binding.noResultsView.visibility = View.GONE
     }
 
     class ResultsAdapter(

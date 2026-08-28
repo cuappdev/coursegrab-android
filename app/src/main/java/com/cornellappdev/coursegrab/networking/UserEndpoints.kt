@@ -11,7 +11,7 @@ private val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 private fun jsonBody(vararg fields: Pair<String, Any?>): RequestBody =
     JSONObject().apply { fields.forEach { (key, value) -> put(key, value) } }
         .toString()
-        .toRequestBody(JSON)
+        .toRequestBody(contentType = JSON)
 
 private fun bearer(token: String): Map<String, String> =
     mapOf("Authorization" to "Bearer $token")

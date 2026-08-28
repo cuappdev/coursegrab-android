@@ -15,16 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.reflect.Type
 
-/** Raised when the backend answers, but the answer isn't a usable payload. */
 class ApiException(message: String) : Exception(message)
 
-/**
- * Single entry point for the CourseGrab backend.
- *
- * Callers get a [Result] and never have to touch [Endpoint], Gson type tokens, or the IO
- * dispatcher. The session token is read here rather than at each call site, so screens no
- * longer need a [PreferencesHelper] just to make a request.
- */
 class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
 
     private val gson = Gson()
@@ -59,12 +51,6 @@ class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
     suspend fun setNotifications(enabled: Boolean): Result<Course> =
         call(Endpoint.setNotification(token, if (enabled) "ANDROID" else "NONE"), courseType)
 
-    /**
-     * Runs [endpoint] on the IO dispatcher and unwraps the [ApiResponse] envelope.
-     *
-     * The body is parsed even for non-2xx responses, since the backend reports failures
-     * inside the envelope rather than through the status code.
-     */
     private suspend fun <T : Any> call(endpoint: Endpoint, type: Type): Result<T> =
         withContext(Dispatchers.IO) {
             try {
@@ -72,7 +58,7 @@ class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
                 val body = httpResponse.use { it.body.string() }
 
                 val envelope: ApiResponse<T>? = try {
-                    gson.fromJson<ApiResponse<T>>(body, type)
+                    gson.fromJson(body, type)
                 } catch (_: JsonParseException) {
                     null
                 }
@@ -87,8 +73,6 @@ class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
                     )
 
                     !envelope.success -> Result.failure(
-                        // `errors` only exists on Course payloads; other endpoints report
-                        // failure through the flag alone.
                         ApiException((data as? Course)?.errors?.firstOrNull() ?: "Request failed")
                     )
 

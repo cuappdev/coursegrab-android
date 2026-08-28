@@ -6,7 +6,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 
 enum class EndpointMethod {
-    GET, POST, DELETE, PUT
+    GET, POST
 }
 
 class Endpoint(
@@ -39,10 +39,6 @@ class Endpoint(
                     .get()
                     .build()
             }
-            else -> {
-                throw IllegalArgumentException("NOT IMPLEMENTED")
-            }
         }
     }
-
 }
