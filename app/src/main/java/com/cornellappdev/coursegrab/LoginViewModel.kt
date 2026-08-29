@@ -118,7 +118,7 @@ class LoginViewModel @Inject constructor(
                 when (val result = requestCredential(signInWithGoogleOption)) {
                     is CredentialResult.Success -> handleSignIn(result.response)
                     CredentialResult.NoneAvailable ->
-                        error("No Google account found. Add one in system settings.")
+                        emitError("No Google account found. Add one in system settings.")
 
                     CredentialResult.Cancelled, CredentialResult.Failed -> Unit
                 }
@@ -145,7 +145,7 @@ class LoginViewModel @Inject constructor(
             CredentialResult.Cancelled
         } catch (e: GetCredentialException) {
             Log.e(TAG, "Credential Manager sign-in failed", e)
-            error(SIGN_IN_FAILED)
+            emitError(SIGN_IN_FAILED)
             CredentialResult.Failed
         }
     }
@@ -167,14 +167,14 @@ class LoginViewModel @Inject constructor(
                     credential.type != GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_SIWG_CREDENTIAL
                 ) {
                     Log.e(TAG, "Unexpected credential type: ${credential.type}")
-                    error(SIGN_IN_FAILED)
+                    emitError(SIGN_IN_FAILED)
                     return
                 }
             }
 
             else -> {
                 Log.e(TAG, "Unexpected type of credential: ${credential::class}")
-                error(SIGN_IN_FAILED)
+                emitError(SIGN_IN_FAILED)
                 return
             }
         }
@@ -183,12 +183,12 @@ class LoginViewModel @Inject constructor(
             GoogleIdTokenCredential.createFrom(credential.data)
         } catch (e: GoogleIdTokenParsingException) {
             Log.e(TAG, "Failed to parse Google ID token", e)
-            error(SIGN_IN_FAILED)
+            emitError(SIGN_IN_FAILED)
             return
         }
 
         if (!isAllowedAccount(googleCredential.id)) {
-            error("Please use a @cornell.edu account")
+            emitError("Please use a @cornell.edu account")
             clearCredentialState()
             return
         }
@@ -197,7 +197,7 @@ class LoginViewModel @Inject constructor(
             .onSuccess { verifySession(it) }
             .onFailure { failure ->
                 Log.e(TAG, "Failed to initialize session", failure)
-                error(SIGN_IN_FAILED)
+                emitError(SIGN_IN_FAILED)
             }
     }
 
@@ -250,7 +250,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private suspend fun error(message: String) {
+    private suspend fun emitError(message: String) {
         _effects.send(LoginEffect.Error(message))
     }
 
