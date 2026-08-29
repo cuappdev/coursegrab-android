@@ -120,7 +120,7 @@ class NotificationService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        notificationManager.notify(course.section.catalog_num, notificationBuilder.build())
+        notificationManager.notify(course.section.catalogNum, notificationBuilder.build())
     }
 
     private companion object {

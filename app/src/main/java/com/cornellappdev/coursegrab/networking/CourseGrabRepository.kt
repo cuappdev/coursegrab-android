@@ -24,7 +24,7 @@ class CourseGrabRepository @Inject constructor(
             service.initializeSession(
                 InitializeSessionRequest(
                     googleToken,
-                    device_token = deviceToken
+                    deviceToken = deviceToken
                 )
             )
         }
@@ -58,19 +58,12 @@ class CourseGrabRepository @Inject constructor(
             )
         }
 
-    /**
-     * Unwraps the [ApiResponse] envelope. Retrofit dispatches off the caller's thread and
-     * throws on transport, HTTP, and decoding failures, so all this adds is turning the
-     * envelope's own `success` flag into a failure.
-     */
     private suspend fun <T : Any> call(request: suspend () -> ApiResponse<T>): Result<T> =
         try {
             val envelope = request()
             if (envelope.success) {
                 Result.success(envelope.data)
             } else {
-                // `errors` only exists on Course payloads; other endpoints report failure
-                // through the flag alone.
                 Result.failure(
                     ApiException(
                         (envelope.data as? Course)?.errors?.firstOrNull() ?: "Request failed"
@@ -78,7 +71,6 @@ class CourseGrabRepository @Inject constructor(
                 )
             }
         } catch (e: CancellationException) {
-            // Never swallow cancellation — the caller's scope is shutting down.
             throw e
         } catch (e: Exception) {
             Result.failure(e)

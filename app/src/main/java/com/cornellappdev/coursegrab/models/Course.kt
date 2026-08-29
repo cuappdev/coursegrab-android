@@ -2,29 +2,25 @@ package com.cornellappdev.coursegrab.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Also carries failure payloads, where only [errors] is present — hence the defaults on
- * every other property.
- */
 @Serializable
 @Parcelize
 data class Course(
-    val catalog_num: Int = 0,
-    val course_num: Int = 0,
+    @SerialName("catalog_num") val catalogNum: Int = 0,
+    @SerialName("course_num") val courseNum: Int = 0,
     val section: String = "",
     val instructors: List<String> = emptyList(),
-    val is_tracking: Boolean = false,
+    @SerialName("is_tracking") val isTracking: Boolean = false,
     val status: String = "",
-    val subject_code: String = "",
+    @SerialName("subject_code") val subjectCode: String = "",
     val title: String = "",
-    val num_tracking: Int = 0,
+    @SerialName("num_tracking") val numTracking: Int = 0,
     val mode: String = "",
     val errors: List<String>? = null
 ) : Parcelable {
 
-    /** The backend reports section availability through [status] rather than a flag. */
     val isOpen: Boolean get() = status == STATUS_OPEN
 
     private companion object {

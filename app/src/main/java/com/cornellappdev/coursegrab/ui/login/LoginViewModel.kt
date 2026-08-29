@@ -219,19 +219,19 @@ class LoginViewModel @Inject constructor(
     }
 
     private suspend fun verifySession(userSession: UserSession) {
-        if (userSession.session_token.isNullOrBlank() ||
-            userSession.update_token.isNullOrBlank()
+        if (userSession.sessionToken.isNullOrBlank() ||
+            userSession.updateToken.isNullOrBlank()
         ) return
 
-        val expiresAt = userSession.session_expiration
+        val expiresAt = userSession.sessionExpiration
         if (expiresAt == null) {
             Log.e(TAG, "Session response had no expiration")
             emitError(SIGN_IN_FAILED)
             return
         }
 
-        preferencesHelper.sessionToken = userSession.session_token
-        preferencesHelper.updateToken = userSession.update_token
+        preferencesHelper.sessionToken = userSession.sessionToken
+        preferencesHelper.updateToken = userSession.updateToken
         preferencesHelper.expiresAt = expiresAt
 
         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->

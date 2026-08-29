@@ -6,6 +6,7 @@ import com.cornellappdev.coursegrab.models.SearchContainer
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.models.TrackingContainer
 import com.cornellappdev.coursegrab.models.UserSession
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -13,10 +14,6 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-/**
- * The Authorization header is per-endpoint rather than an interceptor: `initializeSession`
- * sends none, and `updateSession` sends the update token instead of the session token.
- */
 interface CourseGrabService {
 
     @POST("session/initialize/")
@@ -78,18 +75,18 @@ class EmptyRequest
 @Serializable
 data class InitializeSessionRequest(
     val token: String,
-    val device_type: String = "ANDROID",
-    val device_token: String? = null
+    @SerialName("device_type") val deviceType: String = "ANDROID",
+    @SerialName("device_token") val deviceToken: String? = null
 )
 
 @Serializable
 data class SearchRequest(val query: String)
 
 @Serializable
-data class CourseIdRequest(val course_id: Int)
+data class CourseIdRequest(@SerialName("course_id") val courseId: Int)
 
 @Serializable
-data class DeviceTokenRequest(val device_token: String)
+data class DeviceTokenRequest(@SerialName("device_token") val deviceToken: String)
 
 @Serializable
 data class NotificationRequest(val notification: String)
