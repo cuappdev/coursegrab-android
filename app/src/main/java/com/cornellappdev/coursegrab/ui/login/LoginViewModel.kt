@@ -223,9 +223,9 @@ class LoginViewModel @Inject constructor(
             userSession.update_token.isNullOrBlank()
         ) return
 
-        val expiresAt = userSession.session_expiration?.toLongOrNull()
+        val expiresAt = userSession.session_expiration
         if (expiresAt == null) {
-            Log.e(TAG, "Unusable session expiration: ${userSession.session_expiration}")
+            Log.e(TAG, "Session response had no expiration")
             emitError(SIGN_IN_FAILED)
             return
         }
