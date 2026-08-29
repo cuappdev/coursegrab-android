@@ -3,6 +3,7 @@ package com.cornellappdev.coursegrab
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,8 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -17,16 +20,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivitySearchBinding
-import com.cornellappdev.coursegrab.models.ApiResponse
-import com.cornellappdev.coursegrab.models.SearchContainer
 import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.searchCourses
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
+import com.cornellappdev.coursegrab.networking.CourseGrabRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
@@ -35,9 +32,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchViewAdapter: RecyclerView.Adapter<*>
     private lateinit var searchViewManager: RecyclerView.LayoutManager
 
-    private val preferencesHelper: PreferencesHelper by lazy {
-        PreferencesHelper(this)
+    private val repository: CourseGrabRepository by lazy {
+        CourseGrabRepository(PreferencesHelper(this))
     }
+
+    /** The only search allowed to update the UI; superseded ones are canceled. */
+    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,16 +59,13 @@ class SearchActivity : AppCompatActivity() {
             if ((text ?: "").length > 2) {
                 searchCourses(text.toString())
             } else {
-                binding.layoutResults.visibility = View.GONE
-                binding.noResultsView.visibility = View.VISIBLE
-                binding.noResultsIcon.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        this,
-                        R.drawable.ic_status_warning
-                    )
+                // The query is no longer searchable, so nothing in flight is current.
+                searchJob?.cancel()
+                showEmptyState(
+                    icon = R.drawable.ic_status_warning,
+                    title = R.string.requires_longer_search,
+                    subtitle = R.string.requires_longer_search_subtext
                 )
-                binding.noResultsTitle.text = getString(R.string.requires_longer_search)
-                binding.noResultsSubtitle.text = getString(R.string.requires_longer_search_subtext)
             }
         }
 
@@ -76,19 +73,17 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchCourses(query: String) {
-        val getTracking = Endpoint.searchCourses(preferencesHelper.sessionToken.toString(), query)
-
-        lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<SearchContainer>>() {}.type
-            val courseList = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<SearchContainer>>(
-                    getTracking.okHttpRequest(),
-                    typeToken
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            val courseList = repository.searchCourses(query).getOrElse { error ->
+                Log.e(TAG, "Search failed for query \"$query\"", error)
+                showEmptyState(
+                    icon = R.drawable.ic_status_warning,
+                    title = R.string.search_failed,
+                    subtitle = R.string.search_failed_subtext
                 )
-            }!!.data.courses
-
-            if (binding.editTextSearch.text.toString() != query)
                 return@launch
+            }
 
             // Results Courses Adapter
             searchViewManager = LinearLayoutManager(this@SearchActivity)
@@ -100,19 +95,33 @@ class SearchActivity : AppCompatActivity() {
             }
             binding.resultTitle.text = "${binding.resultsList.adapter?.itemCount} Results"
 
-            binding.layoutResults.visibility =
-                if (courseList.isNotEmpty()) View.VISIBLE else View.GONE
-            binding.noResultsView.visibility = if (courseList.isEmpty()) View.VISIBLE else View.GONE
-            binding.noResultsIcon.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this@SearchActivity,
-                    R.drawable.ic_status_closed
+            if (courseList.isEmpty()) {
+                showEmptyState(
+                    icon = R.drawable.ic_status_closed,
+                    title = R.string.no_courses_alert,
+                    subtitle = R.string.no_results_alert_subtext_try_another
                 )
-            )
-            binding.noResultsTitle.text = getString(R.string.no_courses_alert)
-            binding.noResultsSubtitle.text =
-                getString(R.string.no_results_alert_subtext_try_another)
+            } else {
+                showResults()
+            }
         }
+    }
+
+    private fun showEmptyState(
+        @DrawableRes icon: Int,
+        @StringRes title: Int,
+        @StringRes subtitle: Int
+    ) {
+        binding.layoutResults.visibility = View.GONE
+        binding.noResultsView.visibility = View.VISIBLE
+        binding.noResultsIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
+        binding.noResultsTitle.text = getString(title)
+        binding.noResultsSubtitle.text = getString(subtitle)
+    }
+
+    private fun showResults() {
+        binding.layoutResults.visibility = View.VISIBLE
+        binding.noResultsView.visibility = View.GONE
     }
 
     class ResultsAdapter(
@@ -149,5 +158,9 @@ class SearchActivity : AppCompatActivity() {
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = resultsCourses.size
+    }
+
+    companion object {
+        private const val TAG = "SearchActivity"
     }
 }
