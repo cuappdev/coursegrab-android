@@ -67,7 +67,7 @@ class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
                     envelope == null || data == null -> Result.failure(
                         ApiException(
                             if (httpResponse.isSuccessful) "Unreadable response from server"
-                            else "Server error (${httpResponse.code})"
+                            else "HTTP error (${httpResponse.code})"
                         )
                     )
 
