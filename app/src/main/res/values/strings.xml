@@ -43,6 +43,10 @@
     <string name="no_results_alert_subtext_try_another">
         Try a different query
     </string>
+    <plurals name="search_results_count">
+        <item quantity="one">%d Result</item>
+        <item quantity="other">%d Results</item>
+    </plurals>
     <string name="search_failed">Couldn\'t search right now</string>
     <string name="search_failed_subtext">
         Check your connection and try again

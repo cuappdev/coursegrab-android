@@ -80,7 +80,11 @@ class SearchActivity : AppCompatActivity() {
                     layoutManager = LinearLayoutManager(this@SearchActivity)
                     adapter = ResultsAdapter(state.courses, this@SearchActivity)
                 }
-                binding.resultTitle.text = "${state.courses.size} Results"
+                binding.resultTitle.text = resources.getQuantityString(
+                    R.plurals.search_results_count,
+                    state.courses.size,
+                    state.courses.size
+                )
 
                 if (state.courses.isEmpty()) {
                     showEmptyState(
