@@ -19,7 +19,6 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideJson(): Json = Json {
-        // The backend may add fields we don't model; that shouldn't fail a response.
         ignoreUnknownKeys = true
         encodeDefaults = true
     }
