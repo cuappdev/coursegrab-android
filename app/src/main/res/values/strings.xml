@@ -18,7 +18,7 @@
     <string name="default_notification_channel_id">coursegrab_alert</string>
 
     <string name="add_button">Add</string>
-    <string name="add_course_hint">Enter a Course ID...</string>
+    <string name="add_course_hint">Enter a Course ID…</string>
 
     <string name="search_courses_hint">Find Courses</string>
 
