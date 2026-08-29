@@ -1,4 +1,4 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.ui.login
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -16,6 +16,8 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cornellappdev.coursegrab.R
+import com.cornellappdev.coursegrab.data.PreferencesHelper
 import com.cornellappdev.coursegrab.models.UserSession
 import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption

@@ -1,4 +1,4 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,8 +7,10 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.CourseNotification
 import com.cornellappdev.coursegrab.networking.CourseGrabRepository
+import com.cornellappdev.coursegrab.ui.notification.NotificationModal
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson

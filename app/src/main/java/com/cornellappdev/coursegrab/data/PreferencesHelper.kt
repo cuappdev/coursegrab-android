@@ -1,4 +1,4 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.data
 
 import android.content.Context
 import android.preference.PreferenceManager

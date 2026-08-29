@@ -1,4 +1,4 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.ui.search
 
 import android.content.Context
 import android.content.Intent
@@ -21,8 +21,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.databinding.ActivitySearchBinding
 import com.cornellappdev.coursegrab.models.SearchResult
+import com.cornellappdev.coursegrab.ui.details.CourseDetailsActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

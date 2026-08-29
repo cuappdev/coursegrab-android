@@ -1,4 +1,4 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.ui.details
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
