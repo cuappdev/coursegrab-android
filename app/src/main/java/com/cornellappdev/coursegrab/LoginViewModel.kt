@@ -244,7 +244,8 @@ class LoginViewModel @Inject constructor(
     private fun sendRegistrationToServer(token: String) {
         viewModelScope.launch {
             repository.sendDeviceToken(token)
-                .onSuccess { Log.d(TAG, "sendRegistrationTokenToServer($token)") }
+                // The token itself is a push credential — never log its value.
+                .onSuccess { Log.d(TAG, "Registered device token") }
                 .onFailure { Log.w(TAG, "Failed to register device token", it) }
         }
     }
