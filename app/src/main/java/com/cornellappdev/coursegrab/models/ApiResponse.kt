@@ -1,3 +1,6 @@
 package com.cornellappdev.coursegrab.models
 
-class ApiResponse<T>(val success: Boolean, val data: T, val timestamp: Long)
+import kotlinx.serialization.Serializable
+
+@Serializable
+class ApiResponse<T>(val success: Boolean, val data: T, val timestamp: Long = 0L)
