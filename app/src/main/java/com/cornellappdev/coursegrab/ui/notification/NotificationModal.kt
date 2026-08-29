@@ -23,9 +23,14 @@ class NotificationModal : AppCompatActivity() {
         val course: Course =
             (intent.getParcelableExtra<CourseNotification>("courseDetails") as CourseNotification).section
 
-        binding.courseTitle.text = "${course.subjectCode} ${course.courseNum}: ${course.title}"
+        binding.courseTitle.text = getString(
+            R.string.course_title_format,
+            course.subjectCode,
+            course.courseNum,
+            course.title
+        )
         binding.courseSection.text = course.section
-        binding.coursePin.text = course.catalogNum.toString()
+        binding.coursePin.text = getString(R.string.course_pin_format, course.catalogNum)
 
         binding.buttonStudentCenter.setOnClickListener {
             val browserIntent =
