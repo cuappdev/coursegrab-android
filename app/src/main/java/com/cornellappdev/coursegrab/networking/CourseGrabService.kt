@@ -23,8 +23,7 @@ interface CourseGrabService {
 
     @POST("session/update/")
     suspend fun updateSession(
-        @Header("Authorization") auth: String,
-        @Body body: EmptyRequest = EmptyRequest()
+        @Header("Authorization") auth: String
     ): ApiResponse<UserSession>
 
     @GET("users/tracking/")
@@ -68,9 +67,6 @@ interface CourseGrabService {
         @Body body: NotificationRequest
     ): ApiResponse<Course>
 }
-
-@Serializable
-class EmptyRequest
 
 @Serializable
 data class InitializeSessionRequest(
