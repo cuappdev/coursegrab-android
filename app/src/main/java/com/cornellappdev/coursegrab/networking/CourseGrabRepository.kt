@@ -1,6 +1,6 @@
 package com.cornellappdev.coursegrab.networking
 
-import com.cornellappdev.coursegrab.PreferencesHelper
+import com.cornellappdev.coursegrab.data.PreferencesHelper
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchContainer
