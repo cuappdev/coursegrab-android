@@ -46,7 +46,6 @@
     <!-- Course display formats: "CS 2110: Object-Oriented Programming" -->
     <string name="course_title_format">%1$s %2$d: %3$s</string>
     <string name="course_header_format">%1$s %2$d</string>
-    <string name="course_pin_format">%d</string>
     <string name="available_count">%d Available</string>
     <string name="awaiting_count">%d Awaiting</string>
     <plurals name="tracking_count">

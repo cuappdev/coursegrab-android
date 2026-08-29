@@ -68,7 +68,7 @@
             android:maxLines="2"
             android:paddingStart="14dp"
             android:scrollHorizontally="true"
-            android:text="CS 1998: Intro to Android"
+            tools:text="CS 1998: Intro to Android"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
 
@@ -82,7 +82,7 @@
             android:fontFamily="sans-serif-medium"
             android:gravity="bottom"
             android:paddingLeft="14dp"
-            android:text="LEC 006 / M 7:30PM"
+            tools:text="LEC 006 / M 7:30PM"
             android:textSize="16sp" />
 
     </LinearLayout>

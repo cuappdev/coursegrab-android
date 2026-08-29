@@ -216,8 +216,7 @@ class MainActivity : AppCompatActivity() {
                 availableCourses[position].title
             )
             holder.courseTime.text = availableCourses[position].section.uppercase(getDefault())
-            holder.coursePin.text =
-                context.getString(R.string.course_pin_format, availableCourses[position].catalogNum)
+            holder.coursePin.text = availableCourses[position].catalogNum.toString()
             holder.courseStatus.setImageResource(if (availableCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             holder.removeButton.setOnClickListener {
@@ -272,8 +271,7 @@ class MainActivity : AppCompatActivity() {
                 awaitingCourses[position].title
             )
             holder.courseTime.text = awaitingCourses[position].section.uppercase(getDefault())
-            holder.coursePin.text =
-                context.getString(R.string.course_pin_format, awaitingCourses[position].catalogNum)
+            holder.coursePin.text = awaitingCourses[position].catalogNum.toString()
             holder.courseStatus.setImageResource(if (awaitingCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             holder.removeButton.setOnClickListener {

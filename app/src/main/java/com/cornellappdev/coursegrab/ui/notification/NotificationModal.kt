@@ -30,7 +30,7 @@ class NotificationModal : AppCompatActivity() {
             course.title
         )
         binding.courseSection.text = course.section
-        binding.coursePin.text = getString(R.string.course_pin_format, course.catalogNum)
+        binding.coursePin.text = course.catalogNum.toString()
 
         binding.buttonStudentCenter.setOnClickListener {
             val browserIntent =
