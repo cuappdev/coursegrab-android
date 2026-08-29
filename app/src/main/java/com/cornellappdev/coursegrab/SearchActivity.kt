@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivitySearchBinding
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.networking.CourseGrabRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
@@ -34,6 +35,9 @@ class SearchActivity : AppCompatActivity() {
     private val repository: CourseGrabRepository by lazy {
         CourseGrabRepository(PreferencesHelper(this))
     }
+
+    /** The only search allowed to update the UI; superseded ones are canceled. */
+    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +59,12 @@ class SearchActivity : AppCompatActivity() {
             if ((text ?: "").length > 2) {
                 searchCourses(text.toString())
             } else {
+                // The query is no longer searchable, so nothing in flight is current.
+                searchJob?.cancel()
                 showEmptyState(
-                    R.drawable.ic_status_warning,
-                    R.string.requires_longer_search,
-                    R.string.requires_longer_search_subtext
+                    icon = R.drawable.ic_status_warning,
+                    title = R.string.requires_longer_search,
+                    subtitle = R.string.requires_longer_search_subtext
                 )
             }
         }
@@ -67,19 +73,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchCourses(query: String) {
-        lifecycleScope.launch {
-            val result = repository.searchCourses(query)
-
-            // A slower earlier request may land after the user has typed on; ignore it.
-            if (binding.editTextSearch.text.toString() != query)
-                return@launch
-
-            val courseList = result.getOrElse { error ->
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            val courseList = repository.searchCourses(query).getOrElse { error ->
                 Log.e(TAG, "Search failed for query \"$query\"", error)
                 showEmptyState(
-                    R.drawable.ic_status_warning,
-                    R.string.search_failed,
-                    R.string.search_failed_subtext
+                    icon = R.drawable.ic_status_warning,
+                    title = R.string.search_failed,
+                    subtitle = R.string.search_failed_subtext
                 )
                 return@launch
             }
@@ -96,9 +97,9 @@ class SearchActivity : AppCompatActivity() {
 
             if (courseList.isEmpty()) {
                 showEmptyState(
-                    R.drawable.ic_status_closed,
-                    R.string.no_courses_alert,
-                    R.string.no_results_alert_subtext_try_another
+                    icon = R.drawable.ic_status_closed,
+                    title = R.string.no_courses_alert,
+                    subtitle = R.string.no_results_alert_subtext_try_another
                 )
             } else {
                 showResults()
