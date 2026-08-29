@@ -1,9 +1,10 @@
 package com.cornellappdev.coursegrab.ui.notification
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.databinding.ActivityNotificationModalBinding
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.CourseNotification
@@ -28,7 +29,7 @@ class NotificationModal : AppCompatActivity() {
 
         binding.buttonStudentCenter.setOnClickListener {
             val browserIntent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("http://studentcenter.cornell.edu"))
+                Intent(Intent.ACTION_VIEW, "http://studentcenter.cornell.edu".toUri())
             startActivity(browserIntent)
         }
 
