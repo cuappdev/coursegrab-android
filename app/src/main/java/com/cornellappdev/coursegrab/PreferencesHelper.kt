@@ -12,35 +12,25 @@ class PreferencesHelper @Inject constructor(@ApplicationContext context: Context
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    var sessionToken = preferences.getString(SESSION_TOKEN, "")
-        set(value) {
-            preferences.edit { putString(SESSION_TOKEN, value) }
-            field = preferences.getString(SESSION_TOKEN, "")
-        }
+    var sessionToken: String?
+        get() = preferences.getString(SESSION_TOKEN, "")
+        set(value) = preferences.edit { putString(SESSION_TOKEN, value) }
 
-    var updateToken = preferences.getString(UPDATE_TOKEN, "")
-        set(value) {
-            preferences.edit { putString(UPDATE_TOKEN, value) }
-            field = preferences.getString(UPDATE_TOKEN, "")
-        }
+    var updateToken: String?
+        get() = preferences.getString(UPDATE_TOKEN, "")
+        set(value) = preferences.edit { putString(UPDATE_TOKEN, value) }
 
-    var expiresAt = preferences.getLong(EXPIRES_AT, 0L)
-        set(value) {
-            preferences.edit { putLong(EXPIRES_AT, value) }
-            field = preferences.getLong(EXPIRES_AT, 0L)
-        }
+    var expiresAt: Long
+        get() = preferences.getLong(EXPIRES_AT, 0L)
+        set(value) = preferences.edit { putLong(EXPIRES_AT, value) }
 
-    var emailAlertSetting = preferences.getBoolean(EMAIL_ALERTS, true)
-        set(value) {
-            preferences.edit { putBoolean(EMAIL_ALERTS, value) }
-            field = preferences.getBoolean(EMAIL_ALERTS, true)
-        }
+    var emailAlertSetting: Boolean
+        get() = preferences.getBoolean(EMAIL_ALERTS, true)
+        set(value) = preferences.edit { putBoolean(EMAIL_ALERTS, value) }
 
-    var mobileAlertSetting = preferences.getBoolean(MOBILE_ALERTS, true)
-        set(value) {
-            preferences.edit { putBoolean(MOBILE_ALERTS, value) }
-            field = preferences.getBoolean(MOBILE_ALERTS, true)
-        }
+    var mobileAlertSetting: Boolean
+        get() = preferences.getBoolean(MOBILE_ALERTS, true)
+        set(value) = preferences.edit { putBoolean(MOBILE_ALERTS, value) }
 
     fun clearAll() {
         preferences.edit(commit = true) { clear() }
@@ -50,7 +40,6 @@ class PreferencesHelper @Inject constructor(@ApplicationContext context: Context
         private const val SESSION_TOKEN = "data.source.prefs.SESSION_TOKEN"
         private const val UPDATE_TOKEN = "data.source.prefs.UPDATE_TOKEN"
         private const val EXPIRES_AT = "data.source.prefs.EXPIRES_AT"
-
         private const val EMAIL_ALERTS = "data.source.prefs.EMAIL_ALERTS"
         private const val MOBILE_ALERTS = "data.source.prefs.MOBILE_ALERTS"
     }
