@@ -1,50 +1,47 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.ui.settings
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.credentials.ClearCredentialStateRequest
-import androidx.credentials.CredentialManager
-import androidx.credentials.exceptions.ClearCredentialException
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.cornellappdev.coursegrab.databinding.ActivitySettingsBinding
-import com.cornellappdev.coursegrab.networking.CourseGrabRepository
+import com.cornellappdev.coursegrab.ui.login.LoginActivity
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
+@AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
 
-    private val credentialManager: CredentialManager by lazy {
-        CredentialManager.create(this)
-    }
-
-    private val preferencesHelper: PreferencesHelper by lazy {
-        PreferencesHelper(this)
-    }
-
-    private val repository: CourseGrabRepository by lazy {
-        CourseGrabRepository(preferencesHelper)
-    }
+    private val viewModel: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.emailAlertsSwitch.isChecked = preferencesHelper.emailAlertSetting
-        binding.mobileAlertsSwitch.isChecked = preferencesHelper.mobileAlertSetting
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effects.collect(::handleEffect)
+            }
+        }
+
+        binding.emailAlertsSwitch.isChecked = viewModel.emailAlertsEnabled
+        binding.mobileAlertsSwitch.isChecked = viewModel.mobileAlertsEnabled
 
         binding.emailAlertsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            preferencesHelper.emailAlertSetting = isChecked
+            viewModel.setEmailAlerts(isChecked)
         }
 
         binding.mobileAlertsSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -61,10 +58,8 @@ class SettingsActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG,
                 ).show()
             } else {
-                preferencesHelper.mobileAlertSetting = isChecked
                 FirebaseMessaging.getInstance().isAutoInitEnabled = isChecked
-
-                setNotificationsStatus(isChecked)
+                viewModel.setMobileAlerts(isChecked)
             }
         }
 
@@ -83,10 +78,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(browserIntent)
         }
 
-        binding.signOut.setOnClickListener {
-            preferencesHelper.clearAll()
-            signOut()
-        }
+        binding.signOut.setOnClickListener { viewModel.signOut() }
 
         binding.backBtn.setOnClickListener { finish() }
 
@@ -103,42 +95,13 @@ class SettingsActivity : AppCompatActivity() {
 
     }
 
-    private fun setNotificationsStatus(enabled: Boolean) {
-        lifecycleScope.launch {
-            repository.setNotifications(enabled)
-                .onSuccess {
-                    Toast.makeText(
-                        this@SettingsActivity,
-                        "Notifications ${if (enabled) "enabled." else "disabled."}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                .onFailure { error ->
-                    Log.e(TAG, "Failed to update notification setting", error)
-                    Toast.makeText(
-                        this@SettingsActivity,
-                        "Couldn't update notification settings.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+    private fun handleEffect(effect: SettingsEffect) {
+        when (effect) {
+            is SettingsEffect.Message ->
+                Toast.makeText(this, effect.text, Toast.LENGTH_SHORT).show()
+
+            SettingsEffect.SignedOut ->
+                startActivity(Intent(this, LoginActivity::class.java))
         }
-    }
-
-    private fun signOut() {
-        lifecycleScope.launch {
-            // Clears the Credential Manager provider state so the account picker
-            // reappears on the next sign-in attempt.
-            try {
-                credentialManager.clearCredentialState(ClearCredentialStateRequest())
-            } catch (e: ClearCredentialException) {
-                Log.w(TAG, "Failed to clear credential state", e)
-            }
-
-            startActivity(Intent(this@SettingsActivity, LoginActivity::class.java))
-        }
-    }
-
-    companion object {
-        private const val TAG = "SettingsActivity"
     }
 }
