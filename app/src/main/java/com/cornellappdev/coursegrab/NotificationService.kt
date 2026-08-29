@@ -65,9 +65,9 @@ class NotificationService : FirebaseMessagingService() {
      *
      * @param token The new token.
      */
-    private fun sendRegistrationToServer(token: String?) {
+    private fun sendRegistrationToServer(token: String) {
         CoroutineScope(Dispatchers.Main).launch {
-            repository.sendDeviceToken(token.toString())
+            repository.sendDeviceToken(token)
         }
     }
 

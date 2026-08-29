@@ -198,9 +198,9 @@ class LoginActivity : AppCompatActivity() {
         Snackbar.make(binding.loginRootView, message, Snackbar.LENGTH_LONG).show()
     }
 
-    private fun sendRegistrationToServer(token: String?) {
+    private fun sendRegistrationToServer(token: String) {
         lifecycleScope.launch {
-            repository.sendDeviceToken(token.toString())
+            repository.sendDeviceToken(token)
                 .onSuccess { Log.d(TAG, "sendRegistrationTokenToServer($token)") }
                 .onFailure { Log.w(TAG, "Failed to register device token", it) }
         }
