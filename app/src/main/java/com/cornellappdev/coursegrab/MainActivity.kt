@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -18,44 +17,43 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivityMainBinding
 import com.cornellappdev.coursegrab.models.Course
-import com.cornellappdev.coursegrab.networking.CourseGrabRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Locale.getDefault
 
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var availableRecyclerView: RecyclerView
-    private lateinit var availableViewAdapter: RecyclerView.Adapter<*>
-    private lateinit var availableViewManager: RecyclerView.LayoutManager
-
-    private lateinit var awaitingRecyclerView: RecyclerView
-    private lateinit var awaitingViewAdapter: RecyclerView.Adapter<*>
-    private lateinit var awaitingViewManager: RecyclerView.LayoutManager
-
-    private val repository: CourseGrabRepository by lazy {
-        CourseGrabRepository(PreferencesHelper(this))
-    }
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        refreshAwaiting()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.state.collect(::render) }
+                launch { viewModel.effects.collect(::handleEffect) }
+            }
+        }
 
         binding.refreshCoursesLayout.setOnRefreshListener {
-            refreshAwaiting()
+            viewModel.refresh()
         }
 
         binding.settingsBtn.setOnClickListener {
@@ -69,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.addCourseButton.setOnClickListener {
-            addCourse(binding.addCourseEditText.text.toString().toInt(), this)
+            viewModel.addCourse(binding.addCourseEditText.text.toString().toInt())
             binding.addCourseEditText.clearFocus()
             binding.addCourseEditText.text.clear()
             val inputMethodManager =
@@ -87,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.addCourseEditText.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                addCourse(binding.addCourseEditText.text.toString().toInt(), this)
+                viewModel.addCourse(binding.addCourseEditText.text.toString().toInt())
                 binding.addCourseEditText.clearFocus()
                 binding.addCourseEditText.text.clear()
                 val inputMethodManager =
@@ -130,109 +128,50 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        refreshAwaiting()
+        viewModel.refresh()
     }
 
-    private fun refreshAwaiting() {
-        lifecycleScope.launch {
-            val courseList = repository.getTracking().getOrElse { error ->
-                Log.e(TAG, "Failed to load tracked courses", error)
-                binding.refreshCoursesLayout.isRefreshing = false
-                Toast.makeText(
-                    this@MainActivity,
-                    "Couldn't load your courses.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@launch
-            }
+    private fun render(state: TrackedCoursesState) {
+        binding.availableList.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = AvailableAdapter(state.available, this@MainActivity)
+        }
+        binding.availableTitle.text = "${state.available.size} Available"
 
-            val listOpen = courseList.filter { it.status == "OPEN" }
-            val listAwaiting = courseList.filter { it.status != "OPEN" }
+        binding.awaitingList.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = AwaitingAdapter(state.awaiting, this@MainActivity)
+        }
+        binding.awaitingTitle.text = "${state.awaiting.size} Awaiting"
 
-            // Available Courses Adapter
-            availableViewManager = LinearLayoutManager(this@MainActivity)
-            availableViewAdapter = AvailableAdapter(listOpen, this@MainActivity)
+        binding.layoutAvailable.visibility =
+            if (state.available.isNotEmpty()) View.VISIBLE else View.GONE
+        binding.layoutAwaiting.visibility =
+            if (state.awaiting.isNotEmpty()) View.VISIBLE else View.GONE
 
-            availableRecyclerView = binding.availableList.apply {
-                layoutManager = availableViewManager
-                adapter = availableViewAdapter
-            }
-            binding.availableTitle.text = "${binding.availableList.adapter?.itemCount} Available"
+        binding.noCoursesView.visibility =
+            if (state.hasLoaded && state.available.isEmpty() && state.awaiting.isEmpty())
+                View.VISIBLE else View.GONE
 
-            // Awaiting Courses Adapter
-            awaitingViewManager = LinearLayoutManager(this@MainActivity)
-            awaitingViewAdapter = AwaitingAdapter(listAwaiting, this@MainActivity)
+        binding.refreshCoursesLayout.isRefreshing = state.isRefreshing
+    }
 
-            awaitingRecyclerView = binding.awaitingList.apply {
-                layoutManager = awaitingViewManager
-                adapter = awaitingViewAdapter
-            }
-            binding.awaitingTitle.text = "${binding.awaitingList.adapter?.itemCount} Awaiting"
+    private fun handleEffect(effect: MainEffect) {
+        when (effect) {
+            is MainEffect.Message ->
+                Toast.makeText(this, effect.text, Toast.LENGTH_SHORT).show()
 
-            binding.layoutAvailable.visibility =
-                if (listOpen.isNotEmpty()) View.VISIBLE else View.GONE
-            binding.layoutAwaiting.visibility =
-                if (listAwaiting.isNotEmpty()) View.VISIBLE else View.GONE
-
-            binding.noCoursesView.visibility =
-                if (listOpen.isEmpty() && listAwaiting.isEmpty()) View.VISIBLE else View.GONE
-
-            binding.refreshCoursesLayout.isRefreshing = false
+            is MainEffect.OpenCourse -> startActivity(
+                Intent(this, CourseDetailsActivity::class.java).apply {
+                    putExtra("courseDetails", effect.course)
+                }
+            )
         }
     }
 
-    private fun addCourse(courseId: Int, context: Context) {
-        lifecycleScope.launch {
-            val result = repository.addTracking(courseId)
+    private fun removeCourse(courseId: Int) = viewModel.removeCourse(courseId)
 
-            refreshAwaiting()
-
-            result.onFailure { error ->
-                Log.e(TAG, "Failed to track course $courseId", error)
-                Toast.makeText(
-                    context,
-                    error.message ?: "Couldn't track that course.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    private fun removeCourse(courseId: Int, context: Context) {
-        lifecycleScope.launch {
-            val result = repository.removeTracking(courseId)
-
-            refreshAwaiting()
-
-            result.onFailure { error ->
-                Log.e(TAG, "Failed to untrack course $courseId", error)
-                Toast.makeText(
-                    context,
-                    error.message ?: "Couldn't remove that course.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
-
-    private fun editCourse(courseId: Int, context: Context) {
-        lifecycleScope.launch {
-            val course = repository.getCourseById(courseId).getOrElse { error ->
-                Log.e(TAG, "Failed to load course $courseId", error)
-                Toast.makeText(
-                    context,
-                    "Couldn't open that course.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@launch
-            }
-
-            val intent = Intent(context, CourseDetailsActivity::class.java).apply {
-                putExtra("courseDetails", course)
-            }
-            context.startActivity(intent)
-        }
-    }
+    private fun editCourse(courseId: Int) = viewModel.openCourse(courseId)
 
     private fun enrollCourse() {
         val browserIntent =
@@ -270,11 +209,11 @@ class MainActivity : AppCompatActivity() {
                 "${availableCourses[position].subject_code} ${availableCourses[position].course_num}: ${availableCourses[position].title}"
             holder.courseTime.text = availableCourses[position].section.uppercase(getDefault())
             holder.coursePin.text = availableCourses[position].catalog_num.toString()
-            holder.courseStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
+            holder.courseStatus.setImageResource(if (availableCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             holder.removeButton.setOnClickListener {
                 (context as MainActivity).removeCourse(
-                    availableCourses[position].catalog_num, context
+                    availableCourses[position].catalog_num
                 )
             }
 
@@ -285,7 +224,7 @@ class MainActivity : AppCompatActivity() {
 
             holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
-                    availableCourses[position].catalog_num, context
+                    availableCourses[position].catalog_num
                 )
             }
         }
@@ -321,25 +260,21 @@ class MainActivity : AppCompatActivity() {
                 "${awaitingCourses[position].subject_code} ${awaitingCourses[position].course_num}: ${awaitingCourses[position].title}"
             holder.courseTime.text = awaitingCourses[position].section.uppercase(getDefault())
             holder.coursePin.text = awaitingCourses[position].catalog_num.toString()
-            holder.courseStatus.setImageResource(if (awaitingCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
+            holder.courseStatus.setImageResource(if (awaitingCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             holder.removeButton.setOnClickListener {
                 (context as MainActivity).removeCourse(
-                    awaitingCourses[position].catalog_num, context
+                    awaitingCourses[position].catalog_num
                 )
             }
             holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
-                    awaitingCourses[position].catalog_num, context
+                    awaitingCourses[position].catalog_num
                 )
             }
         }
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = awaitingCourses.size
-    }
-
-    companion object {
-        private const val TAG = "MainActivity"
     }
 }

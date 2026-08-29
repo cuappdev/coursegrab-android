@@ -16,10 +16,15 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.coroutines.executeAsync
 import java.lang.reflect.Type
+import javax.inject.Inject
+import javax.inject.Singleton
 
 class ApiException(message: String) : Exception(message)
 
-class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
+@Singleton
+class CourseGrabRepository @Inject constructor(
+    private val preferencesHelper: PreferencesHelper
+) {
     private val token: String
         get() = preferencesHelper.sessionToken.orEmpty()
 

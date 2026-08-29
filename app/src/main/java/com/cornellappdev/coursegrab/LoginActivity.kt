@@ -1,240 +1,55 @@
 package com.cornellappdev.coursegrab
 
 import android.content.Intent
-import android.content.MutableContextWrapper
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.credentials.ClearCredentialStateRequest
-import androidx.credentials.CredentialManager
-import androidx.credentials.CredentialOption
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.exceptions.ClearCredentialException
-import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.credentials.exceptions.GetCredentialException
-import androidx.credentials.exceptions.NoCredentialException
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.cornellappdev.coursegrab.databinding.ActivityLoginBinding
-import com.cornellappdev.coursegrab.models.UserSession
-import com.cornellappdev.coursegrab.networking.CourseGrabRepository
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
-    private val credentialManager: CredentialManager by lazy {
-        CredentialManager.create(this)
-    }
-    private val credentialContext: MutableContextWrapper by lazy {
-        MutableContextWrapper(this)
-    }
-
-    private val preferencesHelper: PreferencesHelper by lazy {
-        PreferencesHelper(this)
-    }
-
-    private val repository: CourseGrabRepository by lazy {
-        CourseGrabRepository(preferencesHelper)
-    }
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (preferencesHelper.expiresAt > System.currentTimeMillis() / 1000L) {
-            val intent = Intent(this@LoginActivity, MainActivity::class.java)
-            startActivity(intent)
-        } else {
-            val updateToken = preferencesHelper.updateToken
-            if (!updateToken.isNullOrBlank()) {
-                lifecycleScope.launch {
-                    repository.updateSession(updateToken)
-                        .onSuccess { verifySession(it) }
-                        .onFailure { Log.d(TAG, "Could not resume previous session", it) }
-                }
-            }
-        }
-
-        binding.signInButton.setOnClickListener { signIn() }
-    }
-
-    private fun signIn() {
-        lifecycleScope.launch {
-            // Step 1: accounts already authorized for this app. Returning users get a
-            // streamlined sheet, or no prompt at all when there is exactly one match.
-            val googleIdOption = GetGoogleIdOption.Builder()
-                .setServerClientId(getString(R.string.default_web_client_id))
-                .setFilterByAuthorizedAccounts(true)
-                .setAutoSelectEnabled(true)
-                .build()
-
-            when (val authorized = requestCredential(googleIdOption)) {
-                is CredentialResult.Success -> {
-                    handleSignIn(authorized.response)
-                    return@launch
-                }
-
-                CredentialResult.NoneAvailable -> Unit
-                CredentialResult.Cancelled, CredentialResult.Failed -> return@launch
-            }
-
-            // Step 2: first-time (or de-authorized) users get the full account picker.
-            val signInWithGoogleOption = GetSignInWithGoogleOption
-                .Builder(getString(R.string.default_web_client_id))
-                .build()
-
-            when (val result = requestCredential(signInWithGoogleOption)) {
-                is CredentialResult.Success -> handleSignIn(result.response)
-                CredentialResult.NoneAvailable ->
-                    showLoginError("No Google account found. Add one in system settings.")
-
-                CredentialResult.Cancelled, CredentialResult.Failed -> Unit
-            }
-        }
-    }
-
-    private suspend fun requestCredential(option: CredentialOption): CredentialResult {
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(option)
-            .build()
-
-        // TODO: this runs in lifecycleScope, so rotating while the sheet is up cancels
-        // sign-in. Move the call into a ViewModel (viewModelScope) to survive recreation.
-        return try {
-            CredentialResult.Success(
-                credentialManager.getCredential(credentialContext, request)
-            )
-        } catch (e: NoCredentialException) {
-            Log.d(TAG, "No matching credential for ${option::class.simpleName}", e)
-            CredentialResult.NoneAvailable
-        } catch (e: GetCredentialCancellationException) {
-            Log.d(TAG, "Sign-in cancelled by user", e)
-            CredentialResult.Cancelled
-        } catch (e: GetCredentialException) {
-            Log.e(TAG, "Credential Manager sign-in failed", e)
-            showLoginError("Sign-in failed. Please try again.")
-            CredentialResult.Failed
-        }
-    }
-
-    private sealed interface CredentialResult {
-        data class Success(val response: GetCredentialResponse) : CredentialResult
-        data object NoneAvailable : CredentialResult
-        data object Cancelled : CredentialResult
-        data object Failed : CredentialResult
-    }
-
-    private fun handleSignIn(response: GetCredentialResponse) {
-        val credential = response.credential
-        when (credential) {
-            is CustomCredential -> {
-                // GetSignInWithGoogleOption returns the SIWG credential type, while the
-                // bottom-sheet GetGoogleIdOption flow returns the plain one. Accept either.
-                if (credential.type != GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL &&
-                    credential.type != GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_SIWG_CREDENTIAL
-                ) {
-                    Log.e(TAG, "Unexpected credential type: ${credential.type}")
-                    showLoginError("Sign-in failed. Please try again.")
-                    return
-                }
-            }
-
-            else -> {
-                Log.e(TAG, "Unexpected type of credential: ${credential::class}")
-                showLoginError("Sign-in failed. Please try again.")
-                return
-            }
-        }
-
-        val googleCredential = try {
-            GoogleIdTokenCredential.createFrom(credential.data)
-        } catch (e: GoogleIdTokenParsingException) {
-            Log.e(TAG, "Failed to parse Google ID token", e)
-            showLoginError("Sign-in failed. Please try again.")
-            return
-        }
-
-        if (!isAllowedAccount(googleCredential.id)) {
-            showLoginError("Please use a @cornell.edu account")
-            clearCredentialState()
-            return
-        }
+        // Hand Credential Manager the current Activity. On a configuration change this runs
+        // again with the new instance, so a sign-in already in flight keeps its UI host.
+        viewModel.credentialContext.baseContext = this
 
         lifecycleScope.launch {
-            repository.initializeSession(googleCredential.idToken, null)
-                .onSuccess { verifySession(it) }
-                .onFailure { error ->
-                    Log.e(TAG, "Failed to initialize session", error)
-                    showLoginError("Sign-in failed. Please try again.")
-                }
-        }
-    }
-
-    private fun isAllowedAccount(email: String): Boolean =
-        email.endsWith("@cornell.edu") ||
-                email == "appstoreappdev@gmail.com" ||
-                email == "coursegrab.droid@gmail.com"
-
-    private fun clearCredentialState() {
-        lifecycleScope.launch {
-            try {
-                credentialManager.clearCredentialState(ClearCredentialStateRequest())
-            } catch (e: ClearCredentialException) {
-                Log.w(TAG, "Failed to clear credential state", e)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effects.collect(::handleEffect)
             }
         }
+
+        binding.signInButton.setOnClickListener { viewModel.signIn() }
     }
 
-    private fun showLoginError(message: String) {
-        Snackbar.make(binding.loginRootView, message, Snackbar.LENGTH_LONG).show()
+    override fun onDestroy() {
+        // Paired with onCreate: the ViewModel outlives this Activity, so hand the wrapper
+        // back to the application context rather than leaving a destroyed Activity in it.
+        viewModel.credentialContext.baseContext = applicationContext
+        super.onDestroy()
     }
 
-    private fun sendRegistrationToServer(token: String) {
-        lifecycleScope.launch {
-            repository.sendDeviceToken(token)
-                .onSuccess { Log.d(TAG, "sendRegistrationTokenToServer($token)") }
-                .onFailure { Log.w(TAG, "Failed to register device token", it) }
+    private fun handleEffect(effect: LoginEffect) {
+        when (effect) {
+            is LoginEffect.Error ->
+                Snackbar.make(binding.loginRootView, effect.message, Snackbar.LENGTH_LONG).show()
+
+            LoginEffect.NavigateToMain ->
+                startActivity(Intent(this, MainActivity::class.java))
         }
-    }
-
-    private fun verifySession(userSession: UserSession) {
-
-        if (userSession.session_expiration.isNullOrBlank() ||
-            userSession.session_token.isNullOrBlank() ||
-            userSession.update_token.isNullOrBlank()
-        ) return
-
-        preferencesHelper.sessionToken = userSession.session_token
-        preferencesHelper.updateToken = userSession.update_token
-        preferencesHelper.expiresAt = userSession.session_expiration.toLong()
-
-        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
-            sendRegistrationToServer(token)
-        }
-
-        setNotificationsStatus(preferencesHelper.mobileAlertSetting)
-
-        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-        startActivity(intent)
-    }
-
-    private fun setNotificationsStatus(enabled: Boolean) {
-        lifecycleScope.launch {
-            repository.setNotifications(enabled)
-                .onFailure { Log.w(TAG, "Failed to update notifications", it) }
-        }
-    }
-
-    companion object {
-        private const val TAG = "LoginActivity"
     }
 }
