@@ -3,7 +3,6 @@ package com.cornellappdev.coursegrab
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -11,42 +10,42 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivitySearchBinding
 import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.networking.CourseGrabRepository
-import kotlinx.coroutines.Job
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
 
-    private lateinit var searchRecyclerView: RecyclerView
-    private lateinit var searchViewAdapter: RecyclerView.Adapter<*>
-    private lateinit var searchViewManager: RecyclerView.LayoutManager
-
-    private val repository: CourseGrabRepository by lazy {
-        CourseGrabRepository(PreferencesHelper(this))
-    }
-
-    /** The only search allowed to update the UI; superseded ones are canceled. */
-    private var searchJob: Job? = null
+    private val viewModel: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect(::render)
+            }
+        }
+
         binding.editTextSearch.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                searchCourses(binding.editTextSearch.text.toString())
+                viewModel.onQueryChanged(binding.editTextSearch.text.toString())
                 val inputMethodManager =
                     getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 inputMethodManager.hideSoftInputFromWindow(v.windowToken, 0)
@@ -56,53 +55,42 @@ class SearchActivity : AppCompatActivity() {
         })
 
         binding.editTextSearch.doOnTextChanged { text, _, _, _ ->
-            if ((text ?: "").length > 2) {
-                searchCourses(text.toString())
-            } else {
-                // The query is no longer searchable, so nothing in flight is current.
-                searchJob?.cancel()
-                showEmptyState(
-                    icon = R.drawable.ic_status_warning,
-                    title = R.string.requires_longer_search,
-                    subtitle = R.string.requires_longer_search_subtext
-                )
-            }
+            viewModel.onQueryChanged(text?.toString().orEmpty())
         }
 
         binding.backBtn.setOnClickListener { finish() }
     }
 
-    private fun searchCourses(query: String) {
-        searchJob?.cancel()
-        searchJob = lifecycleScope.launch {
-            val courseList = repository.searchCourses(query).getOrElse { error ->
-                Log.e(TAG, "Search failed for query \"$query\"", error)
-                showEmptyState(
-                    icon = R.drawable.ic_status_warning,
-                    title = R.string.search_failed,
-                    subtitle = R.string.search_failed_subtext
-                )
-                return@launch
-            }
+    private fun render(state: SearchState) {
+        when (state) {
+            SearchState.QueryTooShort -> showEmptyState(
+                icon = R.drawable.ic_status_warning,
+                title = R.string.requires_longer_search,
+                subtitle = R.string.requires_longer_search_subtext
+            )
 
-            // Results Courses Adapter
-            searchViewManager = LinearLayoutManager(this@SearchActivity)
-            searchViewAdapter = ResultsAdapter(courseList, this@SearchActivity)
+            SearchState.Failed -> showEmptyState(
+                icon = R.drawable.ic_status_warning,
+                title = R.string.search_failed,
+                subtitle = R.string.search_failed_subtext
+            )
 
-            searchRecyclerView = binding.resultsList.apply {
-                layoutManager = searchViewManager
-                adapter = searchViewAdapter
-            }
-            binding.resultTitle.text = "${binding.resultsList.adapter?.itemCount} Results"
+            is SearchState.Results -> {
+                binding.resultsList.apply {
+                    layoutManager = LinearLayoutManager(this@SearchActivity)
+                    adapter = ResultsAdapter(state.courses, this@SearchActivity)
+                }
+                binding.resultTitle.text = "${state.courses.size} Results"
 
-            if (courseList.isEmpty()) {
-                showEmptyState(
-                    icon = R.drawable.ic_status_closed,
-                    title = R.string.no_courses_alert,
-                    subtitle = R.string.no_results_alert_subtext_try_another
-                )
-            } else {
-                showResults()
+                if (state.courses.isEmpty()) {
+                    showEmptyState(
+                        icon = R.drawable.ic_status_closed,
+                        title = R.string.no_courses_alert,
+                        subtitle = R.string.no_results_alert_subtext_try_another
+                    )
+                } else {
+                    showResults()
+                }
             }
         }
     }
@@ -158,9 +146,5 @@ class SearchActivity : AppCompatActivity() {
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = resultsCourses.size
-    }
-
-    companion object {
-        private const val TAG = "SearchActivity"
     }
 }

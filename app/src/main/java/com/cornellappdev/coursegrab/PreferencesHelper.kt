@@ -3,8 +3,12 @@ package com.cornellappdev.coursegrab
 import android.content.Context
 import android.preference.PreferenceManager
 import androidx.core.content.edit
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PreferencesHelper(context: Context) {
+@Singleton
+class PreferencesHelper @Inject constructor(@ApplicationContext context: Context) {
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
