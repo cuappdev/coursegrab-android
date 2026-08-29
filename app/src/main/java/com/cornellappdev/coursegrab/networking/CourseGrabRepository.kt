@@ -13,14 +13,13 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.coroutines.executeAsync
 import java.lang.reflect.Type
 
 class ApiException(message: String) : Exception(message)
 
 class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
-
-    private val gson = Gson()
-
     private val token: String
         get() = preferencesHelper.sessionToken.orEmpty()
 
@@ -54,7 +53,7 @@ class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
     private suspend fun <T : Any> call(endpoint: Endpoint, type: Type): Result<T> =
         withContext(Dispatchers.IO) {
             try {
-                val httpResponse = Request.httpClient.newCall(endpoint.okHttpRequest()).await()
+                val httpResponse = httpClient.newCall(endpoint.okHttpRequest()).executeAsync()
                 val body = httpResponse.use { it.body.string() }
 
                 val envelope: ApiResponse<T>? = try {
@@ -86,6 +85,8 @@ class CourseGrabRepository(private val preferencesHelper: PreferencesHelper) {
         }
 
     private companion object {
+        val httpClient = OkHttpClient()
+        val gson = Gson()
         val userSessionType: Type = object : TypeToken<ApiResponse<UserSession>>() {}.type
         val trackingType: Type = object : TypeToken<ApiResponse<TrackingContainer>>() {}.type
         val searchType: Type = object : TypeToken<ApiResponse<SearchContainer>>() {}.type
