@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.CourseNotification
@@ -13,12 +14,12 @@ import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import com.cornellappdev.coursegrab.ui.notification.NotificationModal
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -27,6 +28,9 @@ class NotificationService : FirebaseMessagingService() {
     @Inject
     lateinit var repository: CourseGrabRepository
 
+    @Inject
+    lateinit var json: Json
+
     /**
      * Called when message is received.
      *
@@ -34,15 +38,16 @@ class NotificationService : FirebaseMessagingService() {
      */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Check if message contains a data payload.
-        remoteMessage.data.isNotEmpty().let {
-            val courseInfoRaw = Gson()
-            val courseInfo = courseInfoRaw.fromJson<CourseNotification>(
-                remoteMessage.data["message"].toString(),
-                object : TypeToken<CourseNotification>() {}.type
-            )
+        val payload = remoteMessage.data["message"]
+        if (payload != null) {
+            val courseInfo = try {
+                json.decodeFromString<CourseNotification>(payload)
+            } catch (e: SerializationException) {
+                Log.w(TAG, "Unreadable notification payload", e)
+                null
+            }
 
-            if (courseInfo != null)
-                sendNotification(courseInfo)
+            if (courseInfo != null) sendNotification(courseInfo)
         }
 
         // Check if message contains a notification payload.
@@ -115,6 +120,10 @@ class NotificationService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        notificationManager.notify(course.section.catalog_num, notificationBuilder.build())
+        notificationManager.notify(course.section.catalogNum, notificationBuilder.build())
+    }
+
+    private companion object {
+        const val TAG = "NotificationService"
     }
 }

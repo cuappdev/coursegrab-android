@@ -1,7 +1,11 @@
 package com.cornellappdev.coursegrab.models
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 class UserSession(
-    val session_token: String?,
-    val update_token: String?,
-    val session_expiration: String?
+    @SerialName("session_token") val sessionToken: String? = null,
+    @SerialName("update_token") val updateToken: String? = null,
+    @SerialName("session_expiration") val sessionExpiration: Long? = null
 )

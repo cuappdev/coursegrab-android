@@ -36,7 +36,7 @@ class CourseDetailsActivity : AppCompatActivity() {
 
         val courseDetails: SearchResult = intent.getParcelableExtra<SearchResult>("courseDetails") as SearchResult
 
-        binding.headerTextView.text = "${courseDetails.subject_code} ${courseDetails.course_num}"
+        binding.headerTextView.text = "${courseDetails.subjectCode} ${courseDetails.courseNum}"
 
         binding.courseTitle.text = courseDetails.title
         binding.courseDetails.text =
@@ -91,17 +91,17 @@ class CourseDetailsActivity : AppCompatActivity() {
             holder.sectionStatus.setImageResource(if (availableCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             //change tracking text
-            holder.trackText.text = availableCourses[position].num_tracking.toString() + " Tracking"
+            holder.trackText.text = availableCourses[position].numTracking.toString() + " Tracking"
 
             //Change the track button to remove button
             holder.removeButton.visibility =
-                if (availableCourses[position].is_tracking) View.VISIBLE else View.GONE
+                if (availableCourses[position].isTracking) View.VISIBLE else View.GONE
             holder.trackButton.visibility =
-                if (!availableCourses[position].is_tracking) View.VISIBLE else View.GONE
+                if (!availableCourses[position].isTracking) View.VISIBLE else View.GONE
 
             holder.removeButton.setOnClickListener {
                 (context as CourseDetailsActivity).removeCourse(
-                    availableCourses[position].catalog_num
+                    availableCourses[position].catalogNum
                 )
                 holder.removeButton.visibility = View.GONE
                 holder.trackButton.visibility = View.VISIBLE
@@ -115,7 +115,7 @@ class CourseDetailsActivity : AppCompatActivity() {
 
             holder.trackButton.setOnClickListener {
                 (context as CourseDetailsActivity).addCourse(
-                    availableCourses[position].catalog_num
+                    availableCourses[position].catalogNum
                 )
                 holder.trackButton.visibility = View.GONE
                 holder.removeButton.visibility = View.VISIBLE
