@@ -43,11 +43,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cornellappdev.coursegrab.R
-import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.ui.components.BACK_BUTTON_WIDTH
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EmptyState
+import com.cornellappdev.coursegrab.ui.components.sampleSearchResult
 import com.cornellappdev.coursegrab.ui.theme.CardBorder
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import com.cornellappdev.coursegrab.ui.theme.LightText
@@ -235,28 +235,12 @@ private fun SearchResultRow(
     }
 }
 
-private val SampleResult = SearchResult(
-    subjectCode = "CS",
-    courseNum = 1998,
-    title = "Intro to Android Development",
-    sections = listOf(
-        Course(
-            catalogNum = 10032,
-            courseNum = 1998,
-            section = "LEC 001",
-            status = "OPEN",
-            subjectCode = "CS",
-            title = "Intro to Android Development"
-        )
-    )
-)
-
 @Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
 private fun SearchScreenResultsPreview() {
     CourseGrabTheme {
         SearchScreen(
-            state = SearchState.Results(listOf(SampleResult)),
+            state = SearchState.Results(listOf(sampleSearchResult())),
             onQueryChanged = {},
             onOpenCourse = {},
             onBack = {}

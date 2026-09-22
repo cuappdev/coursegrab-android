@@ -35,11 +35,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cornellappdev.coursegrab.R
-import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.components.EmptyState
+import com.cornellappdev.coursegrab.ui.components.sampleCourse
 import com.cornellappdev.coursegrab.ui.components.EnrollButton
 import com.cornellappdev.coursegrab.ui.components.CourseRow
 import com.cornellappdev.coursegrab.ui.components.TrackButton
@@ -254,32 +254,24 @@ private fun SectionHeader(text: String, color: Color, modifier: Modifier = Modif
 private const val SECTION_AVAILABLE = "header-available"
 private const val SECTION_AWAITING = "header-awaiting"
 
-private val SampleAvailable = Course(
-    catalogNum = 10032,
-    courseNum = 1998,
-    section = "LEC 001 / M 7:30PM",
-    status = "OPEN",
-    subjectCode = "CS",
-    title = "Intro to Android Development"
-)
-
-private val SampleAwaiting = Course(
-    catalogNum = 10755,
-    courseNum = 1101,
-    section = "LEC 001 / TR 11:40AM",
-    status = "CLOSED",
-    subjectCode = "COGST",
-    title = "Introduction to Cognitive Science"
-)
-
 @Preview(showBackground = true, widthDp = 360, heightDp = 720)
 @Composable
 private fun MainScreenPreview() {
     CourseGrabTheme {
         MainScreen(
             state = TrackedCoursesState(
-                available = listOf(SampleAvailable),
-                awaiting = listOf(SampleAwaiting),
+                available = listOf(sampleCourse(isTracking = true)),
+                awaiting = listOf(
+                    sampleCourse(
+                        catalogNum = 10755,
+                        subjectCode = "COGST",
+                        courseNum = 1101,
+                        title = "Introduction to Cognitive Science",
+                        section = "LEC 001 / TR 11:40AM",
+                        isOpen = false,
+                        isTracking = true
+                    )
+                ),
                 hasLoaded = true
             ),
             snackbarHostState = remember { SnackbarHostState() },

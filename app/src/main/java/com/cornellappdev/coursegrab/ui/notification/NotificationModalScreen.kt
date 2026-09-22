@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.Course
+import com.cornellappdev.coursegrab.ui.components.sampleCourse
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import com.cornellappdev.coursegrab.ui.theme.DarkEnough
 import com.cornellappdev.coursegrab.ui.theme.LightText
@@ -126,21 +127,12 @@ fun NotificationModalScreen(
     }
 }
 
-private val SampleCourse = Course(
-    catalogNum = 10032,
-    courseNum = 1998,
-    section = "LEC 001 / M 7:30PM",
-    status = "OPEN",
-    subjectCode = "CS",
-    title = "Intro to Android Development"
-)
-
 @Preview(widthDp = 360, heightDp = 720)
 @Composable
 private fun NotificationModalScreenPreview() {
     CourseGrabTheme {
         NotificationModalScreen(
-            course = SampleCourse,
+            course = sampleCourse(),
             onOpenStudentCenter = {},
             onBackHome = {}
         )
