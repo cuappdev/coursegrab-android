@@ -16,4 +16,12 @@ data class Course(
     val num_tracking: Int,
     val mode: String,
     val errors: List<String>?
-) : Parcelable
+) : Parcelable {
+
+    /** The backend reports section availability through [status] rather than a flag. */
+    val isOpen: Boolean get() = status == STATUS_OPEN
+
+    private companion object {
+        const val STATUS_OPEN = "OPEN"
+    }
+}

@@ -1,18 +1,19 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.ui.splash
 
-import androidx.appcompat.app.AppCompatActivity
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
-import com.cornellappdev.coursegrab.databinding.ActivitySplashScreenBinding
-import android.content.Intent
-import android.net.Uri
 import android.widget.VideoView
-import java.lang.Exception
+import androidx.appcompat.app.AppCompatActivity
+import com.cornellappdev.coursegrab.R
+import com.cornellappdev.coursegrab.databinding.ActivitySplashScreenBinding
+import com.cornellappdev.coursegrab.ui.login.LoginActivity
 
 class SplashScreenActivity : AppCompatActivity() {
 
@@ -134,7 +135,7 @@ class SplashScreenActivity : AppCompatActivity() {
     private fun jump() {
         if (isFinishing) return
         startActivity(Intent(this, LoginActivity::class.java))
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
     }
 

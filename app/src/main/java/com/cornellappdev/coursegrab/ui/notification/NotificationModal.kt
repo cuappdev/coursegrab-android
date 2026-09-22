@@ -1,4 +1,4 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.ui.notification
 
 import android.content.Intent
 import android.net.Uri
@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.cornellappdev.coursegrab.databinding.ActivityNotificationModalBinding
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.CourseNotification
+import com.cornellappdev.coursegrab.ui.main.MainActivity
 
 class NotificationModal : AppCompatActivity() {
 

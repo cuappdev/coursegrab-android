@@ -1,8 +1,7 @@
-package com.cornellappdev.coursegrab
+package com.cornellappdev.coursegrab.ui.details
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,26 +9,25 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.databinding.ActivityCourseDetailsBinding
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.networking.CourseGrabRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class CourseDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCourseDetailsBinding
 
-    private lateinit var sectionsRecyclerView: RecyclerView
-    private lateinit var sectionsViewAdapter: RecyclerView.Adapter<*>
-    private lateinit var sectionsViewManager: RecyclerView.LayoutManager
-
-    private val repository: CourseGrabRepository by lazy {
-        CourseGrabRepository(PreferencesHelper(this))
-    }
+    private val viewModel: CourseDetailsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,43 +42,25 @@ class CourseDetailsActivity : AppCompatActivity() {
         binding.courseDetails.text =
             if (courseDetails.sections.isNotEmpty()) courseDetails.sections.first().instructors.first() else "To Be Assigned"
 
-        // Available Courses Adapter
-        sectionsViewManager = LinearLayoutManager(this@CourseDetailsActivity)
-        sectionsViewAdapter = SectionAdapter(courseDetails.sections, this@CourseDetailsActivity)
+        binding.sectionsRecyclerview.apply {
+            layoutManager = LinearLayoutManager(this@CourseDetailsActivity)
+            adapter = SectionAdapter(courseDetails.sections, this@CourseDetailsActivity)
+        }
 
-        sectionsRecyclerView = binding.sectionsRecyclerview.apply {
-            layoutManager = sectionsViewManager
-            adapter = sectionsViewAdapter
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.trackingErrors.collect { error ->
+                    Toast.makeText(this@CourseDetailsActivity, error, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         binding.backBtn.setOnClickListener { finish() }
     }
 
-    fun addCourse(courseId: Int, context: Context) {
-        lifecycleScope.launch {
-            repository.addTracking(courseId).onFailure { error ->
-                Log.e(TAG, "Failed to track course $courseId", error)
-                Toast.makeText(
-                    context,
-                    error.message ?: "Couldn't track that course.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
+    fun addCourse(courseId: Int) = viewModel.addCourse(courseId)
 
-    fun removeCourse(courseId: Int, context: Context) {
-        lifecycleScope.launch {
-            repository.removeTracking(courseId).onFailure { error ->
-                Log.e(TAG, "Failed to untrack course $courseId", error)
-                Toast.makeText(
-                    context,
-                    error.message ?: "Couldn't remove that course.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
+    fun removeCourse(courseId: Int) = viewModel.removeCourse(courseId)
 
     class SectionAdapter(
         private val availableCourses: List<Course>,
@@ -108,7 +88,7 @@ class CourseDetailsActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
             holder.sectionTitle.text = availableCourses[position].section
-            holder.sectionStatus.setImageResource(if (availableCourses[position].status == "OPEN") R.drawable.ic_status_open else R.drawable.ic_status_closed)
+            holder.sectionStatus.setImageResource(if (availableCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             //change tracking text
             holder.trackText.text = availableCourses[position].num_tracking.toString() + " Tracking"
@@ -121,8 +101,7 @@ class CourseDetailsActivity : AppCompatActivity() {
 
             holder.removeButton.setOnClickListener {
                 (context as CourseDetailsActivity).removeCourse(
-                    availableCourses[position].catalog_num,
-                    context
+                    availableCourses[position].catalog_num
                 )
                 holder.removeButton.visibility = View.GONE
                 holder.trackButton.visibility = View.VISIBLE
@@ -136,8 +115,7 @@ class CourseDetailsActivity : AppCompatActivity() {
 
             holder.trackButton.setOnClickListener {
                 (context as CourseDetailsActivity).addCourse(
-                    availableCourses[position].catalog_num,
-                    context
+                    availableCourses[position].catalog_num
                 )
                 holder.trackButton.visibility = View.GONE
                 holder.removeButton.visibility = View.VISIBLE
@@ -152,9 +130,5 @@ class CourseDetailsActivity : AppCompatActivity() {
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = availableCourses.size
-    }
-
-    companion object {
-        private const val TAG = "CourseDetailsActivity"
     }
 }
