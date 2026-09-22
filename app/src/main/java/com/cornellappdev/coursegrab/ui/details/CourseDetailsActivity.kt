@@ -21,7 +21,6 @@ class CourseDetailsActivity : ComponentActivity() {
         )
 
         if (course == null) {
-            // Nothing to show without a course; the caller always supplies one.
             finish()
             return
         }

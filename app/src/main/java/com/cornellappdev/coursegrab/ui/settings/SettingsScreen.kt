@@ -38,13 +38,6 @@ import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
-/**
- * Stateful wrapper: owns the ViewModel, collects its state, and drains its one-shot effects.
- *
- * The notification permission is the caller's concern rather than this screen's — it needs an
- * Activity to check and request — so [notificationsPermitted] and [onRequestNotifications]
- * come in from the host. See [SettingsActivity].
- */
 @Composable
 fun SettingsRoute(
     notificationsPermitted: Boolean,
@@ -105,9 +98,6 @@ fun SettingsScreen(
                 .padding(padding)
                 .padding(horizontal = 12.dp, vertical = 4.dp)
         ) {
-            // Email alerts ship hidden — the switch is android:visibility="gone" in
-            // activity_settings.xml. The ViewModel still tracks the preference, so the row
-            // only needs uncommenting here if the backend ever supports it.
             @Suppress("ConstantConditionIf")
             if (SHOW_EMAIL_ALERTS) {
                 SettingsSwitch(
@@ -119,8 +109,6 @@ fun SettingsScreen(
 
             SettingsSwitch(
                 label = R.string.mobile_alerts,
-                // Without the permission the app cannot deliver anything, so the switch
-                // reads off no matter what the stored preference says.
                 checked = state.mobileAlertsEnabled && notificationsPermitted,
                 onCheckedChange = onMobileAlertsChange
             )
@@ -141,8 +129,6 @@ fun SettingsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
-                // Matches track_button_background.xml: white fill, 1dp black outline,
-                // 1dp corners — not the Material3 outlined default.
                 shape = RoundedCornerShape(1.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = Color.White,
@@ -181,10 +167,6 @@ private fun SettingsSwitch(
     }
 }
 
-/**
- * The XML used borderless Buttons with start-aligned, non-capitalized text for these, which
- * is a text row rather than anything Material3 calls a button.
- */
 @Composable
 private fun SettingsLink(
     @StringRes label: Int,

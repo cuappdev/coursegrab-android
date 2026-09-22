@@ -78,8 +78,6 @@ fun SearchScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // The query lives here rather than in the ViewModel: the ViewModel only ever reacts to
-    // it, and rememberSaveable already carries it across configuration changes.
     var query by rememberSaveable { mutableStateOf("") }
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -185,11 +183,6 @@ private fun Results(
     }
 }
 
-/**
- * The XML put the click listener on the expand arrow alone, leaving the rest of a
- * card-shaped row inert. The whole row is the target here; the arrow stays as the
- * affordance.
- */
 @Composable
 private fun SearchResultRow(
     course: SearchResult,
