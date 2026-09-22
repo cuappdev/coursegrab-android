@@ -19,7 +19,7 @@ class SearchActivity : ComponentActivity() {
                     onOpenCourse = { course ->
                         startActivity(
                             Intent(this, CourseDetailsActivity::class.java).apply {
-                                putExtra("courseDetails", course)
+                                putExtra(CourseDetailsActivity.EXTRA_COURSE_DETAILS, course)
                             }
                         )
                     },

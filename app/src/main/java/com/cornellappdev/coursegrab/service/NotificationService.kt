@@ -88,7 +88,7 @@ class NotificationService : FirebaseMessagingService() {
     private fun sendNotification(course: CourseNotification) {
         val intent = Intent(this, NotificationModal::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        intent.putExtra("courseDetails", course)
+        intent.putExtra(NotificationModal.EXTRA_COURSE_DETAILS, course)
         val pendingIntent = PendingIntent.getActivity(
             this, 10032, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE

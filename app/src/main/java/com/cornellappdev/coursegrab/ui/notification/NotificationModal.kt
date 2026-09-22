@@ -2,45 +2,48 @@ package com.cornellappdev.coursegrab.ui.notification
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
-import com.cornellappdev.coursegrab.R
-import com.cornellappdev.coursegrab.databinding.ActivityNotificationModalBinding
-import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.CourseNotification
 import com.cornellappdev.coursegrab.ui.main.MainActivity
+import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
-class NotificationModal : AppCompatActivity() {
-
-    private lateinit var binding: ActivityNotificationModalBinding
+class NotificationModal : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityNotificationModalBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        val course: Course =
-            (intent.getParcelableExtra<CourseNotification>("courseDetails") as CourseNotification).section
-
-        binding.courseTitle.text = getString(
-            R.string.course_title_format,
-            course.subjectCode,
-            course.courseNum,
-            course.title
+        val notification = IntentCompat.getParcelableExtra(
+            intent,
+            EXTRA_COURSE_DETAILS,
+            CourseNotification::class.java
         )
-        binding.courseSection.text = course.section
-        binding.coursePin.text = course.catalogNum.toString()
 
-        binding.buttonStudentCenter.setOnClickListener {
-            val browserIntent =
-                Intent(Intent.ACTION_VIEW, "http://studentcenter.cornell.edu".toUri())
-            startActivity(browserIntent)
+        if (notification == null) {
+            // Launched without a payload; there is nothing to announce.
+            finish()
+            return
         }
 
-        binding.buttonBackHome.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+        setContent {
+            CourseGrabTheme {
+                NotificationModalScreen(
+                    course = notification.section,
+                    onOpenStudentCenter = {
+                        startActivity(Intent(Intent.ACTION_VIEW, STUDENT_CENTER_URL.toUri()))
+                    },
+                    onBackHome = {
+                        startActivity(Intent(this, MainActivity::class.java))
+                    }
+                )
+            }
         }
+    }
+
+    companion object {
+        const val EXTRA_COURSE_DETAILS = "courseDetails"
+        private const val STUDENT_CENTER_URL = "http://studentcenter.cornell.edu"
     }
 }
