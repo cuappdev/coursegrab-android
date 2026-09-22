@@ -35,8 +35,6 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // The status drawables are 16dp intrinsic — the empty-state ImageViews scale them
-        // to 96dp. Without an explicit size these render as the tiny row-status dot.
         Image(
             painter = painterResource(icon),
             contentDescription = null,

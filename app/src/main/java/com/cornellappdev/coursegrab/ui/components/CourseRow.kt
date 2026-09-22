@@ -68,11 +68,8 @@ fun CourseRow(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    // US-only app: invariant casing, and it keeps the locale out of composition.
                     text = course.section.uppercase(Locale.ROOT),
                     style = MaterialTheme.typography.bodyLarge,
-                    // No textColor in the XML, so these inherit textColorPrimary, not the
-                    // pure black the title sets explicitly.
                     color = PrimaryText,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -106,8 +103,7 @@ private fun CourseRowOpenPreview() {
     CourseGrabTheme {
         CourseRow(course = sampleCourse(), onClick = {}) {
             TrackButton(
-                isTracking = false,
-                onToggle = {},
+                onClick = {},
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
@@ -124,9 +120,8 @@ private fun CourseRowClosedPreview() {
             course = sampleCourse(isOpen = false, isTracking = true),
             onClick = {}
         ) {
-            TrackButton(
-                isTracking = true,
-                onToggle = {},
+            RemoveButton(
+                onClick = {},
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()

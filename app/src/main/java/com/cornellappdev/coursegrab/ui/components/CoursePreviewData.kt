@@ -3,13 +3,6 @@ package com.cornellappdev.coursegrab.ui.components
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 
-/**
- * Sample data for `@Preview`s.
- *
- * Status is a backend string that only [Course.isOpen] knows how to read — and it reads it
- * as "anything that isn't OPEN is closed", so there is no `CLOSED` constant to share.
- * Previews say [isOpen] and this is the single place that turns it back into the wire value.
- */
 internal fun sampleCourse(
     catalogNum: Int = 10032,
     subjectCode: String = "CS",
