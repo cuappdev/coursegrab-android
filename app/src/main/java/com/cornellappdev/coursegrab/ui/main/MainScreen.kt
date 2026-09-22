@@ -41,8 +41,8 @@ import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.components.EmptyState
 import com.cornellappdev.coursegrab.ui.components.sampleCourse
 import com.cornellappdev.coursegrab.ui.components.EnrollButton
+import com.cornellappdev.coursegrab.ui.components.RemoveButton
 import com.cornellappdev.coursegrab.ui.components.CourseRow
-import com.cornellappdev.coursegrab.ui.components.TrackButton
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import com.cornellappdev.coursegrab.ui.theme.StatusGreen
 
@@ -136,9 +136,8 @@ fun MainScreen(
                                 course = course,
                                 onClick = { onOpenCourse(course.catalogNum) }
                             ) {
-                                TrackButton(
-                                    isTracking = true,
-                                    onToggle = { onRemoveCourse(course.catalogNum) },
+                                RemoveButton(
+                                    onClick = { onRemoveCourse(course.catalogNum) },
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxHeight()
@@ -168,9 +167,8 @@ fun MainScreen(
                                 course = course,
                                 onClick = { onOpenCourse(course.catalogNum) }
                             ) {
-                                TrackButton(
-                                    isTracking = true,
-                                    onToggle = { onRemoveCourse(course.catalogNum) },
+                                RemoveButton(
+                                    onClick = { onRemoveCourse(course.catalogNum) },
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxHeight()

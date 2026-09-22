@@ -40,6 +40,7 @@ import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
+import com.cornellappdev.coursegrab.ui.components.RemoveButton
 import com.cornellappdev.coursegrab.ui.components.SAMPLE_INSTRUCTOR
 import com.cornellappdev.coursegrab.ui.components.StatusIndicator
 import com.cornellappdev.coursegrab.ui.components.sampleCourse
@@ -112,7 +113,8 @@ fun CourseDetailsScreen(
                 items(state.sections, key = { it.catalogNum }) { section ->
                     SectionRow(
                         section = section,
-                        onToggle = { onSetTracking(section.catalogNum, !section.isTracking) }
+                        onTrack = { onSetTracking(section.catalogNum, true) },
+                        onUntrack = { onSetTracking(section.catalogNum, false) }
                     )
                 }
             }
@@ -154,7 +156,8 @@ private fun CourseHeaderCard(
 @Composable
 private fun SectionRow(
     section: Course,
-    onToggle: () -> Unit,
+    onTrack: () -> Unit,
+    onUntrack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -192,11 +195,11 @@ private fun SectionRow(
                 )
             }
         }
-        TrackButton(
-            isTracking = section.isTracking,
-            onToggle = onToggle,
-            modifier = Modifier.height(26.dp)
-        )
+        if (section.isTracking) {
+            RemoveButton(onClick = onUntrack, modifier = Modifier.height(26.dp))
+        } else {
+            TrackButton(onClick = onTrack, modifier = Modifier.height(26.dp))
+        }
     }
 }
 
