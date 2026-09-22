@@ -139,8 +139,12 @@ class SearchActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.courseTitle.text =
-                "${resultsCourses[position].subjectCode} ${resultsCourses[position].courseNum}: ${resultsCourses[position].title}"
+            holder.courseTitle.text = context.getString(
+                R.string.course_title_format,
+                resultsCourses[position].subjectCode,
+                resultsCourses[position].courseNum,
+                resultsCourses[position].title
+            )
 
             holder.expandButton.setOnClickListener {
                 val intent = Intent(context, CourseDetailsActivity::class.java).apply {

@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowInsets
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.databinding.ActivitySplashScreenBinding
 import com.cornellappdev.coursegrab.ui.login.LoginActivity
@@ -74,10 +75,8 @@ class SplashScreenActivity : AppCompatActivity() {
         fullscreenContent = binding.fullscreenContent
         fullscreenContent.setOnClickListener { toggle() }
         try {
-            val video: Uri = Uri.parse(
-                "android.resource://" + packageName + "/"
-                        + R.raw.splash
-            )
+            val video: Uri = ("android.resource://" + packageName + "/"
+                    + R.raw.splash).toUri()
             fullscreenContent.visibility = View.VISIBLE
             fullscreenContent.setVideoURI(video)
             fullscreenContent.setOnCompletionListener { jump() }

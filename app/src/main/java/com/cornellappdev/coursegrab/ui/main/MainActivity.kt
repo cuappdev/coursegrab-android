@@ -140,13 +140,13 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = AvailableAdapter(state.available, this@MainActivity)
         }
-        binding.availableTitle.text = "${state.available.size} Available"
+        binding.availableTitle.text = getString(R.string.available_count, state.available.size)
 
         binding.awaitingList.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = AwaitingAdapter(state.awaiting, this@MainActivity)
         }
-        binding.awaitingTitle.text = "${state.awaiting.size} Awaiting"
+        binding.awaitingTitle.text = getString(R.string.awaiting_count, state.awaiting.size)
 
         binding.layoutAvailable.visibility =
             if (state.available.isNotEmpty()) View.VISIBLE else View.GONE
@@ -209,8 +209,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.courseTitle.text =
-                "${availableCourses[position].subjectCode} ${availableCourses[position].courseNum}: ${availableCourses[position].title}"
+            holder.courseTitle.text = context.getString(
+                R.string.course_title_format,
+                availableCourses[position].subjectCode,
+                availableCourses[position].courseNum,
+                availableCourses[position].title
+            )
             holder.courseTime.text = availableCourses[position].section.uppercase(getDefault())
             holder.coursePin.text = availableCourses[position].catalogNum.toString()
             holder.courseStatus.setImageResource(if (availableCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
@@ -260,8 +264,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.courseTitle.text =
-                "${awaitingCourses[position].subjectCode} ${awaitingCourses[position].courseNum}: ${awaitingCourses[position].title}"
+            holder.courseTitle.text = context.getString(
+                R.string.course_title_format,
+                awaitingCourses[position].subjectCode,
+                awaitingCourses[position].courseNum,
+                awaitingCourses[position].title
+            )
             holder.courseTime.text = awaitingCourses[position].section.uppercase(getDefault())
             holder.coursePin.text = awaitingCourses[position].catalogNum.toString()
             holder.courseStatus.setImageResource(if (awaitingCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)

@@ -18,7 +18,7 @@
     <string name="default_notification_channel_id">coursegrab_alert</string>
 
     <string name="add_button">Add</string>
-    <string name="add_course_hint">Enter a Course ID...</string>
+    <string name="add_course_hint">Enter a Course ID…</string>
 
     <string name="search_courses_hint">Find Courses</string>
 
@@ -43,6 +43,15 @@
     <string name="no_results_alert_subtext_try_another">
         Try a different query
     </string>
+    <!-- Course display formats: "CS 2110: Object-Oriented Programming" -->
+    <string name="course_title_format">%1$s %2$d: %3$s</string>
+    <string name="course_header_format">%1$s %2$d</string>
+    <string name="available_count">%d Available</string>
+    <string name="awaiting_count">%d Awaiting</string>
+    <plurals name="tracking_count">
+        <item quantity="one">%d Tracking</item>
+        <item quantity="other">%d Tracking</item>
+    </plurals>
     <plurals name="search_results_count">
         <item quantity="one">%d Result</item>
         <item quantity="other">%d Results</item>

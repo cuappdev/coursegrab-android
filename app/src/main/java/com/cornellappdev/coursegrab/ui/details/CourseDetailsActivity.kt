@@ -36,7 +36,11 @@ class CourseDetailsActivity : AppCompatActivity() {
 
         val courseDetails: SearchResult = intent.getParcelableExtra<SearchResult>("courseDetails") as SearchResult
 
-        binding.headerTextView.text = "${courseDetails.subjectCode} ${courseDetails.courseNum}"
+        binding.headerTextView.text = getString(
+            R.string.course_header_format,
+            courseDetails.subjectCode,
+            courseDetails.courseNum
+        )
 
         binding.courseTitle.text = courseDetails.title
         binding.courseDetails.text =
@@ -91,7 +95,11 @@ class CourseDetailsActivity : AppCompatActivity() {
             holder.sectionStatus.setImageResource(if (availableCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             //change tracking text
-            holder.trackText.text = availableCourses[position].numTracking.toString() + " Tracking"
+            holder.trackText.text = context.resources.getQuantityString(
+                R.plurals.tracking_count,
+                availableCourses[position].numTracking,
+                availableCourses[position].numTracking
+            )
 
             //Change the track button to remove button
             holder.removeButton.visibility =
