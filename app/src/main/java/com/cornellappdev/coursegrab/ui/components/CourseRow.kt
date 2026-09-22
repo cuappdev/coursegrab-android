@@ -100,22 +100,11 @@ fun CourseRow(
 
 private val BUTTON_ROW_HEIGHT = 44.dp
 
-private val SampleCourse = Course(
-    catalogNum = 10032,
-    courseNum = 1998,
-    section = "LEC 006 / M 7:30PM",
-    isTracking = false,
-    status = "OPEN",
-    subjectCode = "CS",
-    title = "Intro to Android Development",
-    numTracking = 12
-)
-
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 private fun CourseRowOpenPreview() {
     CourseGrabTheme {
-        CourseRow(course = SampleCourse, onClick = {}) {
+        CourseRow(course = sampleCourse(), onClick = {}) {
             TrackButton(
                 isTracking = false,
                 onToggle = {},
@@ -132,7 +121,7 @@ private fun CourseRowOpenPreview() {
 private fun CourseRowClosedPreview() {
     CourseGrabTheme {
         CourseRow(
-            course = SampleCourse.copy(status = "CLOSED", isTracking = true),
+            course = sampleCourse(isOpen = false, isTracking = true),
             onClick = {}
         ) {
             TrackButton(
