@@ -22,47 +22,28 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import com.cornellappdev.coursegrab.ui.theme.RemovalRed
 import java.util.Locale
 
-/**
- * Starts tracking a section. See [OutlinedActionButton] for why these are not Material3
- * defaults.
- *
- * Size is the caller's job, because usages differ: the course rows give it the full row
- * width at 44dp, while the section rows use 26dp and wrap. Pass both through [modifier].
- */
 @Composable
 fun TrackButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedActionButton(
         label = R.string.track_button,
         accent = Color.Black,
-        // track_button_background.xml
         cornerRadius = 1.dp,
         onClick = onClick,
         modifier = modifier
     )
 }
 
-/** Stops tracking a section. Sized by the caller, as [TrackButton] is. */
 @Composable
 fun RemoveButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedActionButton(
         label = R.string.remove_button,
         accent = RemovalRed,
-        // remove_button_background.xml — 3dp where track uses 1dp.
         cornerRadius = 3.dp,
         onClick = onClick,
         modifier = modifier
     )
 }
 
-/**
- * The shape both buttons share: white fill and a 1dp outline in the accent color, matching
- * the XML button drawables. A filled M3 Button looks nothing like the shipped app.
- *
- * Track and remove are separate composables rather than one with an `isTracking` flag,
- * because most call sites know statically which one they want — the course rows on the
- * tracked-courses screen only ever remove — and a boolean there reads as a toggle that
- * could go either way.
- */
 @Composable
 private fun OutlinedActionButton(
     @StringRes label: Int,
@@ -83,7 +64,6 @@ private fun OutlinedActionButton(
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
     ) {
         Text(
-            // US-only app: invariant casing keeps the locale out of composition.
             text = stringResource(label).uppercase(Locale.ROOT),
             style = MaterialTheme.typography.labelMedium
         )
