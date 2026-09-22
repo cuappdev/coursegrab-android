@@ -40,9 +40,19 @@ fun CourseGrabTopBar(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    CourseGrabTopBar(title = stringResource(title), onBack = onBack, modifier = modifier)
+}
+
+/** The same bar with an already-resolved title, for one built from data (a course code). */
+@Composable
+fun CourseGrabTopBar(
+    title: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     CourseGrabTopBar(onBack = onBack, modifier = modifier) {
         Text(
-            text = stringResource(title),
+            text = title,
             style = MaterialTheme.typography.headlineSmall,
             color = Color.White,
             textAlign = TextAlign.Center,
