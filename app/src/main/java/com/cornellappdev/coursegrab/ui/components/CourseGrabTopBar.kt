@@ -2,6 +2,7 @@ package com.cornellappdev.coursegrab.ui.components
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,33 @@ fun CourseGrabTopBar(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    CourseGrabTopBar(onBack = onBack, modifier = modifier) {
+        Text(
+            text = stringResource(title),
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.Center)
+                // Keep a long title clear of the back button on both sides.
+                .padding(horizontal = BACK_BUTTON_WIDTH)
+        )
+    }
+}
+
+/**
+ * The same bar with an arbitrary body instead of a centered title — Search puts its text
+ * field here. [content] lays out against the full bar, so position it relative to the back
+ * button yourself; [BACK_BUTTON_WIDTH] is the offset to clear.
+ */
+@Composable
+fun CourseGrabTopBar(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = Color.Black,
@@ -49,18 +77,7 @@ fun CourseGrabTopBar(
                 .fillMaxWidth()
                 .height(HEIGHT)
         ) {
-            Text(
-                text = stringResource(title),
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    // Keep a long title clear of the back button on both sides.
-                    .padding(horizontal = BACK_BUTTON_WIDTH)
-            )
+            content()
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
@@ -79,7 +96,7 @@ fun CourseGrabTopBar(
 }
 
 private val HEIGHT = 60.dp
-private val BACK_BUTTON_WIDTH = 50.dp
+val BACK_BUTTON_WIDTH = 50.dp
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
