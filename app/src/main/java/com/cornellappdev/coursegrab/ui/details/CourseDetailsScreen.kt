@@ -40,7 +40,9 @@ import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
+import com.cornellappdev.coursegrab.ui.components.SAMPLE_INSTRUCTOR
 import com.cornellappdev.coursegrab.ui.components.StatusIndicator
+import com.cornellappdev.coursegrab.ui.components.sampleCourse
 import com.cornellappdev.coursegrab.ui.components.TrackButton
 import com.cornellappdev.coursegrab.ui.theme.CardBorder
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
@@ -202,18 +204,13 @@ private val SampleState = CourseDetailsState(
     subjectCode = "CS",
     courseNum = 1998,
     title = "Intro to Android Development",
-    instructor = "Adrian Sampson (als485)",
+    instructor = SAMPLE_INSTRUCTOR,
     sections = listOf(
-        Course(
-            catalogNum = 10032,
-            section = "LEC 001 / M 7:30PM",
-            status = "OPEN",
-            numTracking = 12
-        ),
-        Course(
+        sampleCourse(catalogNum = 10032, section = "LEC 001 / M 7:30PM"),
+        sampleCourse(
             catalogNum = 10033,
             section = "LEC 002 / W 7:30PM",
-            status = "CLOSED",
+            isOpen = false,
             isTracking = true,
             numTracking = 3
         )
