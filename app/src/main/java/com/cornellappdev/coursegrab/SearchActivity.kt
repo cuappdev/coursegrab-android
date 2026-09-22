@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivitySearchBinding
@@ -23,7 +24,6 @@ import com.cornellappdev.coursegrab.networking.Endpoint
 import com.cornellappdev.coursegrab.networking.Request
 import com.cornellappdev.coursegrab.networking.searchCourses
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,7 +66,7 @@ class SearchActivity : AppCompatActivity() {
                         this,
                         R.drawable.ic_status_warning
                     )
-                );
+                )
                 binding.noResultsTitle.text = getString(R.string.requires_longer_search)
                 binding.noResultsSubtitle.text = getString(R.string.requires_longer_search_subtext)
             }
@@ -78,7 +78,7 @@ class SearchActivity : AppCompatActivity() {
     private fun searchCourses(query: String) {
         val getTracking = Endpoint.searchCourses(preferencesHelper.sessionToken.toString(), query)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             val typeToken = object : TypeToken<ApiResponse<SearchContainer>>() {}.type
             val courseList = withContext(Dispatchers.IO) {
                 Request.makeRequest<ApiResponse<SearchContainer>>(
@@ -88,7 +88,7 @@ class SearchActivity : AppCompatActivity() {
             }!!.data.courses
 
             if (binding.editTextSearch.text.toString() != query)
-                return@launch;
+                return@launch
 
             // Results Courses Adapter
             searchViewManager = LinearLayoutManager(this@SearchActivity)
@@ -108,7 +108,7 @@ class SearchActivity : AppCompatActivity() {
                     this@SearchActivity,
                     R.drawable.ic_status_closed
                 )
-            );
+            )
             binding.noResultsTitle.text = getString(R.string.no_courses_alert)
             binding.noResultsSubtitle.text =
                 getString(R.string.no_results_alert_subtext_try_another)
