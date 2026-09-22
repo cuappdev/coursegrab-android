@@ -36,11 +36,6 @@ class CourseDetailsViewModel @Inject constructor(
 
     private var seeded = false
 
-    /**
-     * Seeds the screen from the course the caller already has. Ignored after the first call
-     * so a recomposition — or a configuration change that re-delivers the same extra — does
-     * not discard tracking changes made since.
-     */
     fun seed(course: SearchResult) {
         if (seeded) return
         seeded = true
@@ -56,9 +51,6 @@ class CourseDetailsViewModel @Inject constructor(
 
     fun setTracking(catalogNum: Int, tracking: Boolean) {
         val before = _state.value.sections
-        // Optimistic: the row flips now and rolls back if the request fails. The XML
-        // adapter flipped button visibility directly and never reconciled, so a failed
-        // request left the row claiming the opposite of the truth.
         updateSection(catalogNum) { it.copy(isTracking = tracking) }
 
         viewModelScope.launch {

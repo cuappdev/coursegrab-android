@@ -16,12 +16,6 @@ import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import java.util.Locale
 
-/**
- * The solid counterpart to [TrackButton], for the enroll action on an available course.
- * Matches `enroll_button_background.xml`: filled dark, 3dp corners, light label.
- *
- * Size is the caller's job, as with [TrackButton].
- */
 @Composable
 fun EnrollButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
@@ -41,7 +35,6 @@ fun EnrollButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-/** `@android:color/background_dark`. */
 private val EnrollBackground = Color(0xFF000000)
 
 @Preview(showBackground = true)

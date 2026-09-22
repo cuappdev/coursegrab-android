@@ -97,11 +97,6 @@ fun LoginScreen(
     }
 }
 
-/**
- * Play Services' own [SignInButton], hosted through [AndroidView]. Google's branding
- * guidelines fix this button's mark, wordmark, and proportions, so re-drawing it as a
- * Material3 Button would put sign-in out of compliance to save a wrapper.
- */
 @Composable
 private fun GoogleSignInButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     AndroidView(

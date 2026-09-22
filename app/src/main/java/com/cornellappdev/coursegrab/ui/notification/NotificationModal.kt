@@ -22,7 +22,6 @@ class NotificationModal : ComponentActivity() {
         )
 
         if (notification == null) {
-            // Launched without a payload; there is nothing to announce.
             finish()
             return
         }

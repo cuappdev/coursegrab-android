@@ -113,9 +113,6 @@ fun MainScreen(
                     subtitle = R.string.no_courses_alert_subtext
                 )
             } else {
-                // One list, where the XML nested two RecyclerViews in a NestedScrollView and
-                // toggled each section's visibility. Section headers are plain items: they
-                // scroll away with their courses, as they did before.
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(14.dp),
@@ -182,11 +179,6 @@ fun MainScreen(
     }
 }
 
-/**
- * Main's bar carries an icon on each side instead of a back button, so it builds on the
- * plain [androidx.compose.material3.Surface] shape rather than [CourseGrabTopBar], whose
- * start slot is always the back arrow.
- */
 @Composable
 private fun MainTopBar(
     onOpenSettings: () -> Unit,

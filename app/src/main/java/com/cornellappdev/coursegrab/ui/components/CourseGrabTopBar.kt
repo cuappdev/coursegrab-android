@@ -26,14 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
-/**
- * The black bar at the top of Settings, Details, and Search. Not a Material3 `TopAppBar`:
- * that centers on a 64dp container with its own color roles, while every `action_bar` block
- * in the XML is a flat 60dp black strip with 4dp elevation and a white 24sp title.
- *
- * The title is centered against the bar, not against the space left over by the back button,
- * which is why this is a [Box] rather than the weighted `LinearLayout` the XML used.
- */
 @Composable
 fun CourseGrabTopBar(
     @StringRes title: Int,
@@ -43,7 +35,6 @@ fun CourseGrabTopBar(
     CourseGrabTopBar(title = stringResource(title), onBack = onBack, modifier = modifier)
 }
 
-/** The same bar with an already-resolved title, for one built from data (a course code). */
 @Composable
 fun CourseGrabTopBar(
     title: String,
@@ -60,17 +51,11 @@ fun CourseGrabTopBar(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .align(Alignment.Center)
-                // Keep a long title clear of the back button on both sides.
                 .padding(horizontal = BACK_BUTTON_WIDTH)
         )
     }
 }
 
-/**
- * The same bar with an arbitrary body instead of a centered title — Search puts its text
- * field here. [content] lays out against the full bar, so position it relative to the back
- * button yourself; [BACK_BUTTON_WIDTH] is the offset to clear.
- */
 @Composable
 fun CourseGrabTopBar(
     onBack: () -> Unit,

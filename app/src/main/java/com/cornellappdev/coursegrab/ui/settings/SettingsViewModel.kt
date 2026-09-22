@@ -53,7 +53,6 @@ class SettingsViewModel @Inject constructor(
     fun setMobileAlerts(enabled: Boolean) {
         preferencesHelper.mobileAlertSetting = enabled
         _state.value = _state.value.copy(mobileAlertsEnabled = enabled)
-        // Firebase only auto-initializes while the user wants mobile alerts.
         FirebaseMessaging.getInstance().isAutoInitEnabled = enabled
         viewModelScope.launch {
             repository.setNotifications(enabled)

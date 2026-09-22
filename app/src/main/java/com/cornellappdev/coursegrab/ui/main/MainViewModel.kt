@@ -85,7 +85,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    /** The permission dialog was declined; alerts cannot be delivered until it is granted. */
     fun reportNotificationsBlocked() {
         viewModelScope.launch {
             _effects.send(

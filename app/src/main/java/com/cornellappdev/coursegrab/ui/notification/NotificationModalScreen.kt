@@ -32,10 +32,6 @@ import com.cornellappdev.coursegrab.ui.theme.DarkEnough
 import com.cornellappdev.coursegrab.ui.theme.LightText
 import com.cornellappdev.coursegrab.ui.theme.StatusGreen
 
-/**
- * The full-screen takeover a course-open notification lands on. No ViewModel: everything
- * shown comes from the notification payload the caller already parsed.
- */
 @Composable
 fun NotificationModalScreen(
     course: Course,
@@ -98,7 +94,6 @@ fun NotificationModalScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            // white_rounded_border.xml: transparent fill, white outline.
             shape = RoundedCornerShape(4.dp),
             border = BorderStroke(1.dp, Color.White),
             colors = ButtonDefaults.outlinedButtonColors(
