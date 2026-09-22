@@ -210,14 +210,14 @@ class MainActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.courseTitle.text =
-                "${availableCourses[position].subject_code} ${availableCourses[position].course_num}: ${availableCourses[position].title}"
+                "${availableCourses[position].subjectCode} ${availableCourses[position].courseNum}: ${availableCourses[position].title}"
             holder.courseTime.text = availableCourses[position].section.uppercase(getDefault())
-            holder.coursePin.text = availableCourses[position].catalog_num.toString()
+            holder.coursePin.text = availableCourses[position].catalogNum.toString()
             holder.courseStatus.setImageResource(if (availableCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             holder.removeButton.setOnClickListener {
                 (context as MainActivity).removeCourse(
-                    availableCourses[position].catalog_num
+                    availableCourses[position].catalogNum
                 )
             }
 
@@ -228,7 +228,7 @@ class MainActivity : AppCompatActivity() {
 
             holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
-                    availableCourses[position].catalog_num
+                    availableCourses[position].catalogNum
                 )
             }
         }
@@ -261,19 +261,19 @@ class MainActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.courseTitle.text =
-                "${awaitingCourses[position].subject_code} ${awaitingCourses[position].course_num}: ${awaitingCourses[position].title}"
+                "${awaitingCourses[position].subjectCode} ${awaitingCourses[position].courseNum}: ${awaitingCourses[position].title}"
             holder.courseTime.text = awaitingCourses[position].section.uppercase(getDefault())
-            holder.coursePin.text = awaitingCourses[position].catalog_num.toString()
+            holder.coursePin.text = awaitingCourses[position].catalogNum.toString()
             holder.courseStatus.setImageResource(if (awaitingCourses[position].isOpen) R.drawable.ic_status_open else R.drawable.ic_status_closed)
 
             holder.removeButton.setOnClickListener {
                 (context as MainActivity).removeCourse(
-                    awaitingCourses[position].catalog_num
+                    awaitingCourses[position].catalogNum
                 )
             }
             holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
-                    awaitingCourses[position].catalog_num
+                    awaitingCourses[position].catalogNum
                 )
             }
         }
