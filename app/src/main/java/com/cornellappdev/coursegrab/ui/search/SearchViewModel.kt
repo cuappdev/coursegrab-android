@@ -31,7 +31,7 @@ class SearchViewModel @Inject constructor(
     fun onQueryChanged(query: String) {
         searchJob?.cancel()
 
-        if (query.length <= MIN_QUERY_LENGTH) {
+        if (query.length < MIN_QUERY_LENGTH) {
             _state.value = SearchState.QueryTooShort
             return
         }
@@ -47,6 +47,6 @@ class SearchViewModel @Inject constructor(
 
     private companion object {
         const val TAG = "SearchViewModel"
-        const val MIN_QUERY_LENGTH = 2
+        const val MIN_QUERY_LENGTH = 3
     }
 }
