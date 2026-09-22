@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.MutableContextWrapper
 import android.util.Log
-import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CredentialOption
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
-import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
@@ -18,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.data.PreferencesHelper
+import com.cornellappdev.coursegrab.data.clearCredentialStateOrLog
 import com.cornellappdev.coursegrab.models.UserSession
 import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -40,6 +39,7 @@ sealed interface LoginEffect {
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
+    private val credentialManager: CredentialManager,
     private val repository: CourseGrabRepository,
     private val preferencesHelper: PreferencesHelper
 ) : ViewModel() {
@@ -54,8 +54,6 @@ class LoginViewModel @Inject constructor(
      */
     @SuppressLint("StaticFieldLeak")
     val credentialContext = MutableContextWrapper(context)
-
-    private val credentialManager by lazy { CredentialManager.create(context) }
 
     private val _effects = Channel<LoginEffect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
@@ -191,7 +189,7 @@ class LoginViewModel @Inject constructor(
 
         if (!isAllowedAccount(googleCredential.id)) {
             emitError("Please use a @cornell.edu account")
-            clearCredentialState()
+            credentialManager.clearCredentialStateOrLog()
             return
         }
 
@@ -207,16 +205,6 @@ class LoginViewModel @Inject constructor(
         email.endsWith("@cornell.edu") ||
                 email == "appstoreappdev@gmail.com" ||
                 email == "coursegrab.droid@gmail.com"
-
-    private fun clearCredentialState() {
-        viewModelScope.launch {
-            try {
-                credentialManager.clearCredentialState(ClearCredentialStateRequest())
-            } catch (e: ClearCredentialException) {
-                Log.w(TAG, "Failed to clear credential state", e)
-            }
-        }
-    }
 
     private suspend fun verifySession(userSession: UserSession) {
         if (userSession.session_token.isNullOrBlank() ||
