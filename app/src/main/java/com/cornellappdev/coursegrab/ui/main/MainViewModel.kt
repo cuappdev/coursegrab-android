@@ -86,6 +86,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun reportNotificationsBlocked() {
+        viewModelScope.launch {
+            _effects.send(
+                MainEffect.Message(
+                    "Enable notifications in settings to receive course updates."
+                )
+            )
+        }
+    }
+
     fun openCourse(courseId: Int) {
         viewModelScope.launch {
             repository.getCourseById(courseId)
