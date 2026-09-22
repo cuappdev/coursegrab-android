@@ -52,6 +52,8 @@
         <item quantity="one">%d Tracking</item>
         <item quantity="other">%d Tracking</item>
     </plurals>
+    <string name="status_open">Open</string>
+    <string name="status_closed">Closed</string>
     <plurals name="search_results_count">
         <item quantity="one">%d Result</item>
         <item quantity="other">%d Results</item>
