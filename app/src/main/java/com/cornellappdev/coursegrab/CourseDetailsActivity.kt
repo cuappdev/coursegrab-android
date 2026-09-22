@@ -2,6 +2,7 @@ package com.cornellappdev.coursegrab
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,17 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cornellappdev.coursegrab.databinding.ActivityCourseDetailsBinding
-import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
-import com.cornellappdev.coursegrab.networking.Endpoint
-import com.cornellappdev.coursegrab.networking.Request
-import com.cornellappdev.coursegrab.networking.addTracking
-import com.cornellappdev.coursegrab.networking.removeTracking
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
+import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class CourseDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCourseDetailsBinding
@@ -33,8 +27,8 @@ class CourseDetailsActivity : AppCompatActivity() {
     private lateinit var sectionsViewAdapter: RecyclerView.Adapter<*>
     private lateinit var sectionsViewManager: RecyclerView.LayoutManager
 
-    private val preferencesHelper: PreferencesHelper by lazy {
-        PreferencesHelper(this)
+    private val repository: CourseGrabRepository by lazy {
+        CourseGrabRepository(PreferencesHelper(this))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,45 +57,28 @@ class CourseDetailsActivity : AppCompatActivity() {
     }
 
     fun addCourse(courseId: Int, context: Context) {
-        val addTracking = Endpoint.addTracking(preferencesHelper.sessionToken.toString(), courseId)
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    addTracking.okHttpRequest(),
-                    typeToken
-                )
-            }
-
-            if (!response!!.success)
+            repository.addTracking(courseId).onFailure { error ->
+                Log.e(TAG, "Failed to track course $courseId", error)
                 Toast.makeText(
                     context,
-                    response.data.errors!![0],
+                    error.message ?: "Couldn't track that course.",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
         }
     }
 
     fun removeCourse(courseId: Int, context: Context) {
-        val removeTracking =
-            Endpoint.removeTracking(preferencesHelper.sessionToken.toString(), courseId)
-
         lifecycleScope.launch {
-            val typeToken = object : TypeToken<ApiResponse<Course>>() {}.type
-            val response = withContext(Dispatchers.IO) {
-                Request.makeRequest<ApiResponse<Course>>(
-                    removeTracking.okHttpRequest(),
-                    typeToken
-                )
-            }
-
-            if (!response!!.success)
+            repository.removeTracking(courseId).onFailure { error ->
+                Log.e(TAG, "Failed to untrack course $courseId", error)
                 Toast.makeText(
                     context,
-                    response.data.errors!![0],
+                    error.message ?: "Couldn't remove that course.",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
         }
     }
 
@@ -175,5 +152,9 @@ class CourseDetailsActivity : AppCompatActivity() {
 
         // Return the size of your dataset (invoked by the layout manager)
         override fun getItemCount() = availableCourses.size
+    }
+
+    companion object {
+        private const val TAG = "CourseDetailsActivity"
     }
 }
