@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CourseGrab</string>
     <string name="settings">Settings</string>
+    <string name="back">Back</string>
     <string name="details">Details</string>
 
     <string name="email_alerts">Email Alerts</string>
