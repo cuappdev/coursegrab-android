@@ -2,39 +2,38 @@ package com.cornellappdev.coursegrab.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.cornellappdev.coursegrab.databinding.ActivityLoginBinding
 import com.cornellappdev.coursegrab.ui.main.MainActivity
-import com.google.android.material.snackbar.Snackbar
+import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityLoginBinding
+class LoginActivity : ComponentActivity() {
 
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         // Hand Credential Manager the current Activity. On a configuration change this runs
         // again with the new instance, so a sign-in already in flight keeps its UI host.
         viewModel.credentialContext.baseContext = this
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.effects.collect(::handleEffect)
+        setContent {
+            CourseGrabTheme {
+                LoginRoute(
+                    onNavigateToMain = {
+                        startActivity(Intent(this, MainActivity::class.java))
+                    },
+                    // The Activity already resolved this ViewModel to wire up
+                    // credentialContext; hiltViewModel() would resolve the same instance,
+                    // but passing it keeps the two references provably identical.
+                    viewModel = viewModel
+                )
             }
         }
-
-        binding.signInButton.setOnClickListener { viewModel.signIn() }
     }
 
     override fun onDestroy() {
@@ -42,15 +41,5 @@ class LoginActivity : AppCompatActivity() {
         // back to the application context rather than leaving a destroyed Activity in it.
         viewModel.credentialContext.baseContext = applicationContext
         super.onDestroy()
-    }
-
-    private fun handleEffect(effect: LoginEffect) {
-        when (effect) {
-            is LoginEffect.Error ->
-                Snackbar.make(binding.loginRootView, effect.message, Snackbar.LENGTH_LONG).show()
-
-            LoginEffect.NavigateToMain ->
-                startActivity(Intent(this, MainActivity::class.java))
-        }
     }
 }
