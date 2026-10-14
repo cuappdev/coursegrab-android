@@ -9,7 +9,7 @@ val RemovalRed = Color(0xFFCA4238)
 val LightText = Color(0xFF9EA7B3)
 val MutedText = Color(0xFF616C7A)
 val StatusGreen = Color(0xFF47C753)
-val DarkEnough = Color(0xFF1C1F23)
+val DarkBackground = Color(0xFF1C1F23)
 
 val CardBorder = Color(0xFFD1D5DA)
 
