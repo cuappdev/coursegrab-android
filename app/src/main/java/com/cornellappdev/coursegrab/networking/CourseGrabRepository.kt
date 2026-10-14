@@ -47,11 +47,11 @@ class CourseGrabRepository @Inject constructor(
     suspend fun getCourseById(courseId: Int): Result<SearchResult> =
         call { service.getCourseById(auth, courseId) }
 
-    suspend fun sendDeviceToken(deviceToken: String): Result<Course> =
-        call { service.sendDeviceToken(auth, DeviceTokenRequest(deviceToken)) }
+    suspend fun sendDeviceToken(deviceToken: String): Result<Unit> =
+        callForStatus { service.sendDeviceToken(auth, DeviceTokenRequest(deviceToken)) }
 
-    suspend fun setNotifications(enabled: Boolean): Result<Course> =
-        call {
+    suspend fun setNotifications(enabled: Boolean): Result<Unit> =
+        callForStatus {
             service.setNotifications(
                 auth,
                 NotificationRequest(if (enabled) "ANDROID" else "NONE")
@@ -59,10 +59,21 @@ class CourseGrabRepository @Inject constructor(
         }
 
     private suspend fun <T : Any> call(request: suspend () -> ApiResponse<T>): Result<T> =
+        callForEnvelope(request).mapCatching { envelope ->
+            envelope.data ?: throw ApiException("Response had no payload")
+        }
+
+    /** For the endpoints that answer with a null `data` and report only success or failure. */
+    private suspend fun callForStatus(request: suspend () -> ApiResponse<Unit>): Result<Unit> =
+        callForEnvelope(request).map { }
+
+    private suspend fun <T : Any> callForEnvelope(
+        request: suspend () -> ApiResponse<T>
+    ): Result<ApiResponse<T>> =
         try {
             val envelope = request()
             if (envelope.success) {
-                Result.success(envelope.data)
+                Result.success(envelope)
             } else {
                 Result.failure(
                     ApiException(

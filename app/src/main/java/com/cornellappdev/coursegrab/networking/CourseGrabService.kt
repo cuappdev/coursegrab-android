@@ -59,13 +59,13 @@ interface CourseGrabService {
     suspend fun sendDeviceToken(
         @Header("Authorization") auth: String,
         @Body body: DeviceTokenRequest
-    ): ApiResponse<Course>
+    ): ApiResponse<Unit>
 
     @POST("users/notification/")
     suspend fun setNotifications(
         @Header("Authorization") auth: String,
         @Body body: NotificationRequest
-    ): ApiResponse<Course>
+    ): ApiResponse<Unit>
 }
 
 @Serializable
