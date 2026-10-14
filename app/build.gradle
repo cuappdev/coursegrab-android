@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 apply plugin: 'com.google.devtools.ksp'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'com.google.firebase.crashlytics'
@@ -38,6 +39,7 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        compose = true
     }
     namespace = 'com.cornellappdev.coursegrab'
 }
@@ -70,7 +72,18 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.19.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.11.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0'
-    implementation 'androidx.activity:activity-ktx:1.13.0'
+    implementation "androidx.activity:activity-ktx:${rootProject.ext.activity_version}"
+
+    // Compose
+    implementation platform("androidx.compose:compose-bom:${rootProject.ext.compose_bom_version}")
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.11.0'
+    implementation "androidx.activity:activity-compose:${rootProject.ext.activity_version}"
+    implementation "androidx.hilt:hilt-navigation-compose:${rootProject.ext.hilt_navigation_compose_version}"
+    debugImplementation 'androidx.compose.ui:ui-tooling'
     implementation "com.google.dagger:hilt-android:${rootProject.ext.hilt_version}"
     ksp "com.google.dagger:hilt-compiler:${rootProject.ext.hilt_version}"
     implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
