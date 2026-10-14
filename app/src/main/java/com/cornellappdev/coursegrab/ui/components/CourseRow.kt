@@ -1,7 +1,6 @@
 package com.cornellappdev.coursegrab.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,9 +36,8 @@ fun CourseRow(
     actions: (@Composable RowScope.() -> Unit)? = null
 ) {
     OutlinedCard(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(6.dp),
         border = BorderStroke(1.dp, CardBorder),
         colors = CardDefaults.outlinedCardColors(
