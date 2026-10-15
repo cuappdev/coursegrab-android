@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                MainRoute(
+                MainScreen(
                     onOpenCourse = { course ->
                         startActivity(
                             Intent(this, CourseDetailsActivity::class.java).apply {
