@@ -190,6 +190,7 @@ private fun SettingsLink(
     }
 }
 
+// TODO: Email alerts disabled since 2020. Should bring back with testing.
 private const val SHOW_EMAIL_ALERTS = false
 private const val CLASS_ROSTER_URL = "https://classes.cornell.edu/"
 private const val ACADEMIC_CALENDAR_URL = "https://registrar.cornell.edu/academic-calendar"
