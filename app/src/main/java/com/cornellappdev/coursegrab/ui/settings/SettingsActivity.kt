@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.cornellappdev.coursegrab.ui.login.LoginActivity
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +27,11 @@ class SettingsActivity : ComponentActivity() {
         setContent {
             CourseGrabTheme {
                 var notificationsPermitted by remember { mutableStateOf(hasNotificationPermission()) }
+
+                LifecycleResumeEffect(Unit) {
+                    notificationsPermitted = hasNotificationPermission()
+                    onPauseOrDispose {}
+                }
 
                 val permissionLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestPermission()
