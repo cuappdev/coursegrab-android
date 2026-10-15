@@ -23,7 +23,7 @@ class LoginActivity : ComponentActivity() {
 
         setContent {
             CourseGrabTheme {
-                LoginRoute(
+                LoginScreen(
                     onNavigateToMain = {
                         startActivity(Intent(this, MainActivity::class.java))
                     },

@@ -33,7 +33,7 @@ import com.cornellappdev.coursegrab.ui.theme.DarkBackground
 import com.google.android.gms.common.SignInButton
 
 @Composable
-fun LoginRoute(
+fun LoginScreen(
     onNavigateToMain: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
@@ -47,7 +47,7 @@ fun LoginRoute(
         }
     }
 
-    LoginScreen(
+    LoginContent(
         snackbarHostState = snackbarHostState,
         onSignIn = viewModel::signIn,
         modifier = modifier
@@ -55,7 +55,7 @@ fun LoginRoute(
 }
 
 @Composable
-fun LoginScreen(
+private fun LoginContent(
     snackbarHostState: SnackbarHostState,
     onSignIn: () -> Unit,
     modifier: Modifier = Modifier
@@ -114,7 +114,7 @@ private fun GoogleSignInButton(onClick: () -> Unit, modifier: Modifier = Modifie
 @Composable
 private fun LoginScreenPreview() {
     CourseGrabTheme {
-        LoginScreen(
+        LoginContent(
             snackbarHostState = remember { SnackbarHostState() },
             onSignIn = {}
         )
