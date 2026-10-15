@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,7 +44,7 @@ class MainViewModel @Inject constructor(
 
     fun refresh() {
         if (_state.value.isRefreshing) return
-        _state.value = _state.value.copy(isRefreshing = true)
+        _state.update { it.copy(isRefreshing = true) }
         viewModelScope.launch {
             repository.getTracking()
                 .onSuccess { courses ->
@@ -55,7 +56,7 @@ class MainViewModel @Inject constructor(
                     )
                 }
                 .onFailure {
-                    _state.value = _state.value.copy(isRefreshing = false)
+                    _state.update { it.copy(isRefreshing = false) }
                     _effects.send(MainEffect.Message("Couldn't load your courses."))
                 }
         }
