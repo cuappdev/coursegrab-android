@@ -26,16 +26,16 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CourseGrabTheme {
-                var permitted by remember { mutableStateOf(hasNotificationPermission()) }
+                var notificationsPermitted by remember { mutableStateOf(hasNotificationPermission()) }
 
                 val permissionLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestPermission()
                 ) { granted ->
-                    permitted = granted
+                    notificationsPermitted = granted
                 }
 
                 SettingsRoute(
-                    notificationsPermitted = permitted,
+                    notificationsPermitted = notificationsPermitted,
                     onRequestNotifications = {
                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     },
