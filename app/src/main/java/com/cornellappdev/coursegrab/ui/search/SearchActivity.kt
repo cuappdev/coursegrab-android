@@ -15,7 +15,7 @@ class SearchActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CourseGrabTheme {
-                SearchRoute(
+                SearchScreen(
                     onOpenCourse = { course ->
                         startActivity(
                             Intent(this, CourseDetailsActivity::class.java).apply {

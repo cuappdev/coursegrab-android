@@ -53,7 +53,7 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import com.cornellappdev.coursegrab.ui.theme.LightText
 
 @Composable
-fun SearchRoute(
+fun SearchScreen(
     onOpenCourse: (SearchResult) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,7 +61,7 @@ fun SearchRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    SearchScreen(
+    SearchContent(
         state = state,
         onQueryChanged = viewModel::onQueryChanged,
         onOpenCourse = onOpenCourse,
@@ -71,7 +71,7 @@ fun SearchRoute(
 }
 
 @Composable
-fun SearchScreen(
+private fun SearchContent(
     state: SearchState,
     onQueryChanged: (String) -> Unit,
     onOpenCourse: (SearchResult) -> Unit,
@@ -232,7 +232,7 @@ private fun SearchResultRow(
 @Composable
 private fun SearchScreenResultsPreview() {
     CourseGrabTheme {
-        SearchScreen(
+        SearchContent(
             state = SearchState.Results(listOf(sampleSearchResult())),
             onQueryChanged = {},
             onOpenCourse = {},
@@ -245,7 +245,7 @@ private fun SearchScreenResultsPreview() {
 @Composable
 private fun SearchScreenEmptyPreview() {
     CourseGrabTheme {
-        SearchScreen(
+        SearchContent(
             state = SearchState.Results(emptyList()),
             onQueryChanged = {},
             onOpenCourse = {},
@@ -258,7 +258,7 @@ private fun SearchScreenEmptyPreview() {
 @Composable
 private fun SearchScreenTooShortPreview() {
     CourseGrabTheme {
-        SearchScreen(
+        SearchContent(
             state = SearchState.QueryTooShort,
             onQueryChanged = {},
             onOpenCourse = {},
