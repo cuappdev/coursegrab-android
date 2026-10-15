@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
@@ -39,7 +39,7 @@ import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
 @Composable
-fun SettingsRoute(
+fun SettingsScreen(
     notificationsPermitted: Boolean,
     onRequestNotifications: () -> Unit,
     onOpenLink: (String) -> Unit,
@@ -58,7 +58,7 @@ fun SettingsRoute(
         }
     }
 
-    SettingsScreen(
+    SettingsContent(
         state = state,
         notificationsPermitted = notificationsPermitted,
         snackbarHostState = snackbarHostState,
@@ -75,7 +75,7 @@ fun SettingsRoute(
 }
 
 @Composable
-fun SettingsScreen(
+private fun SettingsContent(
     state: SettingsState,
     notificationsPermitted: Boolean,
     snackbarHostState: SnackbarHostState,
@@ -98,7 +98,6 @@ fun SettingsScreen(
                 .padding(padding)
                 .padding(horizontal = 12.dp, vertical = 4.dp)
         ) {
-            @Suppress("ConstantConditionIf")
             if (SHOW_EMAIL_ALERTS) {
                 SettingsSwitch(
                     label = R.string.email_alerts,
@@ -199,7 +198,7 @@ private const val ACADEMIC_CALENDAR_URL = "https://registrar.cornell.edu/academi
 @Composable
 private fun SettingsScreenPreview() {
     CourseGrabTheme {
-        SettingsScreen(
+        SettingsContent(
             state = SettingsState(mobileAlertsEnabled = true),
             notificationsPermitted = true,
             snackbarHostState = remember { SnackbarHostState() },
@@ -216,7 +215,7 @@ private fun SettingsScreenPreview() {
 @Composable
 private fun SettingsScreenNoPermissionPreview() {
     CourseGrabTheme {
-        SettingsScreen(
+        SettingsContent(
             state = SettingsState(mobileAlertsEnabled = true),
             notificationsPermitted = false,
             snackbarHostState = remember { SnackbarHostState() },
