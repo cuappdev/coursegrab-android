@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -37,6 +38,11 @@ class SettingsActivity : ComponentActivity() {
                     ActivityResultContracts.RequestPermission()
                 ) { granted ->
                     notificationsPermitted = granted
+                    if (!granted &&
+                        !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+                    ) {
+                        openNotificationSettings()
+                    }
                 }
 
                 SettingsScreen(
@@ -44,6 +50,8 @@ class SettingsActivity : ComponentActivity() {
                     onRequestNotifications = {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            openNotificationSettings()
                         }
                     },
                     onOpenLink = ::openLink,
@@ -59,6 +67,16 @@ class SettingsActivity : ComponentActivity() {
 
     private fun openLink(url: String) {
         startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+    }
+
+    private fun openNotificationSettings() {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:$packageName".toUri())
+        }
+        startActivity(intent)
     }
 
     private fun hasNotificationPermission(): Boolean =
