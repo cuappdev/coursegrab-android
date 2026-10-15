@@ -47,7 +47,7 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import com.cornellappdev.coursegrab.ui.theme.StatusGreen
 
 @Composable
-fun MainRoute(
+fun MainScreen(
     onOpenCourse: (SearchResult) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenSearch: () -> Unit,
@@ -65,7 +65,7 @@ fun MainRoute(
         }
     }
 
-    MainScreen(
+    MainContent(
         state = state,
         snackbarHostState = snackbarHostState,
         onRefresh = viewModel::refresh,
@@ -80,7 +80,7 @@ fun MainRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
+private fun MainContent(
     state: TrackedCoursesState,
     snackbarHostState: SnackbarHostState,
     onRefresh: () -> Unit,
@@ -248,7 +248,7 @@ private const val SECTION_AWAITING = "header-awaiting"
 @Composable
 private fun MainScreenPreview() {
     CourseGrabTheme {
-        MainScreen(
+        MainContent(
             state = TrackedCoursesState(
                 available = listOf(sampleCourse(isTracking = true)),
                 awaiting = listOf(
@@ -279,7 +279,7 @@ private fun MainScreenPreview() {
 @Composable
 private fun MainScreenEmptyPreview() {
     CourseGrabTheme {
-        MainScreen(
+        MainContent(
             state = TrackedCoursesState(hasLoaded = true),
             snackbarHostState = remember { SnackbarHostState() },
             onRefresh = {},
