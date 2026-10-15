@@ -61,7 +61,7 @@ fun CourseGrabTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
         ) {
             content()
             IconButton(
@@ -81,7 +81,7 @@ fun CourseGrabTopBar(
     }
 }
 
-private val BACK_BUTTON_WIDTH = 50.dp
+val BACK_BUTTON_WIDTH = 50.dp
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
