@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,12 +48,12 @@ class SettingsViewModel @Inject constructor(
 
     fun setEmailAlerts(enabled: Boolean) {
         preferencesHelper.emailAlertSetting = enabled
-        _state.value = _state.value.copy(emailAlertsEnabled = enabled)
+        _state.update { it.copy(emailAlertsEnabled = enabled) }
     }
 
     fun setMobileAlerts(enabled: Boolean) {
         preferencesHelper.mobileAlertSetting = enabled
-        _state.value = _state.value.copy(mobileAlertsEnabled = enabled)
+        _state.update { it.copy(mobileAlertsEnabled = enabled) }
         FirebaseMessaging.getInstance().isAutoInitEnabled = enabled
         viewModelScope.launch {
             repository.setNotifications(enabled)
