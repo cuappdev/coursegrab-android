@@ -1,8 +1,6 @@
 package com.cornellappdev.coursegrab.ui.login
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.MutableContextWrapper
 import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.CredentialOption
@@ -44,17 +42,6 @@ class LoginViewModel @Inject constructor(
     private val preferencesHelper: PreferencesHelper
 ) : ViewModel() {
 
-    /**
-     * Credential Manager needs an activity context to launch its system UI, but the request
-     * outlives the Activity across a configuration change. The Activity swaps its own
-     * reference in on every [android.app.Activity.onCreate] and swaps it back out in
-     * onDestroy, so a destroyed Activity is never reachable from here.
-     *
-     * Lint can't see that pairing, only that a ViewModel holds a Context.
-     */
-    @SuppressLint("StaticFieldLeak")
-    val credentialContext = MutableContextWrapper(context)
-
     private val _effects = Channel<LoginEffect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
 
@@ -63,11 +50,6 @@ class LoginViewModel @Inject constructor(
 
     init {
         resumeExistingSession()
-    }
-
-    override fun onCleared() {
-        // Don't leave the destroyed Activity reachable through the wrapper.
-        credentialContext.baseContext = context
     }
 
     private fun resumeExistingSession() {
@@ -86,7 +68,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun signIn() {
+    fun signIn(activityContext: Context) {
         if (signingIn) return
         signingIn = true
 
@@ -100,7 +82,7 @@ class LoginViewModel @Inject constructor(
                     .setAutoSelectEnabled(true)
                     .build()
 
-                when (val authorized = requestCredential(googleIdOption)) {
+                when (val authorized = requestCredential(activityContext, googleIdOption)) {
                     is CredentialResult.Success -> {
                         handleSignIn(authorized.response)
                         return@launch
@@ -115,7 +97,7 @@ class LoginViewModel @Inject constructor(
                     .Builder(context.getString(R.string.default_web_client_id))
                     .build()
 
-                when (val result = requestCredential(signInWithGoogleOption)) {
+                when (val result = requestCredential(activityContext, signInWithGoogleOption)) {
                     is CredentialResult.Success -> handleSignIn(result.response)
                     CredentialResult.NoneAvailable ->
                         emitError("No Google account found. Add one in system settings.")
@@ -128,14 +110,17 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private suspend fun requestCredential(option: CredentialOption): CredentialResult {
+    private suspend fun requestCredential(
+        activityContext: Context,
+        option: CredentialOption
+    ): CredentialResult {
         val request = GetCredentialRequest.Builder()
             .addCredentialOption(option)
             .build()
 
         return try {
             CredentialResult.Success(
-                credentialManager.getCredential(credentialContext, request)
+                credentialManager.getCredential(activityContext, request)
             )
         } catch (e: NoCredentialException) {
             Log.d(TAG, "No matching credential for ${option::class.simpleName}", e)

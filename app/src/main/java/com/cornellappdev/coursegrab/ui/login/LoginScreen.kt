@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +39,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     EffectHandler(viewModel.effects) { effect ->
@@ -49,7 +51,7 @@ fun LoginScreen(
 
     LoginContent(
         snackbarHostState = snackbarHostState,
-        onSignIn = viewModel::signIn,
+        onSignIn = { viewModel.signIn(context) },
         modifier = modifier
     )
 }
