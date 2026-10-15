@@ -39,7 +39,7 @@ fun CourseGrabTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(HEIGHT)
+                .height(60.dp)
         ) {
             Text(
                 text = stringResource(title),
@@ -69,7 +69,6 @@ fun CourseGrabTopBar(
     }
 }
 
-private val HEIGHT = 60.dp
 private val BACK_BUTTON_WIDTH = 50.dp
 
 @Preview(showBackground = true, widthDp = 360)
