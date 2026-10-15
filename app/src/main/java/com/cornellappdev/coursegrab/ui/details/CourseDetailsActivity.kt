@@ -27,7 +27,7 @@ class CourseDetailsActivity : ComponentActivity() {
 
         setContent {
             CourseGrabTheme {
-                CourseDetailsRoute(course = course, onBack = ::finish)
+                CourseDetailsScreen(course = course, onBack = ::finish)
             }
         }
     }

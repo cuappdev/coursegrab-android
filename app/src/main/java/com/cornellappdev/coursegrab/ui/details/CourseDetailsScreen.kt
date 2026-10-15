@@ -49,7 +49,7 @@ import com.cornellappdev.coursegrab.ui.theme.CardBorder
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
 @Composable
-fun CourseDetailsRoute(
+fun CourseDetailsScreen(
     course: SearchResult,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -64,7 +64,7 @@ fun CourseDetailsRoute(
         snackbarHostState.showSnackbar(message)
     }
 
-    CourseDetailsScreen(
+    CourseDetailsContent(
         state = state,
         snackbarHostState = snackbarHostState,
         onSetTracking = viewModel::setTracking,
@@ -74,7 +74,7 @@ fun CourseDetailsRoute(
 }
 
 @Composable
-fun CourseDetailsScreen(
+private fun CourseDetailsContent(
     state: CourseDetailsState,
     snackbarHostState: SnackbarHostState,
     onSetTracking: (catalogNum: Int, tracking: Boolean) -> Unit,
@@ -224,7 +224,7 @@ private val SampleState = CourseDetailsState(
 @Composable
 private fun CourseDetailsScreenPreview() {
     CourseGrabTheme {
-        CourseDetailsScreen(
+        CourseDetailsContent(
             state = SampleState,
             snackbarHostState = remember { SnackbarHostState() },
             onSetTracking = { _, _ -> },
