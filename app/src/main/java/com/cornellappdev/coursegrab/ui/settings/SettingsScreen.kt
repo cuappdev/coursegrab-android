@@ -41,7 +41,7 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 @Composable
 fun SettingsScreen(
     notificationsPermitted: Boolean,
-    onRequestNotifications: () -> Unit,
+    onRequestNotifications: (onGranted: () -> Unit) -> Unit,
     onOpenLink: (String) -> Unit,
     onSignedOut: () -> Unit,
     onBack: () -> Unit,
@@ -65,7 +65,7 @@ fun SettingsScreen(
         onEmailAlertsChange = viewModel::setEmailAlerts,
         onMobileAlertsChange = { enabled ->
             if (notificationsPermitted) viewModel.setMobileAlerts(enabled)
-            else onRequestNotifications()
+            else onRequestNotifications { viewModel.setMobileAlerts(enabled) }
         },
         onOpenLink = onOpenLink,
         onSignOut = viewModel::signOut,

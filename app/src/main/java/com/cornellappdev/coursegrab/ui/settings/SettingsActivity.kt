@@ -34,10 +34,14 @@ class SettingsActivity : ComponentActivity() {
                     onPauseOrDispose {}
                 }
 
+                var onPermissionGranted by remember { mutableStateOf<(() -> Unit)?>(null) }
+
                 val permissionLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestPermission()
                 ) { granted ->
                     notificationsPermitted = granted
+                    if (granted) onPermissionGranted?.invoke()
+                    onPermissionGranted = null
                     if (!granted &&
                         !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
                     ) {
@@ -47,8 +51,9 @@ class SettingsActivity : ComponentActivity() {
 
                 SettingsScreen(
                     notificationsPermitted = notificationsPermitted,
-                    onRequestNotifications = {
+                    onRequestNotifications = { onGranted ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            onPermissionGranted = onGranted
                             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else {
                             openNotificationSettings()
