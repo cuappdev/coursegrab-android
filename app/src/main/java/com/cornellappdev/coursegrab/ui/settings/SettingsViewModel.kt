@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingsState(
-    val emailAlertsEnabled: Boolean = true,
-    val mobileAlertsEnabled: Boolean = true
+    val emailAlertsEnabled: Boolean,
+    val mobileAlertsEnabled: Boolean
 )
 
 sealed interface SettingsEffect {

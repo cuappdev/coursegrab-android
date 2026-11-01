@@ -201,7 +201,7 @@ private fun SettingsLink(
 private fun SettingsScreenPreview() {
     CourseGrabTheme {
         SettingsContent(
-            state = SettingsState(mobileAlertsEnabled = true),
+            state = SettingsState(emailAlertsEnabled = true, mobileAlertsEnabled = true),
             notificationsPermitted = true,
             snackbarHostState = remember { SnackbarHostState() },
             onEmailAlertsChange = {},
@@ -218,7 +218,7 @@ private fun SettingsScreenPreview() {
 private fun SettingsScreenNoPermissionPreview() {
     CourseGrabTheme {
         SettingsContent(
-            state = SettingsState(mobileAlertsEnabled = true),
+            state = SettingsState(emailAlertsEnabled = true, mobileAlertsEnabled = true),
             notificationsPermitted = false,
             snackbarHostState = remember { SnackbarHostState() },
             onEmailAlertsChange = {},
