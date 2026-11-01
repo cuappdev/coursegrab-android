@@ -38,6 +38,11 @@ import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
+// TODO: Email alerts disabled since 2020. Should bring back with testing.
+private const val SHOW_EMAIL_ALERTS = false
+private const val CLASS_ROSTER_URL = "https://classes.cornell.edu/"
+private const val ACADEMIC_CALENDAR_URL = "https://registrar.cornell.edu/academic-calendar"
+
 @Composable
 fun SettingsScreen(
     notificationsPermitted: Boolean,
@@ -189,11 +194,6 @@ private fun SettingsLink(
         )
     }
 }
-
-// TODO: Email alerts disabled since 2020. Should bring back with testing.
-private const val SHOW_EMAIL_ALERTS = false
-private const val CLASS_ROSTER_URL = "https://classes.cornell.edu/"
-private const val ACADEMIC_CALENDAR_URL = "https://registrar.cornell.edu/academic-calendar"
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
