@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
+private val BACK_BUTTON_WIDTH = 50.dp
+
 @Composable
 fun CourseGrabTopBar(
     @StringRes title: Int,
@@ -69,7 +71,6 @@ fun CourseGrabTopBar(
     }
 }
 
-private val BACK_BUTTON_WIDTH = 50.dp
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
