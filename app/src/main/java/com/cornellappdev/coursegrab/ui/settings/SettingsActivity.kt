@@ -2,106 +2,88 @@ package com.cornellappdev.coursegrab.ui.settings
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import android.provider.Settings
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.cornellappdev.coursegrab.databinding.ActivitySettingsBinding
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.cornellappdev.coursegrab.ui.login.LoginActivity
-import com.google.firebase.messaging.FirebaseMessaging
+import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
-class SettingsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivitySettingsBinding
-
-    private val viewModel: SettingsViewModel by viewModels()
+class SettingsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContent {
+            CourseGrabTheme {
+                var notificationsPermitted by remember { mutableStateOf(hasNotificationPermission()) }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.effects.collect(::handleEffect)
-            }
-        }
+                LifecycleResumeEffect(Unit) {
+                    notificationsPermitted = hasNotificationPermission()
+                    onPauseOrDispose {}
+                }
 
-        binding.emailAlertsSwitch.isChecked = viewModel.emailAlertsEnabled
-        binding.mobileAlertsSwitch.isChecked = viewModel.mobileAlertsEnabled
+                var onPermissionGranted by remember { mutableStateOf<(() -> Unit)?>(null) }
 
-        binding.emailAlertsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setEmailAlerts(isChecked)
-        }
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestPermission()
+                ) { granted ->
+                    notificationsPermitted = granted
+                    if (granted) onPermissionGranted?.invoke()
+                    onPermissionGranted = null
+                    if (!granted &&
+                        !shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+                    ) {
+                        openNotificationSettings()
+                    }
+                }
 
-        binding.mobileAlertsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (
-                Build.VERSION.SDK_INT >= 33 &&
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                Toast.makeText(
-                    this,
-                    "Please enable notifications in settings to receive course updates",
-                    Toast.LENGTH_LONG,
-                ).show()
-            } else {
-                FirebaseMessaging.getInstance().isAutoInitEnabled = isChecked
-                viewModel.setMobileAlerts(isChecked)
-            }
-        }
-
-        binding.classRoster.setOnClickListener {
-            val browserIntent =
-                Intent(Intent.ACTION_VIEW, "https://classes.cornell.edu/".toUri())
-            startActivity(browserIntent)
-        }
-
-        binding.cornellAcademicCalendar.setOnClickListener {
-            val browserIntent =
-                Intent(
-                    Intent.ACTION_VIEW,
-                    "https://registrar.cornell.edu/academic-calendar".toUri()
+                SettingsScreen(
+                    notificationsPermitted = notificationsPermitted,
+                    onRequestNotifications = { onGranted ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            onPermissionGranted = onGranted
+                            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            openNotificationSettings()
+                        }
+                    },
+                    onOpenLink = ::openLink,
+                    onSignedOut = {
+                        startActivity(Intent(this, LoginActivity::class.java))
+                        finish()
+                    },
+                    onBack = ::finish
                 )
-            startActivity(browserIntent)
-        }
-
-        binding.signOut.setOnClickListener { viewModel.signOut() }
-
-        binding.backBtn.setOnClickListener { finish() }
-
-        if (
-            Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            binding.mobileAlertsSwitch.isChecked = false
-            binding.mobileAlertsSwitch.isEnabled = false
-        }
-
-    }
-
-    private fun handleEffect(effect: SettingsEffect) {
-        when (effect) {
-            is SettingsEffect.Message ->
-                Toast.makeText(this, effect.text, Toast.LENGTH_SHORT).show()
-
-            SettingsEffect.SignedOut ->
-                startActivity(Intent(this, LoginActivity::class.java))
+            }
         }
     }
+
+    private fun openLink(url: String) {
+        startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+    }
+
+    private fun openNotificationSettings() {
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:$packageName".toUri())
+        }
+        startActivity(intent)
+    }
+
+    private fun hasNotificationPermission(): Boolean =
+        NotificationManagerCompat.from(this).areNotificationsEnabled()
 }
