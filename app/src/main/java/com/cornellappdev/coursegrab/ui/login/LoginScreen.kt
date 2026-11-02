@@ -16,6 +16,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,7 @@ import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import com.cornellappdev.coursegrab.ui.theme.DarkBackground
 import com.google.android.gms.common.SignInButton
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -41,10 +43,11 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     EffectHandler(viewModel.effects) { effect ->
         when (effect) {
-            is LoginEffect.Error -> snackbarHostState.showSnackbar(effect.message)
+            is LoginEffect.Error -> scope.launch { snackbarHostState.showSnackbar(effect.message) }
             LoginEffect.NavigateToMain -> onNavigateToMain()
         }
     }

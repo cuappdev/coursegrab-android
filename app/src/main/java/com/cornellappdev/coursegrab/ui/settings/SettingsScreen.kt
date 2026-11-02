@@ -23,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +39,7 @@ import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
+import kotlinx.coroutines.launch
 
 // TODO: Email alerts disabled since 2020. Should bring back with testing.
 private const val SHOW_EMAIL_ALERTS = false
@@ -56,10 +58,11 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     EffectHandler(viewModel.effects) { effect ->
         when (effect) {
-            is SettingsEffect.Message -> snackbarHostState.showSnackbar(effect.text)
+            is SettingsEffect.Message -> scope.launch { snackbarHostState.showSnackbar(effect.text) }
             SettingsEffect.SignedOut -> onSignedOut()
         }
     }
