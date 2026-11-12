@@ -172,7 +172,7 @@ class LoginViewModel @Inject constructor(
             return
         }
 
-        if (!isAllowedAccount(googleCredential.id)) {
+        if (!isAllowedAccount(googleCredential.email)) {
             emitError("Please use a @cornell.edu account")
             credentialManager.clearCredentialStateOrLog()
             return
@@ -186,8 +186,8 @@ class LoginViewModel @Inject constructor(
             }
     }
 
-    private fun isAllowedAccount(email: String): Boolean =
-        email.endsWith("@cornell.edu") ||
+    private fun isAllowedAccount(email: String?): Boolean =
+        email != null && email.endsWith("@cornell.edu") ||
                 email == "appstoreappdev@gmail.com" ||
                 email == "coursegrab.droid@gmail.com"
 

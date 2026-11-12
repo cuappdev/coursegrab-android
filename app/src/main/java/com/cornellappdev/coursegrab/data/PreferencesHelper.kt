@@ -1,7 +1,6 @@
 package com.cornellappdev.coursegrab.data
 
 import android.content.Context
-import android.preference.PreferenceManager
 import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -10,7 +9,10 @@ import javax.inject.Singleton
 @Singleton
 class PreferencesHelper @Inject constructor(@ApplicationContext context: Context) {
 
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val preferences = context.getSharedPreferences(
+        "${context.packageName}_preferences",
+        Context.MODE_PRIVATE
+    )
 
     var sessionToken: String?
         get() = preferences.getString(SESSION_TOKEN, "")
