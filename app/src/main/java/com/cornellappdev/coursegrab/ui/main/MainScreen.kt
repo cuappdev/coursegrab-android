@@ -1,12 +1,7 @@
 package com.cornellappdev.coursegrab.ui.main
 
-import android.Manifest
 import android.content.ClipData
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -53,7 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -76,6 +69,7 @@ import com.cornellappdev.coursegrab.ui.components.StopTrackingDialog
 import com.cornellappdev.coursegrab.ui.components.displayCode
 import com.cornellappdev.coursegrab.ui.components.displayInstructor
 import com.cornellappdev.coursegrab.ui.components.displaySection
+import com.cornellappdev.coursegrab.ui.components.rememberNotificationPermission
 import com.cornellappdev.coursegrab.ui.components.sampleCourse
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
@@ -92,7 +86,6 @@ fun MainScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     val pinCopied = stringResource(R.string.pin_copied)
@@ -100,17 +93,13 @@ fun MainScreen(
 
     StatusBarIcons(onDarkBackground = true)
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (!granted) viewModel.reportNotificationsBlocked()
-    }
+    val notificationPermission = rememberNotificationPermission()
     var askedForNotifications by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (!askedForNotifications && !hasNotificationPermission(context)) {
+        if (!askedForNotifications && notificationPermission.shouldPrompt) {
             askedForNotifications = true
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            notificationPermission.request(onDenied = { viewModel.reportNotificationsBlocked() })
         }
     }
 
@@ -157,12 +146,6 @@ fun MainScreen(
         )
     }
 }
-
-private fun hasNotificationPermission(context: Context): Boolean =
-    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.POST_NOTIFICATIONS
-    ) == PackageManager.PERMISSION_GRANTED
 
 @Composable
 private fun MainContent(
