@@ -13,20 +13,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CourseGrab">
         <activity
-            android:name=".ui.splash.SplashScreenActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:name=".ui.notification.NotificationModal" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.CourseGrab.Splash">
+            android:theme="@style/Theme.CourseGrab.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.notification.NotificationModal" />
-        <activity
-            android:name=".MainActivity" />
 
         <service
             android:name=".service.NotificationService"

@@ -2,6 +2,7 @@ package com.cornellappdev.coursegrab.ui.navigation
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.dropUnlessResumed
@@ -18,7 +19,10 @@ import com.cornellappdev.coursegrab.ui.settings.SettingsScreen
 private const val STUDENT_CENTER_URL = "http://studentcenter.cornell.edu"
 
 @Composable
-fun CourseGrabNavHost(navController: NavHostController = rememberNavController()) {
+fun CourseGrabNavHost(
+    onReady: () -> Unit,
+    navController: NavHostController = rememberNavController()
+) {
     val context = LocalContext.current
     val openUrl: (String) -> Unit = { url ->
         context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
@@ -27,6 +31,7 @@ fun CourseGrabNavHost(navController: NavHostController = rememberNavController()
     NavHost(navController = navController, startDestination = Route.Login) {
         composable<Route.Login> {
             LoginScreen(
+                onReady = onReady,
                 onNavigateToMain = {
                     navController.navigate(Route.Home) {
                         popUpTo<Route.Login> { inclusive = true }
@@ -36,6 +41,7 @@ fun CourseGrabNavHost(navController: NavHostController = rememberNavController()
         }
 
         composable<Route.Home> {
+            LaunchedEffect(Unit) { onReady() }
             MainScreen(
                 onOpenCourse = { navController.navigate(Route.CourseDetails(it)) },
                 onOpenSettings = dropUnlessResumed { navController.navigate(Route.Settings) },
