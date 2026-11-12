@@ -27,7 +27,7 @@ import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
 
 private val HeaderShape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-private val HeaderTitle = TextStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp)
+private val HeaderTitleStyle = TextStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp)
 
 @Composable
 fun CourseGrabHeader(
@@ -55,7 +55,7 @@ fun CourseGrabHeader(
             )
             Text(
                 text = stringResource(R.string.app_name),
-                style = HeaderTitle,
+                style = HeaderTitleStyle,
                 color = CourseGrabColors.White,
                 modifier = Modifier
                     .padding(start = 4.dp)
