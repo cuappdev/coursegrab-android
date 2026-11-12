@@ -3,8 +3,6 @@ package com.cornellappdev.coursegrab.ui.details
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.content.IntentCompat
-import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,20 +12,14 @@ class CourseDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val course = IntentCompat.getParcelableExtra(
-            intent,
-            EXTRA_COURSE_DETAILS,
-            SearchResult::class.java
-        )
-
-        if (course == null) {
+        if (!intent.hasExtra(EXTRA_COURSE_DETAILS)) {
             finish()
             return
         }
 
         setContent {
             CourseGrabTheme {
-                CourseDetailsScreen(course = course, onBack = ::finish)
+                CourseDetailsScreen(onBack = ::finish)
             }
         }
     }

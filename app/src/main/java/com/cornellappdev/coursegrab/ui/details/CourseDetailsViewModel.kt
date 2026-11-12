@@ -1,6 +1,7 @@
 package com.cornellappdev.coursegrab.ui.details
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cornellappdev.coursegrab.models.Course
@@ -25,21 +26,18 @@ data class CourseDetailsState(
 
 @HiltViewModel
 class CourseDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val repository: CourseGrabRepository
 ) : ViewModel() {
 
     private val _trackingErrors = Channel<String>(Channel.BUFFERED)
     val trackingErrors = _trackingErrors.receiveAsFlow()
 
-    private val _state = MutableStateFlow(CourseDetailsState())
-    val state: StateFlow<CourseDetailsState> = _state.asStateFlow()
+    private val course: SearchResult =
+        checkNotNull(savedStateHandle[CourseDetailsActivity.EXTRA_COURSE_DETAILS])
 
-    private var seeded = false
-
-    fun seed(course: SearchResult) {
-        if (seeded) return
-        seeded = true
-        _state.value = CourseDetailsState(
+    private val _state = MutableStateFlow(
+        CourseDetailsState(
             subjectCode = course.subjectCode,
             courseNum = course.courseNum,
             title = course.title,
@@ -47,7 +45,8 @@ class CourseDetailsViewModel @Inject constructor(
                 ?: UNASSIGNED_INSTRUCTOR,
             sections = course.sections
         )
-    }
+    )
+    val state: StateFlow<CourseDetailsState> = _state.asStateFlow()
 
     fun setTracking(catalogNum: Int, tracking: Boolean) {
         val before = _state.value.sections

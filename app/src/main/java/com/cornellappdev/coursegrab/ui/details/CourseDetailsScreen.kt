@@ -21,7 +21,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,7 +36,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.Course
-import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.components.RemoveButton
@@ -50,13 +48,10 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
 @Composable
 fun CourseDetailsScreen(
-    course: SearchResult,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CourseDetailsViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(course) { viewModel.seed(course) }
-
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
