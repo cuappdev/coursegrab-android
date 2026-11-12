@@ -40,7 +40,6 @@ import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.components.StatusBarIcons
 import com.cornellappdev.coursegrab.ui.components.courseGrabShadow
 import com.cornellappdev.coursegrab.ui.components.meshGradientBackground
-import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
 import kotlinx.coroutines.launch
 
 private val WelcomeStyle = TextStyle(
