@@ -31,4 +31,4 @@ data class Course(
         }
 }
 
-enum class SectionStatus { Open, Closed, Waitlisted }
+enum class SectionStatus { Open, Waitlisted, Closed }

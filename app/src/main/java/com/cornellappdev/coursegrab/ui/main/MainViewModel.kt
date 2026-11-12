@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
+import com.cornellappdev.coursegrab.models.SectionStatus
 import com.cornellappdev.coursegrab.networking.CourseGrabRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -13,14 +14,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 data class TrackedCoursesState(
-    val available: List<Course> = emptyList(),
-    val awaiting: List<Course> = emptyList(),
+    val courses: List<Course> = emptyList(),
     val isRefreshing: Boolean = false,
-    val hasLoaded: Boolean = false
-)
+    val hasLoaded: Boolean = false,
+    val isOffline: Boolean = false
+) {
+    fun count(status: SectionStatus): Int = courses.count { it.sectionStatus == status }
+}
 
 sealed interface MainEffect {
     data class Message(val text: String) : MainEffect
@@ -49,39 +53,24 @@ class MainViewModel @Inject constructor(
             repository.getTracking()
                 .onSuccess { courses ->
                     _state.value = TrackedCoursesState(
-                        available = courses.filter { it.isOpen },
-                        awaiting = courses.filterNot { it.isOpen },
+                        courses = courses.sortedBy { it.sectionStatus.ordinal },
                         isRefreshing = false,
                         hasLoaded = true
                     )
                 }
-                .onFailure {
-                    _state.update { it.copy(isRefreshing = false) }
-                    _effects.send(MainEffect.Message("Couldn't load your courses."))
+                .onFailure { error ->
+                    val offline = error is IOException && !_state.value.hasLoaded
+                    _state.update { it.copy(isRefreshing = false, isOffline = offline) }
+                    if (!offline) _effects.send(MainEffect.Message("Couldn't load your courses."))
                 }
         }
     }
 
-    fun addCourse(courseId: Int) = track(courseId, adding = true)
-
-    fun removeCourse(courseId: Int) = track(courseId, adding = false)
-
-    private fun track(courseId: Int, adding: Boolean) {
+    fun removeCourse(catalogNum: Int) {
         viewModelScope.launch {
-            val result =
-                if (adding) repository.addTracking(courseId)
-                else repository.removeTracking(courseId)
-
-            result.onFailure { error ->
-                _effects.send(
-                    MainEffect.Message(
-                        error.message
-                            ?: if (adding) "Couldn't track that course."
-                            else "Couldn't remove that course."
-                    )
-                )
+            repository.removeTracking(catalogNum).onFailure { error ->
+                _effects.send(MainEffect.Message(error.message ?: "Couldn't remove that course."))
             }
-
             refresh()
         }
     }

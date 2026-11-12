@@ -18,10 +18,6 @@
     <string name="search_courses_hint">Find Courses</string>
 
     <string name="no_courses_alert">No Courses Currently Tracked</string>
-    <string name="no_courses_alert_subtext">
-        Enter an ID below to start tracking\n
-        Find course IDs using the roster above
-    </string>
 
     <string name="remove_button">Remove</string>
     <string name="track_button">Track</string>
@@ -40,8 +36,6 @@
     <!-- Course display formats: "CS 2110: Object-Oriented Programming" -->
     <string name="course_title_format">%1$s %2$d: %3$s</string>
     <string name="course_header_format">%1$s %2$d</string>
-    <string name="available_count">%d Available</string>
-    <string name="awaiting_count">%d Awaiting</string>
     <plurals name="tracking_count">
         <item quantity="one">%d Tracking</item>
         <item quantity="other">%d Tracking</item>
@@ -66,4 +60,16 @@
     <string name="status_closed_count" tools:ignore="PluralsCandidate">%d Closed</string>
     <string name="status_waitlisted_count" tools:ignore="PluralsCandidate">%d Waitlisted</string>
     <string name="search_for_a_course">Search for a course…</string>
+    <string name="tracked_classes">Tracked Classes</string>
+    <string name="no_courses_title">No Courses Currently Tracked</string>
+    <string name="no_courses_subtitle">Search to start adding courses</string>
+    <string name="no_internet_title">No Internet Connection</string>
+    <string name="no_internet_subtitle">Please try again later</string>
+    <string name="stop_tracking">Stop tracking</string>
+    <string name="stop_tracking_prompt">Are you sure you want to stop tracking %1$s?</string>
+    <string name="stop_tracking_course">Stop tracking %1$s</string>
+    <string name="cancel">Cancel</string>
+    <string name="pin_label">PIN:</string>
+    <string name="pin_copied">PIN copied</string>
+    <string name="instructor_staff">Staff</string>
 </resources>
