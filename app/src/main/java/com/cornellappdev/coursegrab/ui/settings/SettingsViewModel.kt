@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingsState(
-    val emailAlertsEnabled: Boolean,
-    val mobileAlertsEnabled: Boolean
+    val mobileAlertsEnabled: Boolean,
+    val email: String?
 )
 
 sealed interface SettingsEffect {
@@ -40,16 +40,11 @@ class SettingsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         SettingsState(
-            emailAlertsEnabled = preferencesHelper.emailAlertSetting,
-            mobileAlertsEnabled = preferencesHelper.mobileAlertSetting
+            mobileAlertsEnabled = preferencesHelper.mobileAlertSetting,
+            email = preferencesHelper.email
         )
     )
     val state: StateFlow<SettingsState> = _state.asStateFlow()
-
-    fun setEmailAlerts(enabled: Boolean) {
-        preferencesHelper.emailAlertSetting = enabled
-        _state.update { it.copy(emailAlertsEnabled = enabled) }
-    }
 
     fun setMobileAlerts(enabled: Boolean) {
         preferencesHelper.mobileAlertSetting = enabled

@@ -26,9 +26,9 @@ class PreferencesHelper @Inject constructor(@ApplicationContext context: Context
         get() = preferences.getLong(EXPIRES_AT, 0L)
         set(value) = preferences.edit { putLong(EXPIRES_AT, value) }
 
-    var emailAlertSetting: Boolean
-        get() = preferences.getBoolean(EMAIL_ALERTS, true)
-        set(value) = preferences.edit { putBoolean(EMAIL_ALERTS, value) }
+    var email: String?
+        get() = preferences.getString(EMAIL, null)
+        set(value) = preferences.edit { putString(EMAIL, value) }
 
     var mobileAlertSetting: Boolean
         get() = preferences.getBoolean(MOBILE_ALERTS, true)
@@ -42,7 +42,7 @@ class PreferencesHelper @Inject constructor(@ApplicationContext context: Context
         private const val SESSION_TOKEN = "data.source.prefs.SESSION_TOKEN"
         private const val UPDATE_TOKEN = "data.source.prefs.UPDATE_TOKEN"
         private const val EXPIRES_AT = "data.source.prefs.EXPIRES_AT"
-        private const val EMAIL_ALERTS = "data.source.prefs.EMAIL_ALERTS"
+        private const val EMAIL = "data.source.prefs.EMAIL"
         private const val MOBILE_ALERTS = "data.source.prefs.MOBILE_ALERTS"
     }
 }
