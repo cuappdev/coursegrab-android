@@ -37,7 +37,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cornellappdev.coursegrab.R
@@ -52,8 +51,6 @@ import com.cornellappdev.coursegrab.ui.components.displaySection
 import com.cornellappdev.coursegrab.ui.components.sampleCourse
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
-
-private val H2 = CourseGrabTextStyles.H3.copy(fontSize = 18.sp)
 
 @Composable
 fun CourseDetailsScreen(
@@ -111,7 +108,7 @@ private fun CourseDetailsContent(
             item(key = "header") { DetailsHeader(code = state.code, onBack = onBack) }
             item(key = "summary") {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Text(state.title, style = H2, color = CourseGrabColors.Black)
+                    Text(state.title, style = CourseGrabTextStyles.H2, color = CourseGrabColors.Black)
                     layout.primary?.let { PrimarySection(it, onSetTracking) }
                 }
             }
