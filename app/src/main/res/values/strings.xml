@@ -32,6 +32,9 @@
     <string name="remove_button">Remove</string>
     <string name="track_button">Track</string>
     <string name="enroll_button">Enroll</string>
+    <string name="instructor_unassigned">To Be Assigned</string>
+    <string name="track_course_failed">Couldn\'t track that course.</string>
+    <string name="untrack_course_failed">Couldn\'t remove that course.</string>
 
     <string name="no_results_alert">No results</string>
     <string name="no_results_alert_subtext_start_searching">

@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 data class Course(
     @SerialName("catalog_num") val catalogNum: Int = 0,
+    @SerialName("course_id") val courseId: Int = 0,
     @SerialName("course_num") val courseNum: Int = 0,
     val section: String = "",
     val instructors: List<String> = emptyList(),
