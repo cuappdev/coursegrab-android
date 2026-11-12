@@ -5,10 +5,12 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.networking.CourseGrabRepository
+import com.cornellappdev.coursegrab.ui.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +40,7 @@ class CourseDetailsViewModel @Inject constructor(
     val trackingErrors = _trackingErrors.receiveAsFlow()
 
     private val course: SearchResult =
-        checkNotNull(savedStateHandle[CourseDetailsActivity.EXTRA_COURSE_DETAILS])
+        savedStateHandle.toRoute<Route.CourseDetails>(Route.CourseDetails.typeMap).course
 
     private val _state = MutableStateFlow(
         CourseDetailsState(

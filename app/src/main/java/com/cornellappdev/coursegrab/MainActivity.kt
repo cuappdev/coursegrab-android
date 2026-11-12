@@ -1,30 +1,21 @@
-package com.cornellappdev.coursegrab.ui.details
+package com.cornellappdev.coursegrab
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.cornellappdev.coursegrab.ui.navigation.CourseGrabNavHost
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class CourseDetailsActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (!intent.hasExtra(EXTRA_COURSE_DETAILS)) {
-            finish()
-            return
-        }
-
         setContent {
             CourseGrabTheme {
-                CourseDetailsScreen(onBack = ::finish)
+                CourseGrabNavHost()
             }
         }
-    }
-
-    companion object {
-        const val EXTRA_COURSE_DETAILS = "courseDetails"
     }
 }

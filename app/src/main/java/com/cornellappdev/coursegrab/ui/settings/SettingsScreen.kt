@@ -1,5 +1,13 @@
 package com.cornellappdev.coursegrab.ui.settings
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,18 +30,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
@@ -48,8 +63,6 @@ private const val ACADEMIC_CALENDAR_URL = "https://registrar.cornell.edu/academi
 
 @Composable
 fun SettingsScreen(
-    notificationsPermitted: Boolean,
-    onRequestNotifications: (onGranted: () -> Unit) -> Unit,
     onOpenLink: (String) -> Unit,
     onSignedOut: () -> Unit,
     onBack: () -> Unit,
@@ -59,6 +72,39 @@ fun SettingsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val activity = LocalActivity.current
+
+    var notificationsPermitted by remember { mutableStateOf(hasNotificationPermission(context)) }
+    LifecycleResumeEffect(Unit) {
+        notificationsPermitted = hasNotificationPermission(context)
+        onPauseOrDispose {}
+    }
+
+    var onPermissionGranted by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        notificationsPermitted = granted
+        if (granted) onPermissionGranted?.invoke()
+        onPermissionGranted = null
+        val canAskAgain = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            activity != null &&
+            ActivityCompat.shouldShowRequestPermissionRationale(
+            activity,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+        if (!granted && !canAskAgain) openNotificationSettings(context)
+    }
+
+    val onRequestNotifications: (() -> Unit) -> Unit = { onGranted ->
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            onPermissionGranted = onGranted
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            openNotificationSettings(context)
+        }
+    }
 
     EffectHandler(viewModel.effects) { effect ->
         when (effect) {
@@ -81,6 +127,19 @@ fun SettingsScreen(
         onBack = onBack,
         modifier = modifier
     )
+}
+
+private fun hasNotificationPermission(context: Context): Boolean =
+    NotificationManagerCompat.from(context).areNotificationsEnabled()
+
+private fun openNotificationSettings(context: Context) {
+    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+    } else {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:${context.packageName}".toUri())
+    }
+    context.startActivity(intent)
 }
 
 @Composable
