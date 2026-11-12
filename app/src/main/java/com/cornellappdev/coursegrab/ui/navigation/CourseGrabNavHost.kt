@@ -53,6 +53,7 @@ fun CourseGrabNavHost(
         composable<Route.Search> {
             SearchScreen(
                 onOpenCourse = { navController.navigate(Route.CourseDetails(it)) },
+                onOpenSettings = dropUnlessResumed { navController.navigate(Route.Settings) },
                 onBack = dropUnlessResumed { navController.popBackStack() }
             )
         }

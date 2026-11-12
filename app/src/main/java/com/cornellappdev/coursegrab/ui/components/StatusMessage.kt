@@ -23,7 +23,7 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
 
 @Composable
 fun StatusMessage(
-    @DrawableRes illustration: Int,
+    @DrawableRes illustration: Int?,
     @StringRes title: Int,
     @StringRes subtitle: Int,
     modifier: Modifier = Modifier
@@ -35,11 +35,13 @@ fun StatusMessage(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
-        Image(
-            painter = painterResource(illustration),
-            contentDescription = null,
-            modifier = Modifier.size(120.dp)
-        )
+        if (illustration != null) {
+            Image(
+                painter = painterResource(illustration),
+                contentDescription = null,
+                modifier = Modifier.size(120.dp)
+            )
+        }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
