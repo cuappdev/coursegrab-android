@@ -2,6 +2,7 @@ package com.cornellappdev.coursegrab.ui.components
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,13 +26,34 @@ import androidx.compose.ui.unit.dp
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
-private val BACK_BUTTON_WIDTH = 50.dp
+internal val BACK_BUTTON_WIDTH = 50.dp
 
 @Composable
 fun CourseGrabTopBar(
     @StringRes title: Int,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
+) {
+    CourseGrabTopBar(onBack = onBack, modifier = modifier) {
+        Text(
+            text = stringResource(title),
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = BACK_BUTTON_WIDTH)
+        )
+    }
+}
+
+@Composable
+fun CourseGrabTopBar(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -41,19 +63,9 @@ fun CourseGrabTopBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp)
+                .height(50.dp)
         ) {
-            Text(
-                text = stringResource(title),
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(horizontal = BACK_BUTTON_WIDTH)
-            )
+            content()
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
