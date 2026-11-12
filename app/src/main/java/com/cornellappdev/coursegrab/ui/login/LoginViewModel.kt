@@ -189,7 +189,10 @@ class LoginViewModel @Inject constructor(
         }
 
         repository.initializeSession(googleCredential.idToken, null)
-            .onSuccess { verifySession(it) }
+            .onSuccess {
+                preferencesHelper.email = googleCredential.email
+                verifySession(it)
+            }
             .onFailure { failure ->
                 Log.e(TAG, "Failed to initialize session", failure)
                 emitError(SIGN_IN_FAILED)

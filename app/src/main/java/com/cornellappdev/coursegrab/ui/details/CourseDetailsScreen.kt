@@ -43,6 +43,7 @@ import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.ui.components.CourseGrabCard
 import com.cornellappdev.coursegrab.ui.components.CourseGrabOutlinedButton
+import com.cornellappdev.coursegrab.ui.components.CourseGrabTitleBar
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.components.SectionStatusIcon
 import com.cornellappdev.coursegrab.ui.components.StatusBarIcons
@@ -105,7 +106,7 @@ private fun CourseDetailsContent(
             ),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            item(key = "header") { DetailsHeader(code = state.code, onBack = onBack) }
+            item(key = "header") { CourseGrabTitleBar(title = state.code, onBack = onBack) }
             item(key = "summary") {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(state.title, style = CourseGrabTextStyles.H2, color = CourseGrabColors.Black)
@@ -134,24 +135,6 @@ private fun CourseDetailsContent(
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
         )
-    }
-}
-
-@Composable
-private fun DetailsHeader(code: String, onBack: () -> Unit) {
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .size(30.dp)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_cg_back),
-                contentDescription = stringResource(R.string.back)
-            )
-        }
-        Text(code, style = CourseGrabTextStyles.H1, color = CourseGrabColors.Black)
     }
 }
 
