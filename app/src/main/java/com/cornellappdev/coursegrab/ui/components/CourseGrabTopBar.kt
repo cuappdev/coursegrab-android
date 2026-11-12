@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
-private val BACK_BUTTON_WIDTH = 50.dp
+internal val BACK_BUTTON_WIDTH = 50.dp
 
 @Composable
 fun CourseGrabTopBar(
