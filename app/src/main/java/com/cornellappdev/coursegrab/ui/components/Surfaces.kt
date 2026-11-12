@@ -27,12 +27,17 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
 val CardShape = RoundedCornerShape(10.dp)
 val PillShape = RoundedCornerShape(100.dp)
 
-fun Modifier.courseGrabShadow(shape: Shape, blur: Dp = 5.dp, offsetY: Dp = 2.dp): Modifier =
+fun Modifier.courseGrabShadow(
+    shape: Shape,
+    blur: Dp = 5.dp,
+    offsetY: Dp = 2.dp,
+    alpha: Float = 0.1f
+): Modifier =
     dropShadow(
         shape = shape,
         shadow = Shadow(
             radius = blur,
-            color = Color.Black.copy(alpha = 0.1f),
+            color = Color.Black.copy(alpha = alpha),
             offset = DpOffset(0.dp, offsetY)
         )
     )

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
@@ -49,6 +50,7 @@ import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
 import com.cornellappdev.coursegrab.ui.components.EmptyState
+import com.cornellappdev.coursegrab.ui.components.StatusBarIcons
 import com.cornellappdev.coursegrab.ui.components.sampleCourse
 import com.cornellappdev.coursegrab.ui.components.EnrollButton
 import com.cornellappdev.coursegrab.ui.components.RemoveButton
@@ -225,8 +227,10 @@ private fun MainTopBar(
         color = Color.Black,
         shadowElevation = 4.dp
     ) {
+        StatusBarIcons(onDarkBackground = true)
         Box(
             modifier = Modifier
+                .statusBarsPadding()
                 .fillMaxWidth()
                 .height(60.dp)
         ) {

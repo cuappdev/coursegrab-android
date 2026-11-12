@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -69,8 +70,10 @@ fun CourseGrabTopBar(
         color = Color.Black,
         shadowElevation = 4.dp
     ) {
+        StatusBarIcons(onDarkBackground = true)
         Box(
             modifier = Modifier
+                .statusBarsPadding()
                 .fillMaxWidth()
                 .height(50.dp)
         ) {

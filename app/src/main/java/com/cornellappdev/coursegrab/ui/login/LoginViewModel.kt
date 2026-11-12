@@ -25,6 +25,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,6 +48,9 @@ class LoginViewModel @Inject constructor(
     private val _effects = Channel<LoginEffect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
 
+    private val _isCheckingSession = MutableStateFlow(true)
+    val isCheckingSession: StateFlow<Boolean> = _isCheckingSession.asStateFlow()
+
     /** Guards against a second sign-in being started while one is already in flight. */
     private var signingIn = false
 
@@ -59,12 +65,16 @@ class LoginViewModel @Inject constructor(
         }
 
         val updateToken = preferencesHelper.updateToken
-        if (updateToken.isNullOrBlank()) return
+        if (updateToken.isNullOrBlank()) {
+            _isCheckingSession.value = false
+            return
+        }
 
         viewModelScope.launch {
             repository.updateSession(updateToken)
                 .onSuccess { verifySession(it) }
                 .onFailure { Log.d(TAG, "Could not resume previous session", it) }
+            _isCheckingSession.value = false
         }
     }
 
