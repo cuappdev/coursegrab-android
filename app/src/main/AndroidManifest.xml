@@ -26,16 +26,7 @@
         <activity
             android:name=".ui.notification.NotificationModal" />
         <activity
-            android:name=".ui.details.CourseDetailsActivity" />
-        <activity
-            android:name=".ui.search.SearchActivity" />
-        <activity
-            android:name=".ui.settings.SettingsActivity" />
-        <activity
-            android:name=".ui.login.LoginActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ui.main.MainActivity" />
+            android:name=".MainActivity" />
 
         <service
             android:name=".service.NotificationService"

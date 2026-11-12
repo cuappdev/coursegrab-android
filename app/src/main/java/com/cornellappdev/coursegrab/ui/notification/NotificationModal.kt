@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import com.cornellappdev.coursegrab.models.CourseNotification
-import com.cornellappdev.coursegrab.ui.main.MainActivity
+import com.cornellappdev.coursegrab.MainActivity
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
 class NotificationModal : ComponentActivity() {
@@ -34,7 +34,11 @@ class NotificationModal : ComponentActivity() {
                         startActivity(Intent(Intent.ACTION_VIEW, STUDENT_CENTER_URL.toUri()))
                     },
                     onBackHome = {
-                        startActivity(Intent(this, MainActivity::class.java))
+                        startActivity(
+                            Intent(this, MainActivity::class.java)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        )
+                        finish()
                     }
                 )
             }

@@ -8,7 +8,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityOptionsCompat
-import com.cornellappdev.coursegrab.ui.login.LoginActivity
+import com.cornellappdev.coursegrab.MainActivity
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 
 class SplashScreenActivity : ComponentActivity() {
@@ -22,19 +22,19 @@ class SplashScreenActivity : ComponentActivity() {
 
         setContent {
             CourseGrabTheme {
-                SplashScreen(onFinished = ::openLogin)
+                SplashScreen(onFinished = ::openApp)
             }
         }
     }
 
-    private fun openLogin() {
+    private fun openApp() {
         if (isFinishing) return
         val fade = ActivityOptionsCompat.makeCustomAnimation(
             this,
             android.R.anim.fade_in,
             android.R.anim.fade_out
         )
-        startActivity(Intent(this, LoginActivity::class.java), fade.toBundle())
+        startActivity(Intent(this, MainActivity::class.java), fade.toBundle())
         finish()
     }
 }
