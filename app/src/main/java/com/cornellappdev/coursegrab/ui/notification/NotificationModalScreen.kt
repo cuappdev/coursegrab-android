@@ -1,36 +1,41 @@
 package com.cornellappdev.coursegrab.ui.notification
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.Course
+import com.cornellappdev.coursegrab.models.SectionStatus
+import com.cornellappdev.coursegrab.ui.components.SectionStatusIcon
+import com.cornellappdev.coursegrab.ui.components.StatusBarIcons
+import com.cornellappdev.coursegrab.ui.components.displaySection
+import com.cornellappdev.coursegrab.ui.components.meshGradientBackground
 import com.cornellappdev.coursegrab.ui.components.sampleCourse
-import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
-import com.cornellappdev.coursegrab.ui.theme.DarkBackground
-import com.cornellappdev.coursegrab.ui.theme.LightText
-import com.cornellappdev.coursegrab.ui.theme.StatusGreen
+import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
+import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
+
+private val PinStyle = TextStyle(fontWeight = FontWeight.Bold, fontSize = 60.sp)
 
 @Composable
 fun NotificationModalScreen(
@@ -39,20 +44,28 @@ fun NotificationModalScreen(
     onBackHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    StatusBarIcons(onDarkBackground = true)
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(DarkBackground)
-            .padding(horizontal = 32.dp, vertical = 48.dp),
+            .meshGradientBackground()
+            .safeDrawingPadding()
+            .padding(horizontal = 24.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = stringResource(R.string.available_now),
-            style = MaterialTheme.typography.titleLarge,
-            fontSize = 22.sp,
-            color = StatusGreen
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SectionStatusIcon(SectionStatus.Open)
+            Text(
+                text = stringResource(R.string.available_now),
+                style = CourseGrabTextStyles.H1,
+                color = CourseGrabColors.Green
+            )
+        }
         Text(
             text = stringResource(
                 R.string.course_title_format,
@@ -60,76 +73,67 @@ fun NotificationModalScreen(
                 course.courseNum,
                 course.title
             ),
-            style = MaterialTheme.typography.headlineSmall,
-            fontSize = 24.sp,
-            color = Color.White,
+            style = CourseGrabTextStyles.H1.copy(fontSize = 24.sp),
+            color = CourseGrabColors.White,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 16.dp)
         )
         Text(
-            text = course.section,
-            style = MaterialTheme.typography.titleLarge,
-            fontSize = 20.sp,
-            color = Color.White,
+            text = course.displaySection,
+            style = CourseGrabTextStyles.H3,
+            color = CourseGrabColors.BellGray,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )
         Text(
             text = course.catalogNum.toString(),
-            style = MaterialTheme.typography.headlineSmall,
-            fontSize = 60.sp,
-            color = Color.White,
+            style = PinStyle,
+            color = CourseGrabColors.White,
             modifier = Modifier.padding(top = 32.dp)
         )
         Text(
             text = stringResource(R.string.course_id),
-            style = MaterialTheme.typography.bodyLarge,
-            color = LightText
+            style = CourseGrabTextStyles.Body,
+            color = CourseGrabColors.BellGray
         )
 
         Spacer(Modifier.height(48.dp))
 
-        OutlinedButton(
+        Button(
             onClick = onOpenStudentCenter,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            shape = RoundedCornerShape(4.dp),
-            border = BorderStroke(1.dp, Color.White),
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.White
+                .height(43.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CourseGrabColors.White,
+                contentColor = CourseGrabColors.Black
             )
         ) {
-            Text(
-                text = stringResource(R.string.open_student_center),
-                fontSize = 18.sp
-            )
+            Text(stringResource(R.string.open_student_center).uppercase(), style = CourseGrabTextStyles.Label)
         }
-
         TextButton(
             onClick = onBackHome,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp)
+                .height(43.dp)
         ) {
             Text(
-                text = stringResource(R.string.back_to_home),
-                color = Color.White,
-                fontSize = 18.sp
+                text = stringResource(R.string.back_to_home).uppercase(),
+                style = CourseGrabTextStyles.Label,
+                color = CourseGrabColors.BellGray
             )
         }
     }
 }
 
-@Preview(widthDp = 360, heightDp = 720)
+@Preview(widthDp = 402, heightDp = 874)
 @Composable
 private fun NotificationModalScreenPreview() {
-    CourseGrabTheme {
-        NotificationModalScreen(
-            course = sampleCourse(),
-            onOpenStudentCenter = {},
-            onBackHome = {}
-        )
-    }
+    NotificationModalScreen(
+        course = sampleCourse(),
+        onOpenStudentCenter = {},
+        onBackHome = {}
+    )
 }
