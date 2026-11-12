@@ -131,7 +131,7 @@ private fun MainContent(
                         items(state.available, key = { it.catalogNum }) { course ->
                             CourseRow(
                                 course = course,
-                                onClick = { onOpenCourse(course.catalogNum) }
+                                onClick = { onOpenCourse(course.courseId) }
                             ) {
                                 RemoveButton(
                                     onClick = { onRemoveCourse(course.catalogNum) },
@@ -162,7 +162,7 @@ private fun MainContent(
                         items(state.awaiting, key = { it.catalogNum }) { course ->
                             CourseRow(
                                 course = course,
-                                onClick = { onOpenCourse(course.catalogNum) }
+                                onClick = { onOpenCourse(course.courseId) }
                             ) {
                                 RemoveButton(
                                     onClick = { onRemoveCourse(course.catalogNum) },
