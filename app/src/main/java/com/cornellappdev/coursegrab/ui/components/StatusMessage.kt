@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
@@ -53,7 +52,7 @@ fun StatusMessage(
             )
             Text(
                 text = stringResource(subtitle),
-                style = CourseGrabTextStyles.H1.copy(fontSize = 18.sp),
+                style = CourseGrabTextStyles.H2,
                 color = CourseGrabColors.DarkGray,
                 textAlign = TextAlign.Center
             )
