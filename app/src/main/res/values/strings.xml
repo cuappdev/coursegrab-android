@@ -12,6 +12,7 @@
     <string name="sign_out">Sign Out</string>
 
     <string name="welcome">Welcome to</string>
+    <string name="powered_by_appdev">Powered by Cornell AppDev</string>
 
     <string name="notification_title">
         A course you were tracking on CourseGrab now has an open slot! Hurry to Student Center to snatch it before someone else does!
