@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity() {
 
             holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
-                    availableCourses[position].catalogNum
+                    availableCourses[position].courseId
                 )
             }
         }
@@ -281,7 +281,7 @@ class MainActivity : AppCompatActivity() {
             }
             holder.backgroundButton.setOnClickListener {
                 (context as MainActivity).editCourse(
-                    awaitingCourses[position].catalogNum
+                    awaitingCourses[position].courseId
                 )
             }
         }
