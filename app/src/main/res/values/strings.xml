@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">CourseGrab</string>
     <string name="settings">Settings</string>
     <string name="back">Back</string>
@@ -61,4 +61,9 @@
     <string name="course_id">Course ID</string>
     <string name="open_student_center">Open Student Center</string>
     <string name="back_to_home">Back to Home</string>
+    <string name="status_waitlisted">Waitlisted</string>
+    <string name="status_open_count" tools:ignore="PluralsCandidate">%d Open</string>
+    <string name="status_closed_count" tools:ignore="PluralsCandidate">%d Closed</string>
+    <string name="status_waitlisted_count" tools:ignore="PluralsCandidate">%d Waitlisted</string>
+    <string name="search_for_a_course">Search for a course…</string>
 </resources>
