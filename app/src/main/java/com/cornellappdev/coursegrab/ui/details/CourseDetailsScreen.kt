@@ -1,22 +1,25 @@
 package com.cornellappdev.coursegrab.ui.details
 
-import androidx.compose.foundation.BorderStroke
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -27,35 +30,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.Course
-import com.cornellappdev.coursegrab.ui.components.CourseGrabTopBar
+import com.cornellappdev.coursegrab.ui.components.CourseGrabCard
+import com.cornellappdev.coursegrab.ui.components.CourseGrabOutlinedButton
 import com.cornellappdev.coursegrab.ui.components.EffectHandler
-import com.cornellappdev.coursegrab.ui.components.RemoveButton
-import com.cornellappdev.coursegrab.ui.components.SAMPLE_INSTRUCTOR
-import com.cornellappdev.coursegrab.ui.components.StatusIndicator
+import com.cornellappdev.coursegrab.ui.components.SectionStatusIcon
+import com.cornellappdev.coursegrab.ui.components.StatusBarIcons
+import com.cornellappdev.coursegrab.ui.components.displayInstructor
+import com.cornellappdev.coursegrab.ui.components.displaySection
 import com.cornellappdev.coursegrab.ui.components.sampleCourse
-import com.cornellappdev.coursegrab.ui.components.TrackButton
-import com.cornellappdev.coursegrab.ui.theme.CardBorder
-import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
+import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
+import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
 
 @Composable
 fun CourseDetailsScreen(
-    onBack: () -> Unit,
+    onBack: (trackingChanged: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CourseDetailsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
+
+    StatusBarIcons(onDarkBackground = false)
+    BackHandler { onBack(state.hasTrackingChanges) }
 
     EffectHandler(viewModel.trackingErrors) { error ->
         snackbarHostState.showSnackbar(error.message ?: resources.getString(error.fallback))
@@ -65,7 +73,7 @@ fun CourseDetailsScreen(
         state = state,
         snackbarHostState = snackbarHostState,
         onSetTracking = viewModel::setTracking,
-        onBack = onBack,
+        onBack = { onBack(state.hasTrackingChanges) },
         modifier = modifier
     )
 }
@@ -78,154 +86,194 @@ private fun CourseDetailsContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            CourseGrabTopBar(
-                title = stringResource(
-                    R.string.course_header_format,
-                    state.subjectCode,
-                    state.courseNum
-                ),
-                onBack = onBack
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { padding ->
-        Column(
+    val layout = remember(state.sections) { layoutSections(state.sections) }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(CourseGrabColors.White)
+    ) {
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .statusBarsPadding(),
+            contentPadding = PaddingValues(
+                start = 24.dp,
+                end = 24.dp,
+                top = 16.dp,
+                bottom = 24.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            ),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            CourseHeaderCard(
-                title = state.title,
-                instructor = state.instructor ?: stringResource(R.string.instructor_unassigned),
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
-            )
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 20.dp)
-            ) {
-                items(state.sections, key = { it.catalogNum }) { section ->
-                    SectionRow(
+            item(key = "header") { DetailsHeader(code = state.code, onBack = onBack) }
+            item(key = "summary") {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(state.title, style = CourseGrabTextStyles.H2, color = CourseGrabColors.Black)
+                    layout.primary?.let { PrimarySection(it, onSetTracking) }
+                }
+            }
+            layout.groups.forEach { group ->
+                item(key = "group-${group.type}") {
+                    Text(
+                        text = stringResource(R.string.section_group_title, sectionTypeName(group.type)),
+                        style = CourseGrabTextStyles.H3,
+                        color = CourseGrabColors.Black
+                    )
+                }
+                items(group.sections, key = { it.catalogNum }) { section ->
+                    SectionCard(
                         section = section,
-                        onTrack = { onSetTracking(section.catalogNum, true) },
-                        onUntrack = { onSetTracking(section.catalogNum, false) }
+                        onTrackingChange = { onSetTracking(section.catalogNum, it) }
                     )
                 }
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+        )
     }
 }
 
 @Composable
-private fun CourseHeaderCard(
-    title: String,
-    instructor: String,
-    modifier: Modifier = Modifier
-) {
-    OutlinedCard(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(6.dp),
-        border = BorderStroke(1.dp, CardBorder),
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(modifier = Modifier.padding(start = 14.dp, top = 12.dp, bottom = 16.dp)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontSize = 18.sp,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = instructor,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 4.dp)
+private fun DetailsHeader(code: String, onBack: () -> Unit) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .size(30.dp)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_cg_back),
+                contentDescription = stringResource(R.string.back)
             )
         }
+        Text(code, style = CourseGrabTextStyles.H1, color = CourseGrabColors.Black)
     }
 }
 
 @Composable
-private fun SectionRow(
-    section: Course,
-    onTrack: () -> Unit,
-    onUntrack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        StatusIndicator(isOpen = section.isOpen)
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 16.dp, end = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+private fun PrimarySection(section: Course, onSetTracking: (Int, Boolean) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            SectionStatusIcon(section.sectionStatus)
+            Text(section.displaySection, style = CourseGrabTextStyles.H3, color = CourseGrabColors.Black)
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(section.mode, style = CourseGrabTextStyles.Body, color = CourseGrabColors.DarkGray)
             Text(
-                text = section.section,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                text = section.displayInstructor() ?: stringResource(R.string.instructor_staff),
+                style = CourseGrabTextStyles.Body,
+                color = CourseGrabColors.DarkGray
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        }
+        CourseGrabOutlinedButton(
+            onClick = { onSetTracking(section.catalogNum, !section.isTracking) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_tracking_ppl_logo),
-                    contentDescription = null
+                    painter = painterResource(R.drawable.ic_cg_track_bell),
+                    contentDescription = null,
+                    modifier = Modifier.size(width = 15.dp, height = 16.dp)
                 )
                 Text(
-                    text = pluralStringResource(
-                        R.plurals.tracking_count,
-                        section.numTracking,
-                        section.numTracking
-                    ),
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(start = 4.dp)
+                    text = stringResource(
+                        if (section.isTracking) R.string.tracking_button else R.string.track_button
+                    ).uppercase(),
+                    style = CourseGrabTextStyles.Label,
+                    color = if (section.isTracking) CourseGrabColors.Black else CourseGrabColors.DarkGray
                 )
             }
         }
-        if (section.isTracking) {
-            RemoveButton(onClick = onUntrack, modifier = Modifier.height(26.dp))
-        } else {
-            TrackButton(onClick = onTrack, modifier = Modifier.height(26.dp))
+    }
+}
+
+@Composable
+private fun SectionCard(section: Course, onTrackingChange: (Boolean) -> Unit) {
+    CourseGrabCard {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                SectionStatusIcon(section.sectionStatus, Modifier.padding(top = 1.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(section.displaySection, style = CourseGrabTextStyles.H3, color = CourseGrabColors.Black)
+                    Text(
+                        text = listOfNotNull(section.mode.ifBlank { null }, section.displayInstructor())
+                            .joinToString(" · "),
+                        style = CourseGrabTextStyles.Body,
+                        color = CourseGrabColors.DarkGray
+                    )
+                }
+            }
+            TrackingToggle(tracking = section.isTracking, onChange = onTrackingChange)
         }
     }
 }
 
-private val SampleState = CourseDetailsState(
-    subjectCode = "CS",
-    courseNum = 1998,
-    title = "Intro to Android Development",
-    instructor = SAMPLE_INSTRUCTOR,
-    sections = listOf(
-        sampleCourse(catalogNum = 10032, section = "LEC 001 / M 7:30PM"),
-        sampleCourse(
-            catalogNum = 10033,
-            section = "LEC 002 / W 7:30PM",
-            isOpen = false,
-            isTracking = true,
-            numTracking = 3
-        )
-    )
-)
-
-@Preview(showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
-private fun CourseDetailsScreenPreview() {
-    CourseGrabTheme {
-        CourseDetailsContent(
-            state = SampleState,
-            snackbarHostState = remember { SnackbarHostState() },
-            onSetTracking = { _, _ -> },
-            onBack = {}
+private fun TrackingToggle(tracking: Boolean, onChange: (Boolean) -> Unit) {
+    val label = stringResource(R.string.track_button)
+    val state = stringResource(if (tracking) R.string.tracking_on else R.string.tracking_off)
+    IconButton(
+        onClick = { onChange(!tracking) },
+        modifier = Modifier
+            .size(28.dp)
+            .semantics {
+                role = Role.Switch
+                stateDescription = state
+            }
+    ) {
+        Image(
+            painter = painterResource(
+                if (tracking) R.drawable.ic_cg_tracking_on else R.drawable.ic_cg_tracking_off
+            ),
+            contentDescription = label
         )
     }
+}
+
+@Composable
+private fun sectionTypeName(type: String): String = when (type) {
+    "LEC" -> stringResource(R.string.section_type_lecture)
+    "DIS" -> stringResource(R.string.section_type_discussion)
+    "LAB" -> stringResource(R.string.section_type_lab)
+    "SEM" -> stringResource(R.string.section_type_seminar)
+    "IND" -> stringResource(R.string.section_type_independent)
+    else -> type
+}
+
+@Preview(widthDp = 402, heightDp = 874)
+@Composable
+private fun CourseDetailsPreview() {
+    CourseDetailsContent(
+        state = CourseDetailsState(
+            subjectCode = "ANTHR",
+            courseNum = 1400,
+            title = "Introduction to Sociocultural Anthropology",
+            sections = listOf(
+                sampleCourse(catalogNum = 1, section = "LEC 001 / MW 10:10AM"),
+                sampleCourse(catalogNum = 2, section = "DIS 201 / R 9:05AM", isOpen = false),
+                sampleCourse(catalogNum = 3, section = "DIS 202 / R 10:10AM", isTracking = true)
+            )
+        ),
+        snackbarHostState = remember { SnackbarHostState() },
+        onSetTracking = { _, _ -> },
+        onBack = {}
+    )
 }
