@@ -23,16 +23,14 @@ import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabColors
 import com.cornellappdev.coursegrab.ui.theme.CourseGrabTextStyles
 
-fun Modifier.searchFieldSurface(): Modifier = this
-    .courseGrabShadow(PillShape, blur = 2.dp)
-    .clip(PillShape)
-    .background(CourseGrabColors.LightGray)
-    .padding(horizontal = 16.dp, vertical = 12.dp)
-
 @Composable
 fun SearchFieldRow(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     Row(
-        modifier = modifier.searchFieldSurface(),
+        modifier = modifier
+            .courseGrabShadow(PillShape, blur = 2.dp)
+            .clip(PillShape)
+            .background(CourseGrabColors.LightGray)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
