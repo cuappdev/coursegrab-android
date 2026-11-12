@@ -104,10 +104,7 @@ private fun SearchContent(
                     },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = {
-                        onQueryChanged(query)
-                        keyboard?.hide()
-                    }),
+                    keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
