@@ -12,6 +12,7 @@ import androidx.compose.ui.node.CompositionLocalConsumerModifierNode
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.currentValueOf
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +26,9 @@ fun Modifier.meshGradientBackground(): Modifier = this then MeshGradientElement
 private data object MeshGradientElement : ModifierNodeElement<MeshGradientNode>() {
     override fun create() = MeshGradientNode()
     override fun update(node: MeshGradientNode) = Unit
+    override fun InspectorInfo.inspectableProperties() {
+        name = "meshGradientBackground"
+    }
 }
 
 private class MeshGradientNode :
