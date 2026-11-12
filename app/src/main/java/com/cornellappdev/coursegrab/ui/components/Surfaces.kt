@@ -3,6 +3,7 @@ package com.cornellappdev.coursegrab.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,13 +56,14 @@ fun Modifier.outlinedSurface(
 @Composable
 fun CourseGrabCard(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .outlinedSurface(CardShape)
-            .padding(16.dp),
+            .padding(contentPadding),
         content = content
     )
 }

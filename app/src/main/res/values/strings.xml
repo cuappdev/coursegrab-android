@@ -15,9 +15,7 @@
 
     <string name="default_notification_channel_id">coursegrab_alert</string>
 
-    <string name="search_courses_hint">Find Courses</string>
 
-    <string name="no_courses_alert">No Courses Currently Tracked</string>
 
     <string name="remove_button">Remove</string>
     <string name="track_button">Track</string>
@@ -72,4 +70,6 @@
     <string name="pin_label">PIN:</string>
     <string name="pin_copied">PIN copied</string>
     <string name="instructor_staff">Staff</string>
+    <string name="no_results">No Results</string>
+    <string name="close_search">Close search</string>
 </resources>
