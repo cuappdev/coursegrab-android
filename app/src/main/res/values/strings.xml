@@ -2,7 +2,6 @@
     <string name="app_name">CourseGrab</string>
     <string name="settings">Settings</string>
     <string name="back">Back</string>
-    <string name="details">Details</string>
 
     <string name="email_alerts">Email Alerts</string>
     <string name="mobile_alerts">Mobile Alerts</string>
@@ -14,9 +13,6 @@
     <string name="welcome">Welcome to</string>
     <string name="powered_by_appdev">Powered by Cornell AppDev</string>
 
-    <string name="notification_title">
-        A course you were tracking on CourseGrab now has an open slot! Hurry to Student Center to snatch it before someone else does!
-    </string>
     <string name="default_notification_channel_id">coursegrab_alert</string>
 
     <string name="search_courses_hint">Find Courses</string>
@@ -34,10 +30,6 @@
     <string name="track_course_failed">Couldn\'t track that course.</string>
     <string name="untrack_course_failed">Couldn\'t remove that course.</string>
 
-    <string name="no_results_alert">No results</string>
-    <string name="no_results_alert_subtext_start_searching">
-        Enter a query above to start searching
-    </string>
     <string name="requires_longer_search">Too few characters</string>
     <string name="requires_longer_search_subtext">
         Please type at least 3 characters
@@ -69,7 +61,4 @@
     <string name="course_id">Course ID</string>
     <string name="open_student_center">Open Student Center</string>
     <string name="back_to_home">Back to Home</string>
-    <string name="title_activity_splash_screen">SplashScreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
