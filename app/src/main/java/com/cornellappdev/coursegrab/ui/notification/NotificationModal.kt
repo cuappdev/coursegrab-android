@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import com.cornellappdev.coursegrab.models.CourseNotification
@@ -13,6 +14,7 @@ import com.cornellappdev.coursegrab.ui.theme.CourseGrabTheme
 class NotificationModal : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val notification = IntentCompat.getParcelableExtra(
