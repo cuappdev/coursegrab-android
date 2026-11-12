@@ -24,9 +24,27 @@ data class CourseDetailsState(
     val subjectCode: String = "",
     val courseNum: Int = 0,
     val title: String = "",
-    val instructor: String? = null,
-    val sections: List<Course> = emptyList()
-)
+    val sections: List<Course> = emptyList(),
+    val hasTrackingChanges: Boolean = false
+) {
+    val code: String get() = "$subjectCode $courseNum"
+}
+
+data class SectionGroup(val type: String, val sections: List<Course>)
+
+data class SectionLayout(val primary: Course?, val groups: List<SectionGroup>)
+
+fun layoutSections(sections: List<Course>): SectionLayout {
+    val groups = sections
+        .groupBy { it.section.substringBefore(' ') }
+        .map { (type, members) -> SectionGroup(type, members) }
+    val first = groups.firstOrNull()
+    return if (first != null && first.sections.size == 1) {
+        SectionLayout(primary = first.sections.single(), groups = groups.drop(1))
+    } else {
+        SectionLayout(primary = null, groups = groups)
+    }
+}
 
 data class TrackingError(val message: String?, @StringRes val fallback: Int)
 
@@ -47,11 +65,12 @@ class CourseDetailsViewModel @Inject constructor(
             subjectCode = course.subjectCode,
             courseNum = course.courseNum,
             title = course.title,
-            instructor = course.sections.firstOrNull()?.instructors?.firstOrNull(),
             sections = course.sections
         )
     )
     val state: StateFlow<CourseDetailsState> = _state.asStateFlow()
+
+    private val initialTracking = course.sections.associate { it.catalogNum to it.isTracking }
 
     fun setTracking(catalogNum: Int, tracking: Boolean) {
         val before = _state.value.sections
@@ -68,7 +87,10 @@ class CourseDetailsViewModel @Inject constructor(
                     "Failed to ${if (tracking) "track" else "untrack"} $catalogNum",
                     error
                 )
-                _state.value = _state.value.copy(sections = before)
+                _state.value = _state.value.copy(
+                    sections = before,
+                    hasTrackingChanges = before.any { it.isTracking != initialTracking[it.catalogNum] }
+                )
                 _trackingErrors.send(
                     TrackingError(
                         message = error.message,
@@ -81,10 +103,12 @@ class CourseDetailsViewModel @Inject constructor(
     }
 
     private fun updateSection(catalogNum: Int, transform: (Course) -> Course) {
+        val sections = _state.value.sections.map { section ->
+            if (section.catalogNum == catalogNum) transform(section) else section
+        }
         _state.value = _state.value.copy(
-            sections = _state.value.sections.map { section ->
-                if (section.catalogNum == catalogNum) transform(section) else section
-            }
+            sections = sections,
+            hasTrackingChanges = sections.any { it.isTracking != initialTracking[it.catalogNum] }
         )
     }
 

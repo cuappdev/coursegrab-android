@@ -17,10 +17,8 @@
 
 
 
-    <string name="remove_button">Remove</string>
     <string name="track_button">Track</string>
     <string name="enroll_button">Enroll</string>
-    <string name="instructor_unassigned">To Be Assigned</string>
     <string name="track_course_failed">Couldn\'t track that course.</string>
     <string name="untrack_course_failed">Couldn\'t remove that course.</string>
 
@@ -33,11 +31,6 @@
     </string>
     <!-- Course display formats: "CS 2110: Object-Oriented Programming" -->
     <string name="course_title_format">%1$s %2$d: %3$s</string>
-    <string name="course_header_format">%1$s %2$d</string>
-    <plurals name="tracking_count">
-        <item quantity="one">%d Tracking</item>
-        <item quantity="other">%d Tracking</item>
-    </plurals>
     <string name="status_open">Open</string>
     <string name="status_closed">Closed</string>
     <plurals name="search_results_count">
@@ -72,4 +65,13 @@
     <string name="instructor_staff">Staff</string>
     <string name="no_results">No Results</string>
     <string name="close_search">Close search</string>
+    <string name="tracking_button">Tracking</string>
+    <string name="tracking_on">Tracking</string>
+    <string name="tracking_off">Not tracking</string>
+    <string name="section_group_title">%1$s Sections</string>
+    <string name="section_type_lecture">Lecture</string>
+    <string name="section_type_discussion">Discussion</string>
+    <string name="section_type_lab">Lab</string>
+    <string name="section_type_seminar">Seminar</string>
+    <string name="section_type_independent">Independent Study</string>
 </resources>

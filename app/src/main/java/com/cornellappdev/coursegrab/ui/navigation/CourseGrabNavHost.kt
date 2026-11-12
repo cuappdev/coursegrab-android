@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -58,8 +59,15 @@ fun CourseGrabNavHost(
             )
         }
 
-        composable<Route.CourseDetails>(typeMap = Route.CourseDetails.typeMap) {
-            CourseDetailsScreen(onBack = dropUnlessResumed { navController.popBackStack() })
+        composable<Route.CourseDetails>(typeMap = Route.CourseDetails.typeMap) { entry ->
+            CourseDetailsScreen(
+                onBack = { trackingChanged ->
+                    if (entry.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        if (trackingChanged) navController.popBackStack<Route.Home>(inclusive = false)
+                        else navController.popBackStack()
+                    }
+                }
+            )
         }
 
         composable<Route.Settings> {
