@@ -17,8 +17,7 @@ data class Course(
     @SerialName("subject_code") val subjectCode: String = "",
     val title: String = "",
     @SerialName("num_tracking") val numTracking: Int = 0,
-    val mode: String = "",
-    val errors: List<String>? = null
+    val mode: String = ""
 ) : Parcelable {
 
     val isOpen: Boolean get() = status == STATUS_OPEN

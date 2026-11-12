@@ -1,5 +1,6 @@
 package com.cornellappdev.coursegrab.networking
 
+import android.util.Log
 import com.cornellappdev.coursegrab.data.PreferencesHelper
 import com.cornellappdev.coursegrab.models.ApiResponse
 import com.cornellappdev.coursegrab.models.Course
@@ -75,15 +76,15 @@ class CourseGrabRepository @Inject constructor(
             if (envelope.success) {
                 Result.success(envelope)
             } else {
-                Result.failure(
-                    ApiException(
-                        (envelope.data as? Course)?.errors?.firstOrNull() ?: "Request failed"
-                    )
-                )
+                Result.failure(ApiException(envelope.errors.firstOrNull() ?: "Request failed"))
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Result.failure(e)
-        }
+        }.onFailure { Log.w(TAG, "Request failed", it) }
+
+    private companion object {
+        const val TAG = "CourseGrabRepository"
+    }
 }
