@@ -13,9 +13,6 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.cornellappdev.coursegrab.ui.details.CourseDetailsActivity
 import com.cornellappdev.coursegrab.ui.search.SearchActivity
 import com.cornellappdev.coursegrab.ui.settings.SettingsActivity
