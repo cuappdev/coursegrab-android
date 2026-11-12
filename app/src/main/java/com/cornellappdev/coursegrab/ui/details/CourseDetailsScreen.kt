@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -54,9 +55,10 @@ fun CourseDetailsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
 
-    EffectHandler(viewModel.trackingErrors) { message ->
-        snackbarHostState.showSnackbar(message)
+    EffectHandler(viewModel.trackingErrors) { error ->
+        snackbarHostState.showSnackbar(error.message ?: resources.getString(error.fallback))
     }
 
     CourseDetailsContent(
@@ -98,7 +100,7 @@ private fun CourseDetailsContent(
         ) {
             CourseHeaderCard(
                 title = state.title,
-                instructor = state.instructor,
+                instructor = state.instructor ?: stringResource(R.string.instructor_unassigned),
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
             )
             LazyColumn(

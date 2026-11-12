@@ -1,9 +1,11 @@
 package com.cornellappdev.coursegrab.ui.details
 
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cornellappdev.coursegrab.R
 import com.cornellappdev.coursegrab.models.Course
 import com.cornellappdev.coursegrab.models.SearchResult
 import com.cornellappdev.coursegrab.networking.CourseGrabRepository
@@ -20,9 +22,11 @@ data class CourseDetailsState(
     val subjectCode: String = "",
     val courseNum: Int = 0,
     val title: String = "",
-    val instructor: String = "",
+    val instructor: String? = null,
     val sections: List<Course> = emptyList()
 )
+
+data class TrackingError(val message: String?, @StringRes val fallback: Int)
 
 @HiltViewModel
 class CourseDetailsViewModel @Inject constructor(
@@ -30,7 +34,7 @@ class CourseDetailsViewModel @Inject constructor(
     private val repository: CourseGrabRepository
 ) : ViewModel() {
 
-    private val _trackingErrors = Channel<String>(Channel.BUFFERED)
+    private val _trackingErrors = Channel<TrackingError>(Channel.BUFFERED)
     val trackingErrors = _trackingErrors.receiveAsFlow()
 
     private val course: SearchResult =
@@ -41,8 +45,7 @@ class CourseDetailsViewModel @Inject constructor(
             subjectCode = course.subjectCode,
             courseNum = course.courseNum,
             title = course.title,
-            instructor = course.sections.firstOrNull()?.instructors?.firstOrNull()
-                ?: UNASSIGNED_INSTRUCTOR,
+            instructor = course.sections.firstOrNull()?.instructors?.firstOrNull(),
             sections = course.sections
         )
     )
@@ -65,8 +68,11 @@ class CourseDetailsViewModel @Inject constructor(
                 )
                 _state.value = _state.value.copy(sections = before)
                 _trackingErrors.send(
-                    error.message ?: if (tracking) "Couldn't track that course."
-                    else "Couldn't remove that course."
+                    TrackingError(
+                        message = error.message,
+                        fallback = if (tracking) R.string.track_course_failed
+                        else R.string.untrack_course_failed
+                    )
                 )
             }
         }
@@ -82,6 +88,5 @@ class CourseDetailsViewModel @Inject constructor(
 
     private companion object {
         const val TAG = "CourseDetailsViewModel"
-        const val UNASSIGNED_INSTRUCTOR = "To Be Assigned"
     }
 }
