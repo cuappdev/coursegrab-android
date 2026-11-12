@@ -21,9 +21,14 @@ data class Course(
     val mode: String = ""
 ) : Parcelable {
 
-    val isOpen: Boolean get() = status == STATUS_OPEN
+    val isOpen: Boolean get() = sectionStatus == SectionStatus.Open
 
-    private companion object {
-        const val STATUS_OPEN = "OPEN"
-    }
+    val sectionStatus: SectionStatus
+        get() = when (status) {
+            "OPEN" -> SectionStatus.Open
+            "WAITLISTED" -> SectionStatus.Waitlisted
+            else -> SectionStatus.Closed
+        }
 }
+
+enum class SectionStatus { Open, Closed, Waitlisted }

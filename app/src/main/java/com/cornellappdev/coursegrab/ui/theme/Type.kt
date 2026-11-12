@@ -33,3 +33,12 @@ val CourseGrabTypography = Typography(
         fontSize = 14.sp
     )
 )
+
+object CourseGrabTextStyles {
+    val H1 = TextStyle(fontWeight = FontWeight.Medium, fontSize = 20.sp)
+    val H3 = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp)
+    val H4 = TextStyle(fontWeight = FontWeight.Normal, fontSize = 16.sp)
+    val Body = TextStyle(fontWeight = FontWeight.Medium, fontSize = 14.sp)
+    val Label = Body
+    val H5 = Body
+}
